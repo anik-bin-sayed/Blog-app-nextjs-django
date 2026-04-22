@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>Activate Your Account | Secure Email Verification</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          Roboto,
+          Helvetica,
+          Arial,
+          sans-serif;
+        background: linear-gradient(135deg, #f5f7fc 0%, #eef2f8 100%);
+        padding: 2rem 1.5rem;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+      }
+
+      .activation-card {
+        max-width: 560px;
+        width: 100%;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 2rem;
+        box-shadow:
+          0 25px 45px -12px rgba(0, 0, 0, 0.2),
+          0 4px 12px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .activation-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 30px 50px -15px rgba(0, 0, 0, 0.25);
+      }
+
+      .card-header {
+        background: linear-gradient(120deg, #1e2a3e 0%, #0f1a24 100%);
+        padding: 2rem 2rem 1.8rem;
+        text-align: center;
+        color: white;
+      }
+
+      .icon-wrapper {
+        display: inline-flex;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(4px);
+        border-radius: 60px;
+        padding: 0.8rem;
+        margin-bottom: 1rem;
+      }
+
+      .icon-envelope {
+        font-size: 2.8rem;
+        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+      }
+
+      .card-header h1 {
+        font-size: 1.9rem;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+        margin-bottom: 0.4rem;
+      }
+
+      .card-header p {
+        font-size: 0.95rem;
+        opacity: 0.85;
+        margin-top: 0.3rem;
+      }
+
+      .card-content {
+        padding: 2.2rem 2rem 2rem;
+      }
+
+      .greeting {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #0f172a;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .greeting span {
+        background: #fef3c7;
+        color: #b45309;
+        font-size: 1rem;
+        font-weight: 500;
+        padding: 0.2rem 0.7rem;
+        border-radius: 40px;
+        letter-spacing: -0.2px;
+      }
+
+      .message {
+        color: #334155;
+        line-height: 1.5;
+        font-size: 1rem;
+        margin: 1rem 0 1.5rem 0;
+      }
+
+      .message strong {
+        color: #0f172a;
+        font-weight: 600;
+      }
+
+      .btn-container {
+        text-align: center;
+        margin: 2rem 0 1.5rem;
+      }
+
+      .activate-btn {
+        display: inline-block;
+        background: linear-gradient(105deg, #c62828 0%, #b71c1c 100%);
+        color: white;
+        font-weight: 700;
+        font-size: 1.1rem;
+        padding: 0.9rem 2rem;
+        border-radius: 10px;
+        text-decoration: none;
+        letter-spacing: 0.3px;
+        transition: all 0.25s ease;
+        border: none;
+        cursor: pointer;
+        text-align: center;
+        min-width: 220px;
+      }
+
+      .activate-btn:hover {
+        background: linear-gradient(105deg, #b71c1c 0%, #8e0000 100%);
+        transform: scale(1.02);
+        box-shadow: 0 12px 24px -8px rgba(183, 28, 28, 0.5);
+        text-decoration: none;
+        color: white;
+      }
+
+      .activate-btn:active {
+        transform: scale(0.98);
+      }
+
+      .fallback-link {
+        margin: 1.2rem 0 0.8rem;
+        text-align: center;
+        font-size: 0.8rem;
+        background: #f8fafc;
+        padding: 0.8rem;
+        border-radius: 1rem;
+        border-left: 3px solid #cbd5e1;
+      }
+
+      .fallback-link p {
+        color: #020810;
+        word-break: break-all;
+        font-family: monospace;
+        font-size: 0.75rem;
+        margin-top: 0.4rem;
+        background: #ffffffd9;
+        padding: 0.4rem 0.6rem;
+        border-radius: 12px;
+        display: inline-block;
+        max-width: 100%;
+        overflow-x: auto;
+      }
+
+      .fallback-link a {
+        color: #c62828;
+        text-decoration: underline;
+        font-weight: 500;
+      }
+
+      .info-note {
+        background: #fefce8;
+        border-radius: 1rem;
+        padding: 0.9rem;
+        margin: 1.2rem 0 0.5rem;
+        font-size: 0.85rem;
+        color: #854d0e;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        border: 1px solid #fde047;
+      }
+
+      .info-note .emoji {
+        font-size: 1.1rem;
+      }
+
+      .card-footer {
+        background: #f9fafb;
+        border-top: 1px solid #e9edf2;
+        padding: 1.2rem 2rem;
+        text-align: center;
+        font-size: 0.75rem;
+        color: #5b6e8c;
+      }
+
+      .card-footer p {
+        margin: 0.2rem 0;
+      }
+
+      .footer-links {
+        margin-top: 0.5rem;
+        display: flex;
+        justify-content: center;
+        gap: 1.2rem;
+        font-size: 0.7rem;
+      }
+
+      .footer-links a {
+        color: #5b6e8c;
+        text-decoration: none;
+      }
+
+      .footer-links a:hover {
+        color: #c62828;
+        text-decoration: underline;
+      }
+
+      @media (max-width: 560px) {
+        body {
+          padding: 1rem;
+        }
+        .card-header {
+          padding: 1.5rem 1rem;
+        }
+        .card-header h1 {
+          font-size: 1.5rem;
+        }
+        .card-content {
+          padding: 1.5rem;
+        }
+        .greeting {
+          font-size: 1.3rem;
+        }
+        .activate-btn {
+          width: 100%;
+          padding: 0.8rem 1rem;
+          font-size: 1rem;
+        }
+        .btn-container {
+          margin: 1.5rem 0 1rem;
+        }
+        .fallback-link p {
+          font-size: 0.7rem;
+        }
+        .info-note {
+          font-size: 0.75rem;
+        }
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: linear-gradient(135deg, #121826 0%, #0c1119 100%);
+        }
+        .activation-card {
+          background: #1e293b;
+          box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.5);
+        }
+        .card-header {
+          background: linear-gradient(120deg, #0f172a 0%, #020617 100%);
+        }
+        .card-content {
+          color: #e2e8f0;
+        }
+        .greeting {
+          color: #f1f5f9;
+        }
+        .greeting span {
+          background: #422006;
+          color: #fed7aa;
+        }
+        .message {
+          color: #cbd5e1;
+        }
+        .message strong {
+          color: #facc15;
+        }
+        .fallback-link {
+          background: #0f172a;
+          border-left-color: #c62828;
+        }
+        .fallback-link p {
+          background: #1e293b;
+          color: #cbd5e6;
+        }
+        .info-note {
+          background: #33210a;
+          border-color: #c2410c;
+          color: #fed7aa;
+        }
+        .card-footer {
+          background: #111827;
+          border-top-color: #2d3a4e;
+          color: #94a3b8;
+        }
+        .footer-links a {
+          color: #94a3b8;
+        }
+        .footer-links a:hover {
+          color: #ef4444;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="activation-card">
+      <div class="card-header">
+        <h1>Activate account</h1>
+        <p>Secure verification • one click access</p>
+      </div>
+
+      <div class="card-content">
+        <div class="greeting">Hello, <span>{{ user.username }}</span></div>
+        <div class="message">
+          <strong>You're almost there!</strong> Please confirm your email
+          address to unlock full access to your account. Click the secure button
+          below and you'll be redirected to activate your profile.
+        </div>
+
+        <div class="btn-container">
+          <a href="{{ activation_link }}" class="activate-btn" target="_blank">
+            Activate Account
+          </a>
+        </div>
+
+        <div class="fallback-link">
+          <p>
+            If the button doesn't work, copy and paste this link into your
+            browser:
+          </p>
+          <p style="word-break: break-all">{{ activation_link }}</p>
+          <small
+            ><a
+              href="{{ activation_link }}"
+              target="_blank"
+              style="color: #c62828"
+              >direct link (click here)
+            </a></small
+          >
+        </div>
+
+        <div class="info-note">
+          <span
+            >This activation link expires in <strong>24 hours</strong> for your
+            security.</span
+          >
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <p>Didn’t request this? You can safely ignore this email.</p>
+        <p>
+          Need help? Contact our <strong>support team</strong> — we're here
+          24/7.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
