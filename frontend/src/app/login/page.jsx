@@ -6,6 +6,7 @@ import Input from "@/components/ui/input";
 import TextLink from "@/components/ui/textLink";
 import SubmitButton from "@/components/ui/submitButton";
 import { MdOutlineErrorOutline } from "react-icons/md";
+import { useLoginMutation } from "@/redux/services/auth/authApi";
 
 const initialFormData = {
   email: "",
@@ -14,10 +15,11 @@ const initialFormData = {
 export default function RegisterPage() {
   const [formData, setFormData] = useState(initialFormData);
   const [acceptTerms, setAcceptTerms] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [error, setError] = useState("");
   const [serverMessage, setServerMessage] = useState(null);
+
+  const [login, { isLoading }] = useLoginMutation();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,23 +33,22 @@ export default function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    setIsLoading(true);
     setServerMessage(null);
 
     try {
-      console.log(formData);
-      setFormData(initialFormData);
-      setAcceptTerms(false);
+      const res = await login(formData).unwrap();
+      console.log(res);
+      // setFormData(initialFormData);
     } catch (err) {
       console.log(err);
     }
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-amber-50 via-white to-orange-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className=" h-[calc(100vh-65px)] bg-linear-to-br from-amber-50 via-white to-orange-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-xl mx-auto">
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-amber-100">
-          <div className="p-8 md:p-10 border">
+          <div className="p-8 md:p-10">
             <div className="mb-6">
               <h3 className="text-2xl font-bold text-gray-800">Sign in</h3>
               <p className="text-gray-500 mt-1">
