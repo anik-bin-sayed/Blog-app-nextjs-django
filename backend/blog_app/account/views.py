@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate
 from django.utils.encoding import force_bytes
 from django.contrib.auth import get_user_model
 from django.template.loader import render_to_string
@@ -5,17 +6,28 @@ from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 
-
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 
-from .serializers import RegisterSerializer
+
+from .serializers import RegisterSerializer, LoginSerializer
 
 User = get_user_model()
 
 
 class RegisterView(APIView):
     def post(self, request):
+        username = request.data.get("username")
+        email = request.data.get("email")
+
+        if User.objects.filter(username=username).exists():
+            return Response({"error": "Username already exits"}, status=400)
+
+        if User.objects.filter(email=email).exists():
+            return Response({"error": "Email already exits"}, status=400)
+
         serializer = RegisterSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -24,9 +36,7 @@ class RegisterView(APIView):
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = default_token_generator.make_token(user)
 
-            activation_link = (
-                f"http://localhost:8000/api/accounts/activate/{uid}/{token}/"
-            )
+            activation_link = f"http://localhost:3000/activate/{uid}/{token}"
 
             subject = "Activate your account"
 
@@ -51,10 +61,8 @@ class RegisterView(APIView):
             return Response(
                 {
                     "message": "User registered successfully. Please check your email.",
-                    "id": user.id,
-                    "email": user.email,
-                    "username": user.username,
-                }
+                },
+                status=201,
             )
 
         return Response(serializer.errors)
@@ -78,3 +86,72 @@ class ActivateView(APIView):
             return Response({"message": "Account activated successfully"})
         else:
             return Response({"error": "Invalid or expired token"})
+
+
+class LoginView(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+        password = request.data.get("password")
+
+        user = authenticate(request, email=email, password=password)
+        print(user)
+        if not user:
+            return Response({"error": "Invalid credentials"}, status=401)
+
+        if not user.is_active:
+            return Response(
+                {"error": "Please active your account to login..."}, status=403
+            )
+
+        refresh = RefreshToken.for_user(user)
+        access = str(refresh.access_token)
+
+        response = Response({"message": "Login successful"}, status=200)
+
+        response.set_cookie(
+            key="access_token",
+            value=access,
+            httponly=True,
+            secure=False,
+            samesite="lax",
+            max_age=60 * 15,
+        )
+
+        response.set_cookie(
+            key="refresh_token",
+            value=str(refresh),
+            httponly=True,
+            secure=False,
+            samesite="lax",
+            max_age=60 * 60 * 24,
+        )
+
+        return response
+
+
+class RefreshTokenView(APIView):
+    def post(self, request):
+        refresh_token = request.COOKIES.get("refresh_token")
+
+        if not refresh_token:
+            return Response({"error": "No refresh token"}, status=401)
+
+        try:
+            refresh = RefreshToken(refresh_token)
+            access = str(refresh.access_token)
+
+            response = Response({"message": "Token refreshed"}, status=200)
+
+            response.set_cookie(
+                key="access_token",
+                value=access,
+                httponly=True,
+                secure=False,
+                samesite="lax",
+                max_age=60 * 15,
+            )
+
+            return response
+
+        except Exception:
+            return Response({"error": "Invalid refresh token"}, status=401)
