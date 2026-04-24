@@ -26,7 +26,7 @@ const Input = forwardRef(
 
     const inputId = id || label?.toLowerCase().replace(/\s/g, "-");
 
-    const baseInputClasses = `w-full px-4 py-2.5 rounded-xl border transition-all duration-200 text-black outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white ${
+    const baseInputClasses = `w-full px-4 py-2.5 rounded-md border transition-all duration-200 text-black outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white ${
       error
         ? "border-red-500 focus:ring-red-500 focus:border-red-500"
         : "border-gray-300 hover:border-gray-400"
