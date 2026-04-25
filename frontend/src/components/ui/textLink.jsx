@@ -1,7 +1,7 @@
 import Link from "next/link";
 import React from "react";
 
-const TextLink = ({ text, link }) => {
+const TextLink = ({ text = "link", link = "/" }) => {
   return (
     <Link href={link} className="text-amber-600 hover:underline">
       {text}

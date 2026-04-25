@@ -2,26 +2,19 @@
 
 import React, { useState } from "react";
 import Card from "../cards/card";
+import { useBlogListQuery } from "@/redux/services/blogs/blogApi";
 
-const blogs = Array.from({ length: 32 }, (_, i) => ({
-  id: i + 1,
-  title: `Blog Post Title ${i + 1}`,
-  excerpt: `This is a short description of blog post ${i + 1}. It gives readers a glimpse of what the article is about.`,
-  image: `https://picsum.photos/id/${i + 10}/400/250`,
-  date: "April 24, 2026",
-  readTime: "5 min read",
-  category: `category ${i + 1}`,
-}));
-
-const AllBlogs = () => {
+const AllBlogs = ({ post }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const postsPerPage = 16; // 2 rows of 4 cards each
+  const postsPerPage = 16;
 
-  const totalPosts = blogs.length;
-  const totalPages = Math.ceil(totalPosts / postsPerPage);
-  const indexOfLastPost = currentPage * postsPerPage;
-  const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentPosts = blogs.slice(indexOfFirstPost, indexOfLastPost);
+  // const totalPosts = blogs.length;
+  // const totalPages = Math.ceil(totalPosts / postsPerPage);
+  // const indexOfLastPost = currentPage * postsPerPage;
+  // const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  // const currentPosts = blogs.slice(indexOfFirstPost, indexOfLastPost);
+
+  const { data: currentPosts, isLoading } = useBlogListQuery();
 
   // Change page
   const goToPage = (pageNumber) => {
@@ -43,6 +36,9 @@ const AllBlogs = () => {
     return pages;
   };
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="text-center mb-12 md:mb-16">
@@ -59,57 +55,57 @@ const AllBlogs = () => {
       </div>
 
       {/* Blog Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {currentPosts.map((post) => (
-          <Card key={post.id} post={post} />
-        ))}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {currentPosts &&
+          currentPosts.map((post, index) => <Card key={index} post={post} />)}
       </div>
 
       {/* Pagination Section */}
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center space-x-2 mt-12">
-          {/* Previous Button */}
-          <button
-            onClick={() => goToPage(currentPage - 1)}
-            disabled={currentPage === 1}
-            className={`px-4 py-2 rounded-md transition ${
-              currentPage === 1
-                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
-          >
-            ← Prev
-          </button>
-
-          {/* Page Numbers */}
-          {getPageNumbers().map((page) => (
+      {/*  
+      <div>
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center space-x-2 mt-12">
             <button
-              key={page}
-              onClick={() => goToPage(page)}
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1}
               className={`px-4 py-2 rounded-md transition ${
-                currentPage === page
-                  ? "bg-blue-600 text-white"
+                currentPage === 1
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                   : "bg-gray-200 text-gray-700 hover:bg-gray-300"
               }`}
             >
-              {page}
+              ← Prev
             </button>
-          ))}
 
-          {/* Next Button */}
-          <button
-            onClick={() => goToPage(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className={`px-4 py-2 rounded-md transition ${
-              currentPage === totalPages
-                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
-          >
-            Next →
-          </button>
-        </div>
-      )}
+            {getPageNumbers().map((page) => (
+              <button
+                key={page}
+                onClick={() => goToPage(page)}
+                className={`px-4 py-2 rounded-md transition ${
+                  currentPage === page
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+
+            <button
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`px-4 py-2 rounded-md transition ${
+                currentPage === totalPages
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
+            >
+              Next →
+            </button>
+          </div>
+        )}
+      </div>
+      */}
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 import { FaArrowRight } from "react-icons/fa";
 
@@ -21,23 +22,33 @@ const Card = ({ post }) => {
 
       <div className="p-5 flex-1 flex flex-col">
         <div className="flex items-center text-xs text-gray-500 mb-2 space-x-2 tracking-wide">
-          <span className="font-medium">{post.date}</span>
+          <span className="font-medium">
+            {" "}
+            {new Date(post.created_at).toLocaleDateString("en-BD", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </span>
           <span>•</span>
           <span>{post.readTime}</span>
         </div>
 
-        <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-amber-600 transition-colors leading-tight">
-          {post.title}
+        <h3 className="text-md font-bold text-gray-800 mb-2 group-hover:text-amber-600 transition-colors leading-tight">
+          {post.title.slice(0, 28) + (post.title.length > 28 ? "..." : "")}
         </h3>
 
         <p className="text-gray-600 text-sm leading-relaxed mb-4 flex-1 line-clamp-3">
           {post.excerpt}
         </p>
 
-        <button className="self-start flex items-center text-amber-600 font-medium text-sm hover:text-amber-700 transition-colors group/btn cursor-pointer">
+        <Link
+          href={`/blogs/${post.slug || ""}`}
+          className="self-start flex items-center text-amber-600 font-medium text-sm hover:text-amber-700 transition-colors group/btn cursor-pointer"
+        >
           <span>Read more</span>
           <FaArrowRight className="h-4 w-4 ml-2 transition-transform duration-200 group-hover/btn:translate-x-1" />
-        </button>
+        </Link>
       </div>
     </article>
   );
