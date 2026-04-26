@@ -5,8 +5,8 @@ import { useParams } from "next/navigation";
 
 import ReadBlog from "@/components/BlogDetails/ReadBlog";
 import RecentBlog from "@/components/BlogDetails/RelatedBlog";
-import { IoMdLocate } from "react-icons/io";
 import CommentForm from "@/components/BlogDetails/CommentForm";
+import CommentList from "@/components/BlogDetails/CommentList";
 
 const Page = () => {
   const params = useParams();
@@ -18,6 +18,7 @@ const Page = () => {
 
   const blog = data?.blog;
   const relatedBlog = data?.relatedBlogs;
+  const comments = data?.comments;
 
   return (
     <div className="min-h-screen  bg-linear-to-br from-amber-50 via-white to-orange-50">
@@ -29,6 +30,11 @@ const Page = () => {
           isError={isError}
         />
         <CommentForm />
+        <CommentList
+          comments={comments}
+          isLoading={isLoading}
+          isError={isError}
+        />
       </div>
     </div>
   );

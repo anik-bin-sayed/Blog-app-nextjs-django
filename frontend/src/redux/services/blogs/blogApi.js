@@ -7,9 +7,10 @@ export const blogApi = createApi({
   tagTypes: ["Blog"],
   endpoints: (builder) => ({
     blogList: builder.query({
-      query: () => ({
-        url: "/blogs/",
+      query: (params) => ({
+        url: `/blogs/`,
         method: "GET",
+        params,
       }),
     }),
 
@@ -19,7 +20,26 @@ export const blogApi = createApi({
         method: "GET",
       }),
     }),
+
+    featuredBlogs: builder.query({
+      query: () => ({
+        url: `/featured/`,
+        method: "GET",
+      }),
+    }),
+
+    recentBlogs: builder.query({
+      query: () => ({
+        url: `/recent/`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useBlogListQuery, useBlogDetailsQuery } = blogApi;
+export const {
+  useBlogListQuery,
+  useBlogDetailsQuery,
+  useFeaturedBlogsQuery,
+  useRecentBlogsQuery,
+} = blogApi;

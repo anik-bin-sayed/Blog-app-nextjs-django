@@ -1,43 +1,22 @@
+"use client";
+
 import React from "react";
 import Card from "../cards/card";
 import LinkButton from "../ui/LinkButton";
+import { useRecentBlogsQuery } from "@/redux/services/blogs/blogApi";
+import CardLoader from "../utils/CardLoader";
 
 const LatestBlog = () => {
-  const latestPosts = [
-    {
-      id: 1,
-      title: "10 Hidden Gems for Your Next Adventure",
-      excerpt:
-        "Discover off-the-beaten-path destinations that will make your journey truly unforgettable. From secret beaches to mountain retreats.",
-      image:
-        "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=500&fit=crop",
-      category: "Travel Tips",
-      date: "May 18, 2025",
-      readTime: "6 min read",
-    },
-    {
-      id: 2,
-      title: "Sustainable Travel: How to Explore Responsibly",
-      excerpt:
-        "Learn eco-friendly practices that help preserve the places you love for future generations. Simple changes make a big difference.",
-      image:
-        "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&h=500&fit=crop",
-      category: "Sustainability",
-      date: "May 15, 2025",
-      readTime: "4 min read",
-    },
-    {
-      id: 3,
-      title: "Ultimate Guide to Solo Travel in 2025",
-      excerpt:
-        "Essential tips, safety advice, and the best destinations for a solo adventure this year. Travel smarter and safer alone.",
-      image:
-        "https://images.unsplash.com/photo-1530789253388-582c481c54b0?w=800&h=500&fit=crop",
-      category: "Solo Travel",
-      date: "May 12, 2025",
-      readTime: "7 min read",
-    },
-  ];
+  const { data: latestPosts, isLoading, isError } = useRecentBlogsQuery();
+
+  if (isLoading) {
+    return (
+      <CardLoader
+        title="Recent"
+        description=" Fresh insights, travel tips, and inspiring tales from our journeys"
+      />
+    );
+  }
 
   return (
     <section className="py-16 md:py-24 bg-linear-to-b from-amber-50/30 via-white to-orange-50/40">
@@ -56,9 +35,8 @@ const LatestBlog = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 lg:gap-10">
-          {latestPosts.map((post) => (
-            <Card key={post.id} post={post} />
-          ))}
+          {latestPosts &&
+            latestPosts.map((post, index) => <Card key={index} post={post} />)}
         </div>
 
         <div className="text-center mt-12">

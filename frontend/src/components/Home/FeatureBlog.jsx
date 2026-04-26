@@ -1,43 +1,23 @@
+"use client";
+
 import React from "react";
 import LinkButton from "../ui/LinkButton";
 import Card from "../cards/card";
+import { useFeaturedBlogsQuery } from "@/redux/services/blogs/blogApi";
+import CardLoader from "../utils/CardLoader";
 
 const FeatureBlog = () => {
-  const featuredPosts = [
-    {
-      id: 1,
-      title: "10 Hidden Gems for Your Next Adventure",
-      excerpt:
-        "Discover off-the-beaten-path destinations that will make your journey truly unforgettable.",
-      image:
-        "https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=800&h=600&fit=crop",
-      category: "Travel Tips",
-      date: "May 15, 2025",
-      readTime: "5 min read",
-    },
-    {
-      id: 2,
-      title: "Sustainable Travel: How to Explore Responsibly",
-      excerpt:
-        "Learn eco-friendly practices that help preserve the places you love for future generations.",
-      image:
-        "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&h=600&fit=crop",
-      category: "Sustainability",
-      date: "May 12, 2025",
-      readTime: "4 min read",
-    },
-    {
-      id: 3,
-      title: "Ultimate Guide to Solo Travel in 2025",
-      excerpt:
-        "Essential tips, safety advice, and the best destinations for a solo adventure this year.",
-      image:
-        "https://images.unsplash.com/photo-1530789253388-582c481c54b0?w=800&h=600&fit=crop",
-      category: "Solo Travel",
-      date: "May 10, 2025",
-      readTime: "7 min read",
-    },
-  ];
+  const { data: featuredPosts, isLoading, isError } = useFeaturedBlogsQuery();
+  console.log(featuredPosts);
+
+  if (isLoading) {
+    return (
+      <CardLoader
+        title="Feature"
+        description="Inspiring tales, expert tips, and hidden gems from our travels"
+      />
+    );
+  }
 
   return (
     <section className="py-16 px-4 md:px-8 bg-linear-to-br from-white via-amber-50/30 to-orange-50/40">
@@ -56,9 +36,10 @@ const FeatureBlog = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 lg:gap-10">
-          {featuredPosts.map((post) => (
-            <Card key={post.id} post={post} />
-          ))}
+          {featuredPosts &&
+            featuredPosts.map((post, index) => (
+              <Card key={index} post={post} />
+            ))}
         </div>
 
         <div className="text-center mt-12">
