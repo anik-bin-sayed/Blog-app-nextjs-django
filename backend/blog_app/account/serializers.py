@@ -21,3 +21,9 @@ class LoginSerializer(serializers.ModelSerializer):
         model = User
         fields = ["email", "password"]
         extra_kwargs = {"password": {"write_only": True}}
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username", "email", "role", "is_active"]

@@ -10,9 +10,10 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
 
 
-from .serializers import RegisterSerializer, LoginSerializer
+from .serializers import *
 
 User = get_user_model()
 
@@ -155,3 +156,25 @@ class RefreshTokenView(APIView):
 
         except Exception:
             return Response({"error": "Invalid refresh token"}, status=401)
+
+
+class ProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        serializer = ProfileSerializer(user)
+        return Response(serializer.data)
+
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        response = Response({"message": "Logout successful"}, status=200)
+
+        response.delete_cookie("access_token")
+        response.delete_cookie("refresh_token")
+        response.delete_cookie("__auth")
+
+        return response
