@@ -33,6 +33,14 @@ class RelatedBlogSerializer(serializers.ModelSerializer):
         return obj.image.url if obj.image else None
 
 
+class CommentListSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source="user.username", read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ["name", "content", "created_at"]
+
+
 class SingleBlogSerializer(serializers.ModelSerializer):
     category = serializers.CharField(source="category.name")
     image = serializers.SerializerMethodField()
