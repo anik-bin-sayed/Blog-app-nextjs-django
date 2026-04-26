@@ -8,7 +8,6 @@ import CardLoader from "../utils/CardLoader";
 
 const FeatureBlog = () => {
   const { data: featuredPosts, isLoading, isError } = useFeaturedBlogsQuery();
-  console.log(featuredPosts);
 
   if (isLoading) {
     return (

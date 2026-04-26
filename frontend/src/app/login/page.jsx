@@ -1,25 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import Input from "@/components/ui/input";
 import TextLink from "@/components/ui/textLink";
 import SubmitButton from "@/components/ui/submitButton";
 import { MdOutlineErrorOutline } from "react-icons/md";
 import { useLoginMutation } from "@/redux/services/auth/authApi";
+import { useDispatch } from "react-redux";
 
 const initialFormData = {
   email: "",
   password: "",
 };
-export default function RegisterPage() {
+
+export default function Login() {
   const [formData, setFormData] = useState(initialFormData);
-  const [acceptTerms, setAcceptTerms] = useState(false);
   const [errors, setErrors] = useState({});
   const [error, setError] = useState("");
   const [serverMessage, setServerMessage] = useState(null);
 
   const [login, { isLoading }] = useLoginMutation();
+
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,7 +37,7 @@ export default function RegisterPage() {
     e.preventDefault();
 
     setServerMessage(null);
-
+    dispatch(setAuth(true));
     try {
       const res = await login(formData).unwrap();
       console.log(res);

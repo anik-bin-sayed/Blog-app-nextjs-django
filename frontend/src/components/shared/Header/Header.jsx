@@ -1,24 +1,52 @@
 "use client";
 
 import Logo from "@/components/ui/Logo";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { useProfileQuery } from "@/redux/services/auth/authApi";
+import AdminDropdown from "./AdminDropdown";
+import { useDispatch } from "react-redux";
+import { setRole } from "@/redux/services/auth/authSlice";
+
+const navLinks = [
+  { id: 1, name: "Home", href: "/" },
+  { id: 2, name: "Blogs", href: "/blogs" },
+  { id: 3, name: "About", href: "/about" },
+  { id: 4, name: "Contact", href: "/contact" },
+];
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const pathname = usePathname();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-  const navLinks = [
-    { id: 1, name: "Home", href: "/" },
-    { id: 2, name: "Blogs", href: "/blogs" },
-    { id: 3, name: "About", href: "/about" },
-    { id: 4, name: "Contact", href: "/contact" },
-  ];
+  const pathname = usePathname();
+  const profileRef = useRef(null);
+  const dispatch = useDispatch();
+  const { data } = useProfileQuery();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
+
+  const toggleProfile = () => setIsProfileOpen(!isProfileOpen);
+
+  useEffect(() => {
+    if (data) {
+      dispatch(setRole(data.role));
+    }
+  }, [data, dispatch]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setIsProfileOpen(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-md">
@@ -43,12 +71,27 @@ const Header = () => {
           </div>
 
           <div className="flex items-center space-x-2">
-            <Link
-              href="/login"
-              className="p-2 text-gray-600 hover:text-amber-600 transition-colors"
-            >
-              Login
-            </Link>
+            {data?.id ? (
+              <div
+                onClick={toggleProfile}
+                ref={profileRef}
+                className="relative"
+              >
+                <div className="w-10 h-10 rounded-full border bg-amber-600 flex items-center justify-center uppercase font-semibold text-md text-white cursor-pointer">
+                  {data?.username[0]}
+                </div>
+                {isProfileOpen && (
+                  <AdminDropdown isProfileOpen={isProfileOpen} data={data} />
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="p-2 text-gray-600 hover:text-amber-600 transition-colors"
+              >
+                Login
+              </Link>
+            )}
 
             <button
               onClick={toggleMenu}
