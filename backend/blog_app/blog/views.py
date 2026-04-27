@@ -38,6 +38,35 @@ class BlogListView(ListAPIView):
     ordering = ["-created_at"]
 
 
+class AdminBlogListView(ListAPIView):
+    queryset = Blog.objects.filter(is_public=True)
+    serializer_class = BlogListSerializer
+    pagination_class = BlogPagination
+
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+
+    filterset_fields = ["category"]
+    search_fields = [
+        "title",
+        "excerpt",
+        "content",
+        "category__name",
+    ]
+
+    ordering_fields = ["created_at"]
+    ordering = ["-created_at"]
+
+    def get_queryset(self):
+        status = self.request.query_params.get("status")
+
+        if status == "published":
+            return Blog.objects.filter(is_public=True)
+        elif status == "draft":
+            return Blog.objects.filter(is_public=False)
+        else:
+            return Blog.objects.all()
+
+
 class SingleBlogView(APIView):
     def get(self, request, slug):
         try:

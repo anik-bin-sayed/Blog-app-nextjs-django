@@ -15,7 +15,15 @@ class BlogListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Blog
-        fields = ["title", "slug", "category", "excerpt", "image", "created_at"]
+        fields = [
+            "title",
+            "slug",
+            "category",
+            "excerpt",
+            "image",
+            "is_public",
+            "created_at",
+        ]
 
     def get_image(self, obj):
         return obj.image.url if obj.image else None

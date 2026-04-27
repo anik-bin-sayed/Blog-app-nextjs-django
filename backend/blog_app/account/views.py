@@ -1,3 +1,6 @@
+from django.db.models import Q
+from datetime import timedelta
+from django.utils.timezone import now
 from django.contrib.auth import authenticate
 from django.utils.encoding import force_bytes
 from django.contrib.auth import get_user_model
@@ -9,11 +12,13 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
 
+from blog.permissions import IsAdmin
 
 from .serializers import *
+from .pagination import UserPagination
 
 User = get_user_model()
 
@@ -165,6 +170,69 @@ class ProfileView(APIView):
         user = request.user
         serializer = ProfileSerializer(user)
         return Response(serializer.data)
+
+
+class GetAllUserView(APIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+    pagination_class = UserPagination
+
+    def get(self, request):
+        users = User.objects.all().exclude(is_superuser=True).exclude(role="admin")
+
+        search = request.GET.get("search")
+
+        if search:
+            users = users.filter(
+                Q(username__icontains=search) | Q(email__icontains=search)
+            )
+
+        is_active = request.GET.get("is_active")
+
+        if is_active is not None:
+            if is_active.lower() == "true":
+                users = users.filter(is_active=True)
+            elif is_active.lower() == "false":
+                users = users.filter(is_active=False)
+
+        paginator = UserPagination()
+        result_page = paginator.paginate_queryset(users, request)
+
+        serializer = ProfileSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
+    def patch(self, request, pk):
+        try:
+            user = (
+                User.objects.exclude(is_superuser=True).exclude(role="admin").get(pk=pk)
+            )
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=404)
+
+        serializer = ProfileSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+
+        return Response(serializer.errors, status=400)
+
+
+class ActiveUserAnalyticsView(APIView):
+    def get(self, request):
+
+        data = []
+
+        for i in range(5, -1, -1):
+            month_date = now() - timedelta(days=30 * i)
+
+            count = User.objects.filter(
+                is_active=True,
+                created_at__month=month_date.month,
+                created_at__year=month_date.year,
+            ).count()
+
+            data.append({"month": month_date.strftime("%b %Y"), "activeUsers": count})
+
+        return Response(data)
 
 
 class LogoutView(APIView):
