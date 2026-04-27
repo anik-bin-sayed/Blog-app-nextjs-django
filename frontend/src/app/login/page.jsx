@@ -7,7 +7,6 @@ import TextLink from "@/components/ui/textLink";
 import SubmitButton from "@/components/ui/submitButton";
 import { MdOutlineErrorOutline } from "react-icons/md";
 import { useLoginMutation } from "@/redux/services/auth/authApi";
-import { useDispatch } from "react-redux";
 
 const initialFormData = {
   email: "",
@@ -22,8 +21,6 @@ export default function Login() {
 
   const [login, { isLoading }] = useLoginMutation();
 
-  const dispatch = useDispatch();
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -37,11 +34,11 @@ export default function Login() {
     e.preventDefault();
 
     setServerMessage(null);
-    dispatch(setAuth(true));
+
     try {
       const res = await login(formData).unwrap();
       console.log(res);
-      // setFormData(initialFormData);
+      setFormData(initialFormData);
     } catch (err) {
       console.log(err);
     }

@@ -1,10 +1,10 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
 import fetchBaseQueryWithReauth from "../fetchBaseQueryWithReauth";
 
 export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQueryWithReauth,
-  tagTypes: ["Auth"],
+  tagTypes: ["Auth", "User"],
   endpoints: (builder) => ({
     register: builder.mutation({
       query: (data) => ({
@@ -12,6 +12,7 @@ export const authApi = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Auth"],
     }),
 
     activateAccount: builder.mutation({
@@ -19,6 +20,7 @@ export const authApi = createApi({
         url: `/accounts/activate/${uid}/${token}/`,
         method: "POST",
       }),
+      invalidatesTags: ["Auth"],
     }),
 
     login: builder.mutation({
@@ -27,6 +29,7 @@ export const authApi = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Auth"],
     }),
 
     profile: builder.query({
@@ -34,6 +37,7 @@ export const authApi = createApi({
         url: `/accounts/profile`,
         method: "GET",
       }),
+      invalidatesTags: ["Auth"],
     }),
   }),
 });

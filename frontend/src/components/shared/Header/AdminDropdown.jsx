@@ -51,7 +51,7 @@ const AdminDropdown = ({ isProfileOpen, data }) => {
         {data?.role != "admin" && (
           <li>
             <Link
-              href="/settings"
+              href="/saved-blog"
               className="block px-4 py-2 hover:bg-gray-100 transition rounded-md mx-1"
             >
               Saved Blogs

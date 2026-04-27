@@ -2,7 +2,10 @@
 
 import React, { useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useBlogListQuery } from "@/redux/services/blogs/blogApi";
+import {
+  useBlogListQuery,
+  useGetAllCategoriesQuery,
+} from "@/redux/services/blogs/blogApi";
 import Card from "../cards/card";
 import CardLoader from "../utils/CardLoader";
 import { IoSearch, IoFilterOutline } from "react-icons/io5";
@@ -10,6 +13,7 @@ import { RxCross1 } from "react-icons/rx";
 import { FcSearch } from "react-icons/fc";
 import { HiOutlineSearch } from "react-icons/hi";
 import { GrFormNextLink, GrFormPreviousLink } from "react-icons/gr";
+import { TbCategory } from "react-icons/tb";
 
 const AllBlogs = () => {
   const router = useRouter();
@@ -20,11 +24,14 @@ const AllBlogs = () => {
   const ordering = searchParams.get("ordering") || "-created_at";
 
   const [tempSearch, setTempSearch] = useState(search);
+  const [category, setCategory] = useState("");
 
   const { data, isLoading } = useBlogListQuery(
-    { page, search, ordering },
+    { page, search, ordering, category },
     { refetchOnMountOrArgChange: true },
   );
+  const { data: categories } = useGetAllCategoriesQuery();
+  console.log(categories);
 
   const posts = data?.results || [];
   const totalCount = data?.count || 0;
@@ -133,6 +140,26 @@ const AllBlogs = () => {
             Search
           </button>
 
+          {/* category */}
+          <div className="relative">
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="appearance-none pl-10 pr-8 py-2.5 border border-gray-200 rounded-xl bg-gray-50 text-gray-700 text-sm font-medium focus:ring-2 focus:ring-blue-500 cursor-pointer hover:bg-gray-100 transition-colors"
+            >
+              <option value="">All</option>
+              {categories &&
+                categories.map((category) => {
+                  return (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  );
+                })}
+            </select>
+            <TbCategory className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none text-lg" />
+          </div>
+          {/* ordering */}
           <div className="relative">
             <select
               value={ordering}
