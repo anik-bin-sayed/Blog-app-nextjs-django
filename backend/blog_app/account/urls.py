@@ -17,4 +17,6 @@ urlpatterns = [
     path("users/<int:pk>/", GetAllUserView.as_view(), name="user-detail"),
     # activity
     path("activity/", ActiveUserAnalyticsView.as_view(), name="user-activity"),
+    # logout
+    path("logout", LogoutView.as_view(), name="logout"),
 ]
