@@ -4,21 +4,51 @@ import fetchBaseQueryWithReauth from "../fetchBaseQueryWithReauth";
 export const blogApi = createApi({
   reducerPath: "blogApi",
   baseQuery: fetchBaseQueryWithReauth,
-  tagTypes: ["Blog"],
+  tagTypes: ["Blog", "Category"],
   endpoints: (builder) => ({
+    // categories
     getAllCategories: builder.query({
       query: () => ({
         url: `/categories/`,
         method: "GET",
       }),
+      providesTags: ["Category"],
     }),
 
+    createCategory: builder.mutation({
+      query: (data) => ({
+        url: `/categories/create/`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Category"],
+    }),
+
+    deleteCategory: builder.mutation({
+      query: (id) => ({
+        url: `/categories/delete/${id}/`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Category"],
+    }),
+
+    // blogs
     blogList: builder.query({
       query: (params) => ({
         url: `/blogs/`,
         method: "GET",
         params,
       }),
+      providesTags: ["Blog"],
+    }),
+
+    createBlog: builder.mutation({
+      query: (data) => ({
+        url: `/blog/create/`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Blog"],
     }),
 
     blogDetails: builder.query({
@@ -26,6 +56,7 @@ export const blogApi = createApi({
         url: `/blogs/${slug}/`,
         method: "GET",
       }),
+      providesTags: ["Blog"],
     }),
 
     featuredBlogs: builder.query({
@@ -33,6 +64,7 @@ export const blogApi = createApi({
         url: `/featured/`,
         method: "GET",
       }),
+      providesTags: ["Blog"],
     }),
 
     recentBlogs: builder.query({
@@ -40,6 +72,7 @@ export const blogApi = createApi({
         url: `/recent/`,
         method: "GET",
       }),
+      providesTags: ["Blog"],
     }),
 
     adminBlogs: builder.query({
@@ -68,6 +101,7 @@ export const blogApi = createApi({
           params,
         };
       },
+      providesTags: ["Blog"],
     }),
   }),
 });
@@ -75,11 +109,13 @@ export const blogApi = createApi({
 export const {
   // categories
   useGetAllCategoriesQuery,
-
+  useCreateCategoryMutation,
+  useDeleteCategoryMutation,
   // blogs
   useBlogListQuery,
   useBlogDetailsQuery,
   useFeaturedBlogsQuery,
   useRecentBlogsQuery,
   useAdminBlogsQuery,
+  useCreateBlogMutation,
 } = blogApi;

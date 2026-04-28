@@ -8,7 +8,7 @@ const Card = ({ post }) => {
     <article className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer border border-gray-100">
       <div className="relative h-52 overflow-hidden bg-gray-100">
         <Image
-          src={post.image}
+          src={post.image || ""}
           alt={post.title}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           fill

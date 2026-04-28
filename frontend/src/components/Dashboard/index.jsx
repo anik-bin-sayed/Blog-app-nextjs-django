@@ -121,7 +121,7 @@ export default function Dashboard() {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-y-auto p-6 relative lg:ml-56">
+      <main className="flex-1 overflow-y-auto relative lg:ml-56">
         <button
           onClick={toggleSidebar}
           className="lg:hidden fixed top-20 left-1 z-45 p-2 bg-white rounded-md shadow-md hover:bg-gray-100 focus:outline-none"

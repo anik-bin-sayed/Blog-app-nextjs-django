@@ -31,7 +31,6 @@ const AllBlogs = () => {
     { refetchOnMountOrArgChange: true },
   );
   const { data: categories } = useGetAllCategoriesQuery();
-  console.log(categories);
 
   const posts = data?.results || [];
   const totalCount = data?.count || 0;
