@@ -4,6 +4,7 @@ from rest_framework.generics import ListAPIView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import DestroyAPIView
 
 from django.db import IntegrityError
 
@@ -162,3 +163,9 @@ class RecentBlogsView(APIView):
         recent_blogs = Blog.objects.filter(is_public=True).order_by("-created_at")[:5]
         serializer = BlogListSerializer(recent_blogs, many=True)
         return Response(serializer.data)
+
+
+# destroy blog
+class DeleteBlogView(DestroyAPIView):
+    queryset = Blog.objects.all()
+    permission_classes = [IsAuthenticated, IsAdmin]

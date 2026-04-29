@@ -29,11 +29,12 @@ class BlogListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Blog
         fields = [
-            "title",
+            "id",
             "slug",
-            "category",
-            "excerpt",
+            "title",
             "image",
+            "excerpt",
+            "category",
             "is_public",
             "created_at",
         ]

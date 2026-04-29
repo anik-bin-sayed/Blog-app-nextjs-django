@@ -19,4 +19,5 @@ urlpatterns = [
     path("admin/blogs/", AdminBlogListView.as_view(), name="admin-blogs"),
     path("blogs/<slug:slug>/", SingleBlogView.as_view(), name="single-blog"),
     path("blog/create/", CreateBlogView.as_view(), name="create-blog"),
+    path("blog/delete/<int:pk>/", DeleteBlogView.as_view(), name="delete-blog"),
 ]
