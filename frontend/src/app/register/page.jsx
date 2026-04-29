@@ -14,7 +14,8 @@ const initialFormData = {
   password: "",
   confirmPassword: "",
 };
-export default function RegisterPage() {
+
+const RegisterPage = () => {
   const [formData, setFormData] = useState(initialFormData);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [errors, setErrors] = useState({});
@@ -151,4 +152,6 @@ export default function RegisterPage() {
       </div>
     </div>
   );
-}
+};
+
+export default RegisterPage;

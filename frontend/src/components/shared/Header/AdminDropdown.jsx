@@ -1,7 +1,21 @@
-import Link from "next/link";
+"use client";
+
 import React from "react";
+import Link from "next/link";
+import { useLogoutMutation } from "@/redux/services/auth/authApi";
 
 const AdminDropdown = ({ isProfileOpen, data }) => {
+  const [logout] = useLogoutMutation();
+
+  const handleLogout = async () => {
+    try {
+      await logout().unwrap();
+      window.location.reload();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div
       className={`absolute right-0 mt-3 w-52 bg-white shadow-xl overflow-hidden transition-all duration-200 origin-top border border-gray-100 ${
@@ -59,10 +73,9 @@ const AdminDropdown = ({ isProfileOpen, data }) => {
           </li>
         )}
 
-        {/* Logout */}
         <li className="border-t cursor-pointer border-gray-300 mt-1 pt-1">
           <button
-            onClick={() => console.log("logout")}
+            onClick={handleLogout}
             className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-500 transition rounded-md mx-1 cursor-pointer"
           >
             Logout

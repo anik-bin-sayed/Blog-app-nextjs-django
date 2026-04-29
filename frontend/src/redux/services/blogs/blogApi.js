@@ -75,6 +75,14 @@ export const blogApi = createApi({
       providesTags: ["Blog"],
     }),
 
+    deleteBlogs: builder.mutation({
+      query: (id) => ({
+        url: `blog/delete/${id}/`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Blog"],
+    }),
+
     adminBlogs: builder.query({
       query: ({ status, search, category, page } = {}) => {
         const params = {};
@@ -118,4 +126,5 @@ export const {
   useRecentBlogsQuery,
   useAdminBlogsQuery,
   useCreateBlogMutation,
+  useDeleteBlogsMutation,
 } = blogApi;

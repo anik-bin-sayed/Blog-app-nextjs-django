@@ -3,8 +3,11 @@ import {
   useUpdateUserMutation,
 } from "@/redux/services/user/userApi";
 import React, { useState } from "react";
+import { IoSearch } from "react-icons/io5";
+import ComponentLoader from "../Loader/ComponentLoader";
 
 const AllUser = () => {
+  const [updatingId, setUpdatingId] = useState(null);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
@@ -13,17 +16,25 @@ const AllUser = () => {
     page,
   });
 
-  const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
+  const [updateUser] = useUpdateUserMutation();
 
   const users = data?.results || [];
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-gray-500">Loading users...</div>
-      </div>
-    );
-  }
+  const handleToggle = async (id, newStatus) => {
+    try {
+      setUpdatingId(id);
+      await updateUser({
+        id,
+        data: { is_active: newStatus },
+      }).unwrap();
+    } catch (err) {
+      console.log("Update failed", err);
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  if (isLoading) return <ComponentLoader />;
 
   if (isError) {
     return (
@@ -33,35 +44,12 @@ const AllUser = () => {
     );
   }
 
-  const handleToggle = async (id, newStatus) => {
-    try {
-      await updateUser({
-        id,
-        data: { is_active: newStatus },
-      }).unwrap();
-    } catch (err) {
-      console.log("Update failed", err);
-    }
-  };
-
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-gray-100">
+    <div className="space-y-6 p-6">
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-gray-300">
         <div className="relative w-full sm:w-96 group">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg
-              className="h-5 w-5 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
+            <IoSearch className="h-5 w-5 text-gray-400" />
           </div>
 
           <input
@@ -72,10 +60,10 @@ const AllUser = () => {
               setPage(1);
             }}
             placeholder="Search by name or email..."
-            className="block w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded-xl bg-white text-sm placeholder-gray-400
-                   focus:ring-2 focus:ring-indigo-400 focus:border-transparent
+            className="block w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded bg-white text-sm placeholder-gray-400
+                   focus:ring-2 focus:ring-yellow-400 focus:border-transparent
                    transition-all duration-200 ease-out
-                   hover:border-gray-300 hover:shadow-sm"
+                   hover:border-gray-300 hover:shadow-sm outline-0"
           />
         </div>
 
@@ -129,7 +117,7 @@ const AllUser = () => {
                         <input
                           type="checkbox"
                           checked={user.is_active}
-                          disabled={isUpdating}
+                          disabled={updatingId === user.id}
                           onChange={(e) =>
                             handleToggle(user.id, e.target.checked)
                           }

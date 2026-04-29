@@ -32,6 +32,22 @@ export const authApi = createApi({
       invalidatesTags: ["Auth"],
     }),
 
+    logout: builder.mutation({
+      query: (data) => ({
+        url: `/accounts/logout`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Auth"],
+    }),
+
+    refresh: builder.mutation({
+      query: () => ({
+        url: `/accounts/refresh`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Auth"],
+    }),
+
     profile: builder.query({
       query: () => ({
         url: `/accounts/profile`,
@@ -47,4 +63,6 @@ export const {
   useActivateAccountMutation,
   useLoginMutation,
   useProfileQuery,
+  useLogoutMutation,
+  useRefreshMutation,
 } = authApi;

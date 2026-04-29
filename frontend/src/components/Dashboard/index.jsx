@@ -5,7 +5,6 @@ import AllUser from "./AllUser";
 import Activity from "./Activity";
 import Blogs from "./Blogs";
 import CreateBlog from "./CreateBlog";
-import DraftBlogs from "./DraftBlogs";
 import { RxCross2 } from "react-icons/rx";
 import { GiHamburgerMenu } from "react-icons/gi";
 
@@ -103,17 +102,6 @@ export default function Dashboard() {
                 Create Blogs
               </button>
             </li>
-            <li>
-              <button
-                onClick={() => {
-                  setActiveSection("draft");
-                  closeSidebar();
-                }}
-                className={getClassName("draft")}
-              >
-                Draft Blogs
-              </button>
-            </li>
           </ul>
         </nav>
         <div className="p-4 border-t border-gray-200 text-xs text-gray-500">
@@ -137,7 +125,6 @@ export default function Dashboard() {
           {activeSection === "users" && <AllUser />}
           {activeSection === "activities" && <Activity />}
           {activeSection === "create" && <CreateBlog />}
-          {activeSection === "draft" && <DraftBlogs />}
         </div>
       </main>
     </div>

@@ -4,6 +4,7 @@ import ReduxProvider from "@/redux/Provider";
 import Header from "@/components/shared/Header/Header";
 
 import FooterController from "@/components/layout/FooterController";
+import AutoRefreshProvider from "@/hooks/AutoRefreshProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,7 +30,7 @@ export default function RootLayout({ children }) {
       <body className="min-h-full flex flex-col">
         <ReduxProvider>
           <Header />
-          {children}
+          <AutoRefreshProvider>{children}</AutoRefreshProvider>
           <FooterController />
         </ReduxProvider>
       </body>

@@ -4,8 +4,10 @@ import React, { useState, useEffect } from "react";
 import { FaPlus, FaCloudUploadAlt } from "react-icons/fa";
 import { useAdminBlogsQuery } from "@/redux/services/blogs/blogApi";
 import AdminBlogCard from "../cards/AdminBlogCard";
+import { IoSearch } from "react-icons/io5";
+import ComponentLoader from "../Loader/ComponentLoader";
 
-const Blogs = ({ setActiveSection }) => {
+const Blogs = () => {
   const [filters, setFilters] = useState({
     page: 1,
     status: "all",
@@ -58,58 +60,34 @@ const Blogs = ({ setActiveSection }) => {
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin h-12 w-12 border-t-2 border-b-2 border-yellow-500 rounded-full"></div>
-      </div>
-    );
-  }
+  if (isLoading) return <ComponentLoader />;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b sticky top-0 z-40 backdrop-blur">
-        <div className="max-w-7xl mx-auto px-4 py-5 flex flex-col md:flex-row justify-between gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-              Blog Studio
-            </h1>
-            <p className="text-gray-500 text-sm mt-1">
-              Manage, filter and publish your content efficiently
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="hidden md:block text-sm text-gray-500">
-              Total: <span className="font-semibold">{data?.count || 0}</span>
-            </div>
-
-            <button
-              onClick={() => setActiveSection("create")}
-              className="flex items-center gap-2 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg shadow transition"
-            >
-              <FaPlus />
-              New Blog
-            </button>
-          </div>
-        </div>
-      </div>
-
+    <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto p-4 m-4 bg-white rounded-xl shadow mt-6 flex flex-col sm:flex-row justify-between gap-4">
-        <input
-          type="text"
-          placeholder="Search blogs..."
-          value={filters.search}
-          onChange={handleSearchChange}
-          className="border px-4 py-2 rounded-lg w-full sm:w-80 focus:ring-2 focus:ring-yellow-400 outline-none"
-        />
+        <div className="relative w-full sm:w-96 group">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <IoSearch className="h-5 w-5 text-gray-400" />
+          </div>
+
+          <input
+            type="text"
+            value={filters.search}
+            onChange={handleSearchChange}
+            placeholder="Search by name or email..."
+            className="block w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded bg-white text-sm placeholder-gray-400
+                           focus:ring-2 focus:ring-yellow-400 focus:border-transparent
+                           transition-all duration-200 ease-out
+                           hover:border-gray-300 hover:shadow-sm outline-0"
+          />
+        </div>
 
         <div className="flex gap-2">
           {["all", "published", "draft"].map((item) => (
             <button
               key={item}
               onClick={() => handleStatusChange(item)}
-              className={`px-4 py-1.5 rounded-full text-sm capitalize transition ${
+              className={`px-4 py-1 rounded text-sm capitalize transition ${
                 filters.status === item
                   ? "bg-yellow-500 text-white shadow"
                   : "bg-gray-200 hover:bg-gray-300"

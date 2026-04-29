@@ -2,8 +2,11 @@ import React from "react";
 import Image from "next/image";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { CiTimer } from "react-icons/ci";
+import { useDeleteBlogsMutation } from "@/redux/services/blogs/blogApi";
 
-const AdminBlogCard = ({ blog, onEdit, onDelete, onToggleStatus }) => {
+const AdminBlogCard = ({ blog, onEdit, onToggleStatus }) => {
+  const [deleteBlogs] = useDeleteBlogsMutation();
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -11,6 +14,14 @@ const AdminBlogCard = ({ blog, onEdit, onDelete, onToggleStatus }) => {
       month: "short",
       day: "numeric",
     });
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteBlogs(id).unwrap();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -74,10 +85,11 @@ const AdminBlogCard = ({ blog, onEdit, onDelete, onToggleStatus }) => {
           </button>
 
           <button
-            onClick={() => onDelete(blog.id)}
+            onClick={() => handleDelete(blog.id)}
             className="text-red-500 hover:text-red-700 text-sm font-medium transition flex items-center gap-1"
           >
-            <FaTrashAlt size={14} /> Delete
+            <FaTrashAlt size={14} />
+            Delete
           </button>
         </div>
       </div>

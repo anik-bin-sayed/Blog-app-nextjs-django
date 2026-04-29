@@ -14,6 +14,7 @@ import {
   AreaChart,
   Area,
 } from "recharts";
+import ComponentLoader from "../Loader/ComponentLoader";
 
 const Activity = () => {
   const [selectedChart, setSelectedChart] = useState("line");
@@ -30,16 +31,7 @@ const Activity = () => {
     return <div>Error loading data</div>;
   }
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-pulse flex flex-col items-center gap-2">
-          <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-gray-500">Loading activity data...</p>
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <ComponentLoader />;
 
   if (!monthlyData.length) {
     return (
@@ -65,9 +57,9 @@ const Activity = () => {
     : 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="bg-white rounded-2xl shadow-md p-5 border border-gray-100">
+        <div className="bg-white rounded shadow-md p-5 border border-gray-100">
           <p className="text-sm font-medium text-gray-500">
             Active Users (This Month)
           </p>
@@ -76,7 +68,7 @@ const Activity = () => {
           </p>
           <p className="text-xs text-gray-400 mt-1">{currentMonth?.month}</p>
         </div>
-        <div className="bg-white rounded-2xl shadow-md p-5 border border-gray-100">
+        <div className="bg-white rounded shadow-md p-5 border border-gray-100">
           <p className="text-sm font-medium text-gray-500">Previous Month</p>
           <p className="text-3xl font-bold text-gray-800 mt-2">
             {previousMonth?.activeUsers ?? 0}
@@ -85,7 +77,7 @@ const Activity = () => {
             {previousMonth?.month ?? "—"}
           </p>
         </div>
-        <div className="bg-white rounded-2xl shadow-md p-5 border border-gray-100">
+        <div className="bg-white rounded shadow-md p-5 border border-gray-100">
           <p className="text-sm font-medium text-gray-500">Change</p>
           <div className="flex items-baseline gap-2 mt-2">
             <p className="text-3xl font-bold text-gray-800">
@@ -107,10 +99,10 @@ const Activity = () => {
           <button
             key={type}
             onClick={() => setSelectedChart(type)}
-            className={`px-3 py-1.5 text-sm rounded-lg transition capitalize ${
+            className={`px-3 py-1.5 text-sm rounded transition capitalize ${
               selectedChart === type
-                ? "bg-amber-600 text-white"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                ? "bg-yellow-400 text-black"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
             {type} Chart
@@ -118,8 +110,7 @@ const Activity = () => {
         ))}
       </div>
 
-      {/* Graph Section */}
-      <div className="bg-white rounded-2xl shadow-md p-5 border border-gray-200">
+      <div className="bg-white rounded shadow-md p-5 border border-gray-200">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">
           Monthly Active Users Trend
         </h3>
@@ -195,7 +186,7 @@ const Activity = () => {
         </ResponsiveContainer>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded shadow-md border border-gray-200 overflow-hidden">
         <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-800">
             Monthly Activity Breakdown

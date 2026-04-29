@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import Input from "@/components/ui/input";
 import TextLink from "@/components/ui/textLink";
@@ -13,11 +14,13 @@ const initialFormData = {
   password: "",
 };
 
-export default function Login() {
+const Login = () => {
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState({});
   const [error, setError] = useState("");
   const [serverMessage, setServerMessage] = useState(null);
+
+  const router = useRouter();
 
   const [login, { isLoading }] = useLoginMutation();
 
@@ -36,8 +39,10 @@ export default function Login() {
     setServerMessage(null);
 
     try {
-      const res = await login(formData).unwrap();
-      console.log(res);
+      await login(formData).unwrap();
+
+      window.location.reload();
+      router.push("/");
       setFormData(initialFormData);
     } catch (err) {
       console.log(err);
@@ -114,4 +119,6 @@ export default function Login() {
       </div>
     </div>
   );
-}
+};
+
+export default Login;
