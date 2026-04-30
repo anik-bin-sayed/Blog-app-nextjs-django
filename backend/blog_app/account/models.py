@@ -48,6 +48,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     role = models.CharField(max_length=50, choices=userRole, default="user")
     is_verified = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
+    is_banned = models.BooleanField(default=False, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True)
 

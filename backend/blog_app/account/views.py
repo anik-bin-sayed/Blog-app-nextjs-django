@@ -104,9 +104,9 @@ class LoginView(APIView):
         if not user:
             return Response({"error": "Invalid credentials"}, status=401)
 
-        if not user.is_active:
+        if not user.is_verified:
             return Response(
-                {"error": "Please active your account to login..."}, status=403
+                {"error": "Please verify your account to login..."}, status=403
             )
 
         refresh = RefreshToken.for_user(user)

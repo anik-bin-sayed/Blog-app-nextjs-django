@@ -1,5 +1,5 @@
 import { useGetActivityQuery } from "@/redux/services/user/userApi";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   LineChart,
   Line,

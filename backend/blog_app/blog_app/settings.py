@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "blog",
     # third-party
     "rest_framework",
+    "django_filters",
     "corsheaders",
     "cloudinary",
     "cloudinary_storage",
@@ -138,6 +139,7 @@ SIMPLE_JWT = {
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "account.authentication.CookieJWTAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_FILTER_BACKENDS": [
         "django_filters.rest_framework.DjangoFilterBackend",
@@ -154,6 +156,11 @@ cloudinary.config(
     api_key=os.getenv("CLOUDINARY_API_KEY"),
     api_secret=os.getenv("CLOUDINARY_API_SECRET"),
 )
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "account.authentication.CustomAuthBackend",
+]
 
 # email backend
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

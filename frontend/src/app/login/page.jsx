@@ -39,8 +39,8 @@ const Login = () => {
     setServerMessage(null);
 
     try {
-      await login(formData).unwrap();
-
+      const res = await login(formData).unwrap();
+      console.log(formData);
       window.location.reload();
       router.push("/");
       setFormData(initialFormData);

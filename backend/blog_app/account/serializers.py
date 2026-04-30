@@ -26,4 +26,4 @@ class LoginSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "username", "email", "role", "is_active"]
+        fields = ["id", "username", "email", "role", "is_active", "is_banned"]

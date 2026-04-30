@@ -4,7 +4,7 @@ import {
   useDeleteCategoryMutation,
   useGetAllCategoriesQuery,
 } from "@/redux/services/blogs/blogApi";
-import React, { useState } from "react";
+import React, { useState, memo } from "react";
 import AlertMessage from "../ui/AlertMessage";
 import { RxCross2 } from "react-icons/rx";
 
@@ -108,4 +108,4 @@ const CategoryModal = ({ setIsModalOpen }) => {
   );
 };
 
-export default CategoryModal;
+export default memo(CategoryModal);

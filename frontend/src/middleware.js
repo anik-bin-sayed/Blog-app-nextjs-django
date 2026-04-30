@@ -1,11 +1,22 @@
 import { NextResponse } from "next/server";
-import { useProfileQuery } from "./redux/services/auth/authApi";
+
+const PUBLIC_FILE = /\.(.*)$/;
 
 export function middleware(request) {
-  const token = request.cookies.get("access_token")?.value;
-  const role = request.cookies.get("role")?.value;
-
   const { pathname } = request.nextUrl;
+
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    pathname === "/favicon.ico" ||
+    PUBLIC_FILE.test(pathname)
+  ) {
+    return NextResponse.next();
+  }
+
+  const role = request.cookies.get("role")?.value;
+  const token = request.cookies.get("access_token")?.value;
+  const isBanned = request.cookies.get("is_banned")?.value;
 
   if (pathname.includes("/login") || pathname.includes("/register")) {
     if (token) {
@@ -20,7 +31,6 @@ export function middleware(request) {
   }
 
   const protectedRoutes = ["/profile", "/dashboard"];
-
   const isProtected = protectedRoutes.some((route) =>
     pathname.startsWith(route),
   );
@@ -29,5 +39,19 @@ export function middleware(request) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
+  const isBlocked = isBanned === "true";
+  if (isBlocked) {
+    const allowedPaths = ["/", "/contact", "/login"];
+    const isAllowed = allowedPaths.includes(pathname);
+
+    if (!isAllowed) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+  }
+
   return NextResponse.next();
 }
+
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+};

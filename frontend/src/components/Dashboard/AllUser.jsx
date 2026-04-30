@@ -25,7 +25,7 @@ const AllUser = () => {
       setUpdatingId(id);
       await updateUser({
         id,
-        data: { is_active: newStatus },
+        data: { is_banned: newStatus },
       }).unwrap();
     } catch (err) {
       console.log("Update failed", err);
@@ -86,7 +86,7 @@ const AllUser = () => {
                   Email
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Active
+                  Banned
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                   Role
@@ -109,21 +109,18 @@ const AllUser = () => {
                     <td className="px-6 py-4">
                       <span
                         className={`px-2 inline-flex items-center text-xs font-semibold rounded-full ${
-                          user.is_active
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
+                          user.is_banned ? " text-green-800" : "text-red-800"
                         }`}
                       >
                         <input
                           type="checkbox"
-                          checked={user.is_active}
+                          checked={user.is_banned}
                           disabled={updatingId === user.id}
                           onChange={(e) =>
                             handleToggle(user.id, e.target.checked)
                           }
                           className="mr-1"
                         />
-                        {user.is_active ? "Active" : "Inactive"}
                       </span>
                     </td>
 

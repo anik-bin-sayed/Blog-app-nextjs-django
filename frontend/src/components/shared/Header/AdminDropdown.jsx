@@ -2,17 +2,20 @@
 
 import React from "react";
 import Link from "next/link";
+import { useDispatch } from "react-redux";
+import { logoutUser } from "@/redux/services/auth/authSlice";
 import { useLogoutMutation } from "@/redux/services/auth/authApi";
 
 const AdminDropdown = ({ isProfileOpen, data }) => {
+  const dispatch = useDispatch();
   const [logout] = useLogoutMutation();
 
   const handleLogout = async () => {
     try {
       await logout().unwrap();
-      window.location.reload();
+      await dispatch(logoutUser());
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 

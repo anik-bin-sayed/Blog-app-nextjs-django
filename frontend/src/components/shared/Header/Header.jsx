@@ -8,7 +8,8 @@ import Link from "next/link";
 import { useProfileQuery } from "@/redux/services/auth/authApi";
 import AdminDropdown from "./AdminDropdown";
 import { useDispatch } from "react-redux";
-import { setRole } from "@/redux/services/auth/authSlice";
+import { setRole, setStatus } from "@/redux/services/auth/authSlice";
+import BannedUserModal from "@/components/Modal/BannedAlertModal";
 
 const navLinks = [
   { id: 1, name: "Home", href: "/" },
@@ -34,6 +35,7 @@ const Header = () => {
   useEffect(() => {
     if (data) {
       dispatch(setRole(data.role));
+      dispatch(setStatus(data.is_banned));
     }
   }, [data, dispatch]);
 
@@ -47,6 +49,8 @@ const Header = () => {
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
+
+  if (data?.is_banned) return <BannedUserModal />;
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-md">
