@@ -1,27 +1,7 @@
 from rest_framework import serializers
-
-from .models import *
-
-
-# category serializers
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = "__all__"
+from blog.models import Blog
 
 
-class CreateCategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ["id", "name", "slug"]
-
-    def validate_name(self, value):
-        if Category.objects.filter(name=value).exists():
-            raise serializers.ValidationError("Category already exists")
-        return value
-
-
-# Blog serializers
 class BlogListSerializer(serializers.ModelSerializer):
     category = serializers.CharField(source="category.name")
     image = serializers.SerializerMethodField()
@@ -55,14 +35,6 @@ class RelatedBlogSerializer(serializers.ModelSerializer):
         return obj.image.url if obj.image else None
 
 
-class CommentListSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(source="user.username", read_only=True)
-
-    class Meta:
-        model = Comment
-        fields = ["name", "content", "created_at"]
-
-
 class SingleBlogSerializer(serializers.ModelSerializer):
     category = serializers.CharField(source="category.name")
     image = serializers.SerializerMethodField()
@@ -81,9 +53,6 @@ class SingleBlogSerializer(serializers.ModelSerializer):
 
     def get_image(self, obj):
         return obj.image.url if obj.image else None
-
-
-# create blog serializer
 
 
 class CreateBlogSerializer(serializers.ModelSerializer):

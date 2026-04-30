@@ -1,64 +1,19 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
+from rest_framework.generics import DestroyAPIView
+from rest_framework.permissions import IsAuthenticated
+
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import DestroyAPIView
-
-from django.db import IntegrityError
-
-from .permissions import IsAdmin
-
-from .models import *
-from .serializers import *
-from .pagination import BlogPagination
-
-# Create your views here.
 
 
-# Category Views
-class GetAllCategoryView(APIView):
-    def get(self, request):
-        categories = Category.objects.all().order_by("created_at")
-        serializer = CategorySerializer(categories, many=True)
-        return Response(serializer.data)
+from ..models import *
+from ..serializers import *
+from ..pagination import BlogPagination
+from ..permissions import IsAdmin
 
 
-class CreateCategoryView(APIView):
-    def post(self, request):
-        serializer = CreateCategorySerializer(data=request.data)
-
-        try:
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-                return Response(
-                    {"success": True, "message": "Category created successfully"},
-                    status=201,
-                )
-
-        except IntegrityError:
-            return Response(
-                {"success": False, "message": "Category already exists"}, status=400
-            )
-
-        except Exception as e:
-            return Response(
-                {"success": False, "message": "Something went wrong"}, status=500
-            )
-
-
-class DeleteCategoryView(APIView):
-    def delete(self, request, pk):
-        try:
-            category = Category.objects.get(pk=pk)
-            category.delete()
-            return Response(status=204)
-        except Category.DoesNotExist:
-            return Response({"error": "Category not found"}, status=404)
-
-
-# Blog Views
 class BlogListView(ListAPIView):
     queryset = Blog.objects.filter(is_public=True)
     serializer_class = BlogListSerializer
@@ -165,7 +120,6 @@ class RecentBlogsView(APIView):
         return Response(serializer.data)
 
 
-# destroy blog
 class DeleteBlogView(DestroyAPIView):
     queryset = Blog.objects.all()
     permission_classes = [IsAuthenticated, IsAdmin]

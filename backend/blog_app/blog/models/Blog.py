@@ -4,26 +4,9 @@ from django.contrib.auth import get_user_model
 
 from cloudinary.models import CloudinaryField
 
-# Create your models here.
-
+from .Category import Category
 
 User = get_user_model()
-
-
-class Category(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-    slug = models.SlugField(unique=True, blank=True)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
 
 
 class Blog(models.Model):
@@ -61,18 +44,6 @@ class Blog(models.Model):
 
     def __str__(self):
         return self.title
-
-
-class Comment(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
-    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name="blog")
-
-    content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    update_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"{self.user}-{self.content[:20]}"
 
 
 class SavedBlog(models.Model):
