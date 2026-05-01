@@ -3,12 +3,14 @@ import { authApi } from "./services/auth/authApi";
 import { blogApi } from "./services/blogs/blogApi";
 import authReducer from "./services/auth/authSlice";
 import { userApi } from "./services/user/userApi";
+import { commentApi } from "./services/blogs/commentApi";
 
 export const store = configureStore({
   reducer: {
     [authApi.reducerPath]: authApi.reducer,
     [blogApi.reducerPath]: blogApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
+    [commentApi.reducerPath]: commentApi.reducer,
     auth: authReducer,
   },
   middleware: (getDefaultMiddleware) =>
@@ -16,5 +18,6 @@ export const store = configureStore({
       authApi.middleware,
       blogApi.middleware,
       userApi.middleware,
+      commentApi.middleware,
     ),
 });

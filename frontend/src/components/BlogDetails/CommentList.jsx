@@ -1,9 +1,20 @@
 "use client";
 
+import { useBlogDetailsQuery } from "@/redux/services/blogs/blogApi";
+import { useDeleteCommentMutation } from "@/redux/services/blogs/commentApi";
 import React from "react";
 import { FaRegCommentDots } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
-const CommentList = ({ comments = [] }) => {
+const CommentList = ({ comments = [], slug }) => {
+  const { userId, role } = useSelector((state) => state.auth);
+
+  const [deleteComment] = useDeleteCommentMutation();
+
+  const { refetch } = useBlogDetailsQuery(slug, {
+    skip: !slug,
+  });
+
   const formatRelativeTime = (isoString) => {
     const date = new Date(isoString);
     const now = new Date();
@@ -17,6 +28,15 @@ const CommentList = ({ comments = [] }) => {
     if (diffHours < 24) return `${diffHours} hour ago`;
     if (diffDays < 7) return `${diffDays} day ago`;
     return date.toLocaleDateString();
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteComment(id).unwrap();
+      refetch();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   if (comments.length === 0) {
@@ -39,7 +59,6 @@ const CommentList = ({ comments = [] }) => {
     <div className="max-w-4xl mx-auto p-4 mb-10 ">
       <div className="space-y-4">
         {comments.map((comment, idx) => {
-          console.log(comment);
           return (
             <div
               key={idx}
@@ -71,11 +90,16 @@ const CommentList = ({ comments = [] }) => {
                     {comment.content}
                   </p>
 
-                  <div className="flex items-center gap-5 mt-3">
-                    <button className="flex items-center gap-1.5 text-gray-400 hover:text-red-500 transition-colors group/btn">
-                      <span className="text-xs font-medium">Delete</span>
-                    </button>
-                  </div>
+                  {(role == "admin" || userId == comment.user) && (
+                    <div className="flex items-center gap-5 mt-3">
+                      <button
+                        onClick={() => handleDelete(comment.id)}
+                        className="flex items-center gap-1.5 text-gray-400 hover:text-red-500 transition-colors group/btn"
+                      >
+                        <span className="text-xs font-medium">Delete</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

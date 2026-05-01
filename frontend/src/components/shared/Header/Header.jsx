@@ -8,7 +8,12 @@ import Link from "next/link";
 import { useProfileQuery } from "@/redux/services/auth/authApi";
 import AdminDropdown from "./AdminDropdown";
 import { useDispatch } from "react-redux";
-import { setRole, setStatus } from "@/redux/services/auth/authSlice";
+import {
+  setAuth,
+  setRole,
+  setStatus,
+  setUserId,
+} from "@/redux/services/auth/authSlice";
 import BannedUserModal from "@/components/Modal/BannedAlertModal";
 
 const navLinks = [
@@ -36,6 +41,8 @@ const Header = () => {
     if (data) {
       dispatch(setRole(data.role));
       dispatch(setStatus(data.is_banned));
+      dispatch(setUserId(data.id));
+      dispatch(setAuth(true));
     }
   }, [data, dispatch]);
 

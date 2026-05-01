@@ -56,7 +56,7 @@ export const blogApi = createApi({
         url: `/blogs/${slug}/`,
         method: "GET",
       }),
-      providesTags: ["Blog"],
+      providesTags: (result, error, slug) => [{ type: "Blog", id: slug }],
     }),
 
     featuredBlogs: builder.query({
@@ -79,6 +79,14 @@ export const blogApi = createApi({
       query: (id) => ({
         url: `blog/delete/${id}/`,
         method: "DELETE",
+      }),
+      invalidatesTags: ["Blog"],
+    }),
+
+    toggleBlogStatus: builder.mutation({
+      query: (id) => ({
+        url: `blog/toggle-status/${id}/`,
+        method: "PATCH",
       }),
       invalidatesTags: ["Blog"],
     }),
@@ -127,4 +135,5 @@ export const {
   useAdminBlogsQuery,
   useCreateBlogMutation,
   useDeleteBlogsMutation,
+  useToggleBlogStatusMutation,
 } = blogApi;

@@ -1,16 +1,37 @@
-import React, { useState } from "react";
-import { FaCommentDots, FaPaperPlane, FaCheckCircle } from "react-icons/fa";
+import React, { memo, useState } from "react";
 import SubmitButton from "../ui/submitButton";
+import { useCreateCommentMutation } from "@/redux/services/blogs/commentApi";
+import { useBlogDetailsQuery } from "@/redux/services/blogs/blogApi";
 
-const CommentForm = () => {
+const CommentForm = ({ auth, blog, slug }) => {
   const [comment, setComment] = useState("");
   const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+
+  const [createComment, { isLoading }] = useCreateCommentMutation();
+  const { refetch } = useBlogDetailsQuery(slug, {
+    skip: !slug,
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.lod(formData);
+
+    if (!auth) {
+      alert("Please login first!");
+      return;
+    }
+
+    if (!comment.trim()) return;
+
+    try {
+      await createComment({
+        blog: blog.id,
+        content: comment.trim(),
+      }).unwrap();
+      refetch();
+      setComment("");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -21,16 +42,6 @@ const CommentForm = () => {
         </h3>
       </div>
 
-      {isSuccess && (
-        <div className="mb-6 p-4 bg-green-50  rounded-xl flex items-center gap-3 text-green-700  border border-green-200 ">
-          <FaCheckCircle className="w-5 h-5 shrink-0" />
-          <span>
-            Your comment has been submitted successfully! It will appear after
-            moderation.
-          </span>
-        </div>
-      )}
-
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <div className="relative">
@@ -39,7 +50,7 @@ const CommentForm = () => {
               name="comment"
               rows="5"
               value={comment}
-              onChange={(e) => e.target.value}
+              onChange={(e) => setComment(e.target.value)}
               className={`w-full px-4 py-2 rounded-xl border ${
                 errors.comment
                   ? "border-red-500 focus:ring-red-500"
@@ -52,7 +63,7 @@ const CommentForm = () => {
 
         <div className="pt-1">
           <SubmitButton
-            isLoading={isSubmitting}
+            isLoading={isLoading}
             isLoadingText="Processing..."
             type="submit"
             text="Post Comment"
@@ -63,4 +74,4 @@ const CommentForm = () => {
   );
 };
 
-export default CommentForm;
+export default memo(CommentForm);

@@ -2,7 +2,6 @@ from django.urls import path
 
 from .views import *
 
-
 urlpatterns = [
     # category
     path("categories/", GetAllCategoryView.as_view(), name="category"),
@@ -20,4 +19,17 @@ urlpatterns = [
     path("blogs/<slug:slug>/", SingleBlogView.as_view(), name="single-blog"),
     path("blog/create/", CreateBlogView.as_view(), name="create-blog"),
     path("blog/delete/<int:pk>/", DeleteBlogView.as_view(), name="delete-blog"),
+    # toggle blog status
+    path(
+        "blog/toggle-status/<int:pk>/",
+        ToggleBlogStatusView.as_view(),
+        name="toggle-blog-status",
+    ),
+    # comments
+    path("comment/create/", CreateComment.as_view(), name="create-comment"),
+    path(
+        "comment/delete/<int:comment_id>/",
+        DeleteComment.as_view(),
+        name="delete-comment",
+    ),
 ]

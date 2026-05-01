@@ -2,10 +2,15 @@ import React from "react";
 import Image from "next/image";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { CiTimer } from "react-icons/ci";
-import { useDeleteBlogsMutation } from "@/redux/services/blogs/blogApi";
+import {
+  useDeleteBlogsMutation,
+  useToggleBlogStatusMutation,
+} from "@/redux/services/blogs/blogApi";
+import Link from "next/link";
 
-const AdminBlogCard = ({ blog, onEdit, onToggleStatus }) => {
+const AdminBlogCard = ({ blog, onEdit }) => {
   const [deleteBlogs] = useDeleteBlogsMutation();
+  const [toggleBlogStatus, { isLoading }] = useToggleBlogStatusMutation();
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -14,6 +19,14 @@ const AdminBlogCard = ({ blog, onEdit, onToggleStatus }) => {
       month: "short",
       day: "numeric",
     });
+  };
+
+  const handleToggleStatus = async (id) => {
+    try {
+      await toggleBlogStatus(id).unwrap();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleDelete = async (id) => {
@@ -25,16 +38,18 @@ const AdminBlogCard = ({ blog, onEdit, onToggleStatus }) => {
   };
 
   return (
-    <div className="group bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col transform hover:-translate-y-1">
-      <div className="relative h-48 w-full overflow-hidden bg-gray-200">
-        <Image
-          src={blog.image}
-          alt={blog.title}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover group-hover:scale-105 transition-transform duration-500"
-          priority={false}
-        />
+    <div className="group bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden transition-all duration-300 flex flex-col transform hover:-translate-y-1">
+      <div className="relative h-44 w-full overflow-hidden bg-gray-200">
+        <Link href={`/blogs/${blog.slug}`}>
+          <Image
+            src={blog.image}
+            alt={blog.title}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            priority={false}
+          />
+        </Link>
 
         <div className="absolute top-3 right-3 z-10">
           <span
@@ -49,10 +64,13 @@ const AdminBlogCard = ({ blog, onEdit, onToggleStatus }) => {
         </div>
       </div>
 
-      <div className="p-5 flex-1">
-        <h3 className="text-lg font-bold text-gray-900 line-clamp-2 group-hover:text-yellow-600 transition">
+      <div className="p-4 flex-1 ">
+        <Link
+          href={`/blogs/${blog.slug}`}
+          className="text-lg font-bold text-gray-900 line-clamp-2 group-hover:text-yellow-600 transition cursor-pointer"
+        >
           {blog.title}
-        </h3>
+        </Link>
         <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
           <span className="font-medium">Category:</span> {blog.category}
         </p>
@@ -67,7 +85,7 @@ const AdminBlogCard = ({ blog, onEdit, onToggleStatus }) => {
 
       <div className="border-t border-gray-100 px-5 py-3 bg-gray-50/80 flex justify-between items-center">
         <button
-          onClick={() => onToggleStatus(blog.id)}
+          onClick={() => handleToggleStatus(blog.id)}
           className={`text-xs font-medium px-2 py-1 rounded-full transition ${
             blog.is_public
               ? "text-amber-600 hover:bg-amber-50"

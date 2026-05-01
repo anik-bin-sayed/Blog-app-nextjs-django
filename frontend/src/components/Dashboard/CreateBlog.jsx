@@ -140,9 +140,9 @@ const CreateBlog = () => {
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300">
+        <div className="bg-white rounded shadow-xl overflow-hidden transition-all duration-300">
           <div className="bg-linear-to-r from-yellow-400 to-yellow-500 px-6 py-5 sm:px-8">
-            <h1 className="text-2xl sm:text-3xl font-semibold text-black tracking-tight">
+            <h1 className="text-xl sm:text-3xl font-semibold text-black tracking-tight">
               Create New Blog
             </h1>
             <p className="text-black text-sm mt-1">
@@ -166,14 +166,12 @@ const CreateBlog = () => {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                className={`w-full px-4 py-2.5 rounded-md border focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition ${
+                className={`w-full px-4 py-2.5 rounded border focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none ${
                   errors.title ? "border-red-500 bg-red-50" : "border-gray-300"
                 }`}
                 placeholder="Enter an engaging title"
+                required
               />
-              {errors.title && (
-                <p className="mt-1 text-xs text-red-500">{errors.title}</p>
-              )}
             </div>
 
             <TextArea

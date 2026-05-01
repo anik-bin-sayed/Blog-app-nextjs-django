@@ -1,21 +1,7 @@
 import React from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { FaCalendarAlt, FaUser, FaArrowRight } from "react-icons/fa";
 import Card from "../cards/card";
 
 const RelatedBlog = ({ relatedBlog, isLoading, isError }) => {
-  // Format date
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
-
   if (isLoading) {
     return (
       <div className="my-16">

@@ -13,7 +13,7 @@ import {
 } from "react-icons/fa";
 import TextLink from "@/components/ui/textLink";
 
-const ReadBlog = ({ blog, isLoading, isError }) => {
+const ReadBlog = ({ auth, blog, isLoading, isError }) => {
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -142,7 +142,13 @@ const ReadBlog = ({ blog, isLoading, isError }) => {
         )}
 
         <div className="prose prose-lg prose-indigo dark:prose-invert max-w-none">
-          {formatContent(blog.content)}
+          {auth ? (
+            formatContent(blog.content)
+          ) : (
+            <p className="text-center text-red-400">
+              Please login to read all blog
+            </p>
+          )}
         </div>
 
         <div className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-800">

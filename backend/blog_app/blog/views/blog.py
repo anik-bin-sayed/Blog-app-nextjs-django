@@ -88,7 +88,11 @@ class SingleBlogView(APIView):
                 category=blog.category, is_public=True
             ).exclude(id=blog.id)[:3]
 
-            comments = Comment.objects.filter(blog=blog).select_related("user")
+            comments = (
+                Comment.objects.filter(blog=blog)
+                .select_related("user")
+                .order_by("-created_at")
+            )
 
             return Response(
                 {
@@ -123,3 +127,18 @@ class RecentBlogsView(APIView):
 class DeleteBlogView(DestroyAPIView):
     queryset = Blog.objects.all()
     permission_classes = [IsAuthenticated, IsAdmin]
+
+
+class ToggleBlogStatusView(APIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    def patch(self, request, pk):
+        try:
+            blog = Blog.objects.get(pk=pk)
+            blog.is_public = not blog.is_public
+            blog.save()
+            return Response(
+                {"success": True, "message": "Blog status updated successfully"}
+            )
+        except Blog.DoesNotExist:
+            return Response({"error": "Blog not found"}, status=404)

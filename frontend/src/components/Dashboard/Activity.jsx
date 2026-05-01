@@ -217,7 +217,7 @@ const Activity = () => {
                   item.previousMonth,
                 );
                 return (
-                  <tr key={item.month} className="hover:bg-gray-50">
+                  <tr key={idx} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {item.month}
                     </td>

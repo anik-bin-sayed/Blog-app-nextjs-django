@@ -87,9 +87,9 @@ const Blogs = () => {
             <button
               key={item}
               onClick={() => handleStatusChange(item)}
-              className={`px-4 py-1 rounded text-sm capitalize transition ${
+              className={`px-4 py-1 rounded-md text-sm capitalize transition font-medium cursor-pointer ${
                 filters.status === item
-                  ? "bg-yellow-500 text-white shadow"
+                  ? "bg-yellow-500 text-black  shadow"
                   : "bg-gray-200 hover:bg-gray-300"
               }`}
             >
