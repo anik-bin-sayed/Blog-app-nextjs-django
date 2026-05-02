@@ -91,6 +91,15 @@ export const blogApi = createApi({
       invalidatesTags: ["Blog"],
     }),
 
+    updateBlog: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `blog/edit/${id}/`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["Blog"],
+    }),
+
     adminBlogs: builder.query({
       query: ({ status, search, category, page } = {}) => {
         const params = {};
@@ -136,4 +145,5 @@ export const {
   useCreateBlogMutation,
   useDeleteBlogsMutation,
   useToggleBlogStatusMutation,
+  useUpdateBlogMutation,
 } = blogApi;

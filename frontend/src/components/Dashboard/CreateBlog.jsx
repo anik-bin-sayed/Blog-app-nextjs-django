@@ -177,7 +177,7 @@ const CreateBlog = () => {
             <TextArea
               label="Excerpt"
               name="excerpt"
-              errors={errors}
+              error=""
               value={formData.excerpt}
               handleChange={handleChange}
             />
@@ -185,7 +185,7 @@ const CreateBlog = () => {
             <TextArea
               label="Content"
               name="content"
-              errors={errors}
+              error=""
               value={formData.content}
               handleChange={handleChange}
             />

@@ -15,6 +15,7 @@ import {
   setUserId,
 } from "@/redux/services/auth/authSlice";
 import BannedUserModal from "@/components/Modal/BannedAlertModal";
+import GlobalLoader from "@/components/Loader/GlobalLoader";
 
 const navLinks = [
   { id: 1, name: "Home", href: "/" },
@@ -30,7 +31,7 @@ const Header = () => {
   const pathname = usePathname();
   const profileRef = useRef(null);
   const dispatch = useDispatch();
-  const { data } = useProfileQuery();
+  const { data, isLoading } = useProfileQuery();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
@@ -58,6 +59,8 @@ const Header = () => {
   }, []);
 
   if (data?.is_banned) return <BannedUserModal />;
+
+  if (isLoading) return <GlobalLoader />;
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-md">

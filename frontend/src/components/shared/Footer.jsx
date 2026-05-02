@@ -1,35 +1,12 @@
 import Link from "next/link";
 import React from "react";
 import Logo from "../ui/Logo";
+import { useRecentBlogsQuery } from "@/redux/services/blogs/blogApi";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
-  const recentPosts = [
-    {
-      title: "10 Hidden Gems for Your Next Adventure",
-      slug: "hidden-gems",
-      date: "May 18, 2025",
-    },
-    {
-      title: "Sustainable Travel: How to Explore Responsibly",
-      slug: "sustainable-travel",
-      date: "May 15, 2025",
-    },
-    {
-      title: "Ultimate Guide to Solo Travel in 2025",
-      slug: "solo-travel-guide",
-      date: "May 12, 2025",
-    },
-  ];
-
-  const categories = [
-    { name: "Travel Tips", slug: "travel-tips" },
-    { name: "Sustainability", slug: "sustainability" },
-    { name: "Solo Travel", slug: "solo-travel" },
-    { name: "Adventure", slug: "adventure" },
-    { name: "Food & Culture", slug: "food-culture" },
-  ];
+  const { data: recentPosts } = useRecentBlogsQuery();
 
   const socialLinks = [
     {
@@ -55,10 +32,9 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-300">
+    <footer className="bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-300">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-          {/* Brand & Description */}
           <div className="space-y-4">
             <Logo />
             <p className="text-sm text-gray-400 leading-relaxed">
@@ -95,14 +71,13 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Quick Links */}
           <div>
             <h4 className="text-white font-semibold text-lg mb-4 relative inline-block">
               Quick Links
               <span className="absolute bottom-0 left-0 w-8 h-0.5 bg-amber-500 rounded-full -mb-1"></span>
             </h4>
             <ul className="space-y-2">
-              {["Home", "About", "Blog", "Contact"].map((item) => (
+              {["Home", "About", "Blogs", "Contact"].map((item) => (
                 <li key={item}>
                   <Link
                     href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
@@ -115,23 +90,25 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Recent Posts */}
           <div>
             <h4 className="text-white font-semibold text-lg mb-4 relative inline-block">
               Recent Posts
               <span className="absolute bottom-0 left-0 w-8 h-0.5 bg-amber-500 rounded-full -mb-1"></span>
             </h4>
             <ul className="space-y-3">
-              {recentPosts.map((post) => (
-                <li key={post.slug}>
-                  <Link href={`/blog/${post.slug}`} className="group block">
-                    <p className="text-sm font-medium text-gray-300 group-hover:text-amber-400 transition-colors">
-                      {post.title}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-0.5">{post.date}</p>
-                  </Link>
-                </li>
-              ))}
+              {recentPosts &&
+                recentPosts.map((post) => (
+                  <li key={post.slug}>
+                    <Link href={`/blogs/${post.slug}`} className="group block">
+                      <p className="text-sm font-medium text-gray-300 group-hover:text-amber-400 transition-colors">
+                        {post.title}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        {post.date}
+                      </p>
+                    </Link>
+                  </li>
+                ))}
             </ul>
           </div>
 
@@ -145,16 +122,16 @@ const Footer = () => {
               Get the latest posts and travel inspiration straight to your
               inbox.
             </p>
-            <form className="flex flex-col sm:flex-row gap-2">
+            <form className="sm:flex-row gap-2">
               <input
                 type="email"
                 placeholder="Your email address"
-                className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm text-white placeholder-gray-500"
+                className="flex-1 w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm text-white placeholder-gray-500"
                 required
               />
               <button
                 type="submit"
-                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-lg transition-colors duration-200 text-sm shadow-md"
+                className="px-4 py-2 mt-4 bg-yellow-600 hover:bg-yellow-700 text-black font-medium rounded transition-colors duration-200 text-sm shadow-md cursor-pointer "
               >
                 Subscribe
               </button>

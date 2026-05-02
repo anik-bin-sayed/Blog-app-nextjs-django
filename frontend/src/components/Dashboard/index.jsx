@@ -8,12 +8,25 @@ import CreateBlog from "./CreateBlog";
 import { RxCross2 } from "react-icons/rx";
 import { GiHamburgerMenu } from "react-icons/gi";
 
+import { useRouter, useSearchParams } from "next/navigation";
+
 export default function Dashboard() {
-  const [activeSection, setActiveSection] = useState("activities");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const activeSection = searchParams.get("tab") || "activities";
+  // const [activeSection, setActiveSection] = useState("activities");
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const toggleSidebar = () => setMobileSidebarOpen(!mobileSidebarOpen);
   const closeSidebar = () => setMobileSidebarOpen(false);
+
+  const handleTabChange = (section) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", section);
+
+    router.push(`?${params.toString()}`);
+  };
 
   const getClassName = (section) => {
     return `w-full flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors cursor-pointer text-black ${
@@ -61,7 +74,7 @@ export default function Dashboard() {
             <li>
               <button
                 onClick={() => {
-                  setActiveSection("activities");
+                  handleTabChange("activities");
                   closeSidebar();
                 }}
                 className={getClassName("activities")}
@@ -72,7 +85,7 @@ export default function Dashboard() {
             <li>
               <button
                 onClick={() => {
-                  setActiveSection("blogs");
+                  handleTabChange("blogs");
                   closeSidebar();
                 }}
                 className={getClassName("blogs")}
@@ -83,7 +96,7 @@ export default function Dashboard() {
             <li>
               <button
                 onClick={() => {
-                  setActiveSection("users");
+                  handleTabChange("users");
                   closeSidebar();
                 }}
                 className={getClassName("users")}
@@ -94,7 +107,7 @@ export default function Dashboard() {
             <li>
               <button
                 onClick={() => {
-                  setActiveSection("create");
+                  handleTabChange("create");
                   closeSidebar();
                 }}
                 className={getClassName("create")}
@@ -120,7 +133,7 @@ export default function Dashboard() {
 
         <div className="lg:pt-0 pt-12">
           {activeSection === "blogs" && (
-            <Blogs setActiveSection={setActiveSection} />
+            <Blogs setActiveSection={handleTabChange} />
           )}
           {activeSection === "users" && <AllUser />}
           {activeSection === "activities" && <Activity />}

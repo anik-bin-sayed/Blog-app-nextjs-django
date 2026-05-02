@@ -142,3 +142,23 @@ class ToggleBlogStatusView(APIView):
             )
         except Blog.DoesNotExist:
             return Response({"error": "Blog not found"}, status=404)
+
+
+class EditBlogView(APIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    def put(self, request, pk):
+        try:
+            blog = Blog.objects.get(pk=pk)
+            serializer = EditBlogSerializer(blog, data=request.data)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(
+                    {"success": True, "message": "Blog updated successfully"}
+                )
+            else:
+                return Response(serializer.errors, status=400)
+
+        except Blog.DoesNotExist:
+            return Response({"error": "Blog not found"}, status=404)

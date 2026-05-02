@@ -32,4 +32,5 @@ urlpatterns = [
         DeleteComment.as_view(),
         name="delete-comment",
     ),
+    path("blog/edit/<int:pk>/", EditBlogView.as_view(), name="edit-blog"),
 ]

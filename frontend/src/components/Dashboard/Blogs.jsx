@@ -1,21 +1,24 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { FaPlus, FaCloudUploadAlt } from "react-icons/fa";
 import { useAdminBlogsQuery } from "@/redux/services/blogs/blogApi";
 import AdminBlogCard from "../cards/AdminBlogCard";
 import { IoSearch } from "react-icons/io5";
 import ComponentLoader from "../Loader/ComponentLoader";
+import EditBlogDrawer from "./EditBlogDrawer";
 
-const Blogs = () => {
-  const [filters, setFilters] = useState({
-    page: 1,
-    status: "all",
-    search: "",
-    category: "",
-  });
-
+const initialFilterState = {
+  page: 1,
+  status: "all",
+  search: "",
+  category: "",
+};
+const Blogs = ({ setActiveSection }) => {
+  const [filters, setFilters] = useState(initialFilterState);
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [blogToEdit, setBlogToEdit] = useState(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -60,6 +63,16 @@ const Blogs = () => {
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   };
 
+  const onEdit = (blog) => {
+    setBlogToEdit(blog);
+    setIsDrawerOpen(true);
+  };
+
+  const handleCloseDrawer = useCallback(() => {
+    setIsDrawerOpen(false);
+    setBlogToEdit(null);
+  }, []);
+
   if (isLoading) return <ComponentLoader />;
 
   return (
@@ -99,7 +112,7 @@ const Blogs = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto ">
         {data?.results?.length === 0 ? (
           <div className="text-center p-10 bg-white rounded-xl">
             <FaCloudUploadAlt className="mx-auto text-4xl text-gray-400" />
@@ -108,13 +121,13 @@ const Blogs = () => {
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {data?.results?.map((blog, index) => (
-              <AdminBlogCard key={index} blog={blog} />
+              <AdminBlogCard key={index} blog={blog} onEdit={onEdit} />
             ))}
           </div>
         )}
       </div>
 
-      <div className="flex justify-center items-center gap-2 pb-10 flex-wrap">
+      <div className="flex justify-center items-center gap-2 py-10 flex-wrap">
         <button
           onClick={() => goToPage(currentPage - 1)}
           disabled={!data?.previous}
@@ -145,6 +158,13 @@ const Blogs = () => {
           Next
         </button>
       </div>
+      {isDrawerOpen && (
+        <EditBlogDrawer
+          isOpen={isDrawerOpen}
+          onClose={handleCloseDrawer}
+          editBlog={blogToEdit}
+        />
+      )}
     </div>
   );
 };

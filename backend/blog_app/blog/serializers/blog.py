@@ -14,9 +14,11 @@ class BlogListSerializer(serializers.ModelSerializer):
             "title",
             "image",
             "excerpt",
+            "content",
             "category",
             "is_public",
             "created_at",
+            "is_featured",
         ]
 
     def get_image(self, obj):
@@ -43,13 +45,14 @@ class SingleBlogSerializer(serializers.ModelSerializer):
         model = Blog
         fields = [
             "id",
-            "title",
             "slug",
-            "category",
+            "image",
+            "title",
             "excerpt",
             "content",
-            "image",
+            "category",
             "created_at",
+            "is_featured",
         ]
 
     def get_image(self, obj):
@@ -60,11 +63,29 @@ class CreateBlogSerializer(serializers.ModelSerializer):
     class Meta:
         model = Blog
         fields = [
-            "title",
             "slug",
-            "category",
-            "is_public",
+            "image",
+            "title",
             "excerpt",
             "content",
-            "image",
+            "category",
+            "is_public",
         ]
+
+
+class EditBlogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Blog
+        fields = [
+            "slug",
+            "image",
+            "title",
+            "excerpt",
+            "content",
+            "category",
+            "is_featured",
+        ]
+        extra_kwargs = {
+            "slug": {"required": False},
+            "image": {"required": False, "allow_null": True},
+        }

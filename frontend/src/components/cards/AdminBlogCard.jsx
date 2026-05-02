@@ -38,7 +38,7 @@ const AdminBlogCard = ({ blog, onEdit }) => {
   };
 
   return (
-    <div className="group bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden transition-all duration-300 flex flex-col transform hover:-translate-y-1">
+    <div className="group bg-white rounded-xl shadow-md border  border-gray-100 overflow-hidden transition-all duration-300 flex flex-col transform hover:-translate-y-1">
       <div className="relative h-44 w-full overflow-hidden bg-gray-200">
         <Link href={`/blogs/${blog.slug}`}>
           <Image
