@@ -56,7 +56,6 @@ const EditBlogDrawer = ({ isOpen, onClose, editBlog = null }) => {
       setErrors({});
       setSuccessMessage("");
       setFeatured(false);
-      setIsPublic(true);
     };
 
     if (editBlog) {
@@ -70,9 +69,6 @@ const EditBlogDrawer = ({ isOpen, onClose, editBlog = null }) => {
       setThumbnailPreview(editBlog.thumbnail_url || null);
 
       setFeatured(Boolean(editBlog.is_featured));
-      setIsPublic(
-        editBlog.is_public !== undefined ? Boolean(editBlog.is_public) : true,
-      );
     } else {
       resetForm();
     }
@@ -156,7 +152,6 @@ const EditBlogDrawer = ({ isOpen, onClose, editBlog = null }) => {
       formDataToSend.append("content", formData.content);
       formDataToSend.append("category", selectedCategory);
       formDataToSend.append("is_featured", featured);
-      formDataToSend.append("is_public", isPublic || false);
 
       if (thumbnailFile) {
         formDataToSend.append("image", thumbnailFile);
@@ -252,7 +247,7 @@ const EditBlogDrawer = ({ isOpen, onClose, editBlog = null }) => {
               name="title"
               value={formData.title}
               onChange={handleChange}
-              className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition ${
+              className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition placeholder:text-gray-500 text-gray-700 ${
                 errors.title ? "border-red-500 bg-red-50" : "border-gray-300"
               }`}
               placeholder="Enter an engaging title"

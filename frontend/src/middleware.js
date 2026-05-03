@@ -30,7 +30,7 @@ export function middleware(request) {
     }
   }
 
-  const protectedRoutes = ["/profile", "/dashboard"];
+  const protectedRoutes = ["/saved-blog", "/dashboard"];
   const isProtected = protectedRoutes.some((route) =>
     pathname.startsWith(route),
   );

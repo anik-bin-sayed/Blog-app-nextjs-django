@@ -166,7 +166,7 @@ const CreateBlog = () => {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                className={`w-full px-4 py-2.5 rounded border focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none ${
+                className={`w-full px-4 py-2.5 rounded border focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none placeholder:text-gray-500 text-gray-700 ${
                   errors.title ? "border-red-500 bg-red-50" : "border-gray-300"
                 }`}
                 placeholder="Enter an engaging title"
@@ -186,6 +186,7 @@ const CreateBlog = () => {
               label="Content"
               name="content"
               error=""
+              row={10}
               value={formData.content}
               handleChange={handleChange}
             />

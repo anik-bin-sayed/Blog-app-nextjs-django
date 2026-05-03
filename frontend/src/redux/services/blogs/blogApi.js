@@ -128,6 +128,22 @@ export const blogApi = createApi({
       },
       providesTags: ["Blog"],
     }),
+
+    savedBlogs: builder.mutation({
+      query: (blogId) => ({
+        url: `blog/save/${blogId}/`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Blog"],
+    }),
+
+    savedBlogsList: builder.query({
+      query: () => ({
+        url: `blog/saved/`,
+        method: "GET",
+      }),
+      providesTags: ["Blog"],
+    }),
   }),
 });
 
@@ -146,4 +162,8 @@ export const {
   useDeleteBlogsMutation,
   useToggleBlogStatusMutation,
   useUpdateBlogMutation,
+
+  // saved blog
+  useSavedBlogsMutation,
+  useSavedBlogsListQuery,
 } = blogApi;

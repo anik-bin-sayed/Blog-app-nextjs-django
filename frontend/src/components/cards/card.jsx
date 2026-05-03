@@ -1,9 +1,20 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import { FaArrowRight } from "react-icons/fa";
+import { FaArrowRight, FaBookmark, FaRegBookmark } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
-const Card = ({ post }) => {
+const Card = ({ post, onSave, savedButton = false, isSaved }) => {
+  const { auth } = useSelector((state) => state.auth);
+
+  const handleSaveClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onSave) onSave(post.id);
+  };
+
+  const isButtonShown = savedButton && auth;
+
   return (
     <article className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer border border-gray-100">
       <Link href={`/blogs/${post.slug}`}>
@@ -16,16 +27,31 @@ const Card = ({ post }) => {
             priority
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
+          {/* Category badge */}
           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-amber-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">
             {post.category}
           </div>
+
+          {/* saved button */}
+          {isButtonShown && (
+            <button
+              onClick={handleSaveClick}
+              className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-white transition-all duration-200 focus:outline-none"
+              aria-label={isSaved ? "Unsave blog" : "Save blog"}
+            >
+              {isSaved ? (
+                <FaBookmark className="text-amber-600 w-4 h-4" />
+              ) : (
+                <FaRegBookmark className="text-gray-700 w-4 h-4 hover:text-amber-500 transition" />
+              )}
+            </button>
+          )}
         </div>
       </Link>
 
       <div className="p-5 flex-1 flex flex-col">
         <div className="flex items-center text-xs text-gray-500 mb-2 space-x-2 tracking-wide">
           <span className="font-medium">
-            {" "}
             {new Date(post.created_at).toLocaleDateString("en-BD", {
               year: "numeric",
               month: "long",

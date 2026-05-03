@@ -11,8 +11,8 @@ const TextArea = ({ errors, value, handleChange, label, name, row = 4 }) => {
         name={name}
         value={value}
         onChange={handleChange}
-        className={`w-full px-4 py-2.5 rounded-md border focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none resize-none ${
-          errors ? "border-red-500 bg-red-50" : "border-gray-300"
+        className={`w-full px-4 py-2.5 rounded-md border focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none resize-none placeholder:text-gray-500 text-gray-700 ${
+          errors ? "border-red-500 bg-red-50" : "border-gray-300 "
         }`}
         placeholder="Short summary of your blog post..."
       />

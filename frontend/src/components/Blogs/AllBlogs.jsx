@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   useBlogListQuery,
   useGetAllCategoriesQuery,
+  useSavedBlogsListQuery,
+  useSavedBlogsMutation,
 } from "@/redux/services/blogs/blogApi";
 import Card from "../cards/card";
 import CardLoader from "../utils/CardLoader";
@@ -19,9 +21,11 @@ const AllBlogs = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const page = Number(searchParams.get("page") || 1);
+  const page = searchParams.get("page") || 1;
   const search = searchParams.get("search") || "";
   const ordering = searchParams.get("ordering") || "-created_at";
+
+  const [localSaved, setLocalSaved] = useState(new Set());
 
   const [tempSearch, setTempSearch] = useState(search);
   const [category, setCategory] = useState("");
@@ -31,6 +35,8 @@ const AllBlogs = () => {
     { refetchOnMountOrArgChange: true },
   );
   const { data: categories } = useGetAllCategoriesQuery();
+  const [savedBlogs] = useSavedBlogsMutation();
+  const { data: savedPosts, refetch } = useSavedBlogsListQuery();
 
   const posts = data?.results || [];
   const totalCount = data?.count || 0;
@@ -83,6 +89,50 @@ const AllBlogs = () => {
     setTempSearch("");
     updateURL(1, "", "-created_at");
   };
+
+  const serverSavedIds = new Set(savedPosts?.map((item) => item.blog));
+
+  const finalSavedIds = new Set([...serverSavedIds, ...localSaved]);
+
+  const handleSaveClick = async (id) => {
+    const isSaved = finalSavedIds.has(id);
+
+    if (!isSaved && finalSavedIds.size > 8) {
+      alert("Max 8 saved blogs");
+      return;
+    }
+
+    setLocalSaved((prev) => {
+      const newSet = new Set(prev);
+
+      if (isSaved) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+
+      return newSet;
+    });
+
+    try {
+      const res = await savedBlogs(id).unwrap();
+    } catch (error) {
+      alert(error?.data?.message);
+
+      setLocalSaved((prev) => {
+        const newSet = new Set(prev);
+
+        if (isSaved) {
+          newSet.add(id);
+        } else {
+          newSet.delete(id);
+        }
+
+        return newSet;
+      });
+    }
+  };
+  const savedIds = new Set(savedPosts?.map((item) => item.id));
 
   if (isLoading) {
     return (
@@ -216,9 +266,18 @@ const AllBlogs = () => {
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {posts.map((post, index) => (
-              <Card key={index} post={post} />
-            ))}
+            {posts.map((post) => {
+              const isSaved = savedIds.has(post.id);
+              return (
+                <Card
+                  key={post.id}
+                  post={post}
+                  onSave={handleSaveClick}
+                  savedButton={true}
+                  isSaved={isSaved}
+                />
+              );
+            })}
           </div>
 
           {totalPages > 1 && (
