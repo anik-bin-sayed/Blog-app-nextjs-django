@@ -33,4 +33,7 @@ urlpatterns = [
         name="delete-comment",
     ),
     path("blog/edit/<int:pk>/", EditBlogView.as_view(), name="edit-blog"),
+    # saved blogs
+    path("blog/saved/", UserSavedBlogsView.as_view(), name="saved-blogs"),
+    path("blog/save/<int:blog_id>/", SavedBlogsView.as_view(), name="save-blog"),
 ]

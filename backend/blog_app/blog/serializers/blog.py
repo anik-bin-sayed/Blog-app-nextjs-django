@@ -89,3 +89,11 @@ class EditBlogSerializer(serializers.ModelSerializer):
             "slug": {"required": False},
             "image": {"required": False, "allow_null": True},
         }
+
+
+class BlogAdminListSerializer(serializers.ModelSerializer):
+    category = serializers.CharField(source="category.name")
+
+    class Meta:
+        model = Blog
+        fields = "__all__"

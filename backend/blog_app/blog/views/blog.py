@@ -3,9 +3,11 @@ from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
 from rest_framework.generics import DestroyAPIView
 from rest_framework.permissions import IsAuthenticated
-
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
+
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 from ..models import *
@@ -119,7 +121,7 @@ class FeaturedBlogsView(APIView):
 
 class RecentBlogsView(APIView):
     def get(self, request):
-        recent_blogs = Blog.objects.filter(is_public=True).order_by("-created_at")[:5]
+        recent_blogs = Blog.objects.filter(is_public=True).order_by("-created_at")[:4]
         serializer = BlogListSerializer(recent_blogs, many=True)
         return Response(serializer.data)
 
@@ -162,3 +164,44 @@ class EditBlogView(APIView):
 
         except Blog.DoesNotExist:
             return Response({"error": "Blog not found"}, status=404)
+
+
+class SavedBlogsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, blog_id):
+        user = request.user
+
+        blog = get_object_or_404(Blog, id=blog_id, is_public=True)
+
+        with transaction.atomic():
+            saved_qs = SavedBlog.objects.select_for_update().filter(user=user)
+
+            existing = saved_qs.filter(blog=blog).first()
+
+            if existing:
+                existing.delete()
+                return Response(
+                    {"success": True, "message": "Blog removed from saved list"}
+                )
+
+            if saved_qs.count() >= 8:
+                return Response(
+                    {"success": False, "message": "You can save maximum 8 blogs only"},
+                    status=400,
+                )
+
+            SavedBlog.objects.create(user=user, blog=blog)
+
+        return Response({"success": True, "message": "Blog added to saved list"})
+
+
+class UserSavedBlogsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        saved_blogs = SavedBlog.objects.filter(user=user).select_related("blog")
+        blogs = [saved.blog for saved in saved_blogs]
+        serializer = BlogListSerializer(blogs, many=True)
+        return Response(serializer.data)
