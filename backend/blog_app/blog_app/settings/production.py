@@ -2,10 +2,10 @@ from .base import *
 
 DEBUG = False
 
-ALLOWED_HOSTS = ["yourdomain.com"]
+ALLOWED_HOSTS = ["*"]
 
 CORS_ALLOWED_ORIGINS = [
-    "https://yourfrontend.com",
+    "http://localhost:3000/",
 ]
 
 SECURE_SSL_REDIRECT = True

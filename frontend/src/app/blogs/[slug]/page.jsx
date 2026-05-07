@@ -8,6 +8,7 @@ import RecentBlog from "@/components/BlogDetails/RelatedBlog";
 import CommentForm from "@/components/BlogDetails/CommentForm";
 import CommentList from "@/components/BlogDetails/CommentList";
 import { useSelector } from "react-redux";
+import { Suspense } from "react";
 
 const Page = () => {
   const params = useParams();
@@ -37,12 +38,14 @@ const Page = () => {
           isError={isError}
         />
         <CommentForm auth={auth} blog={blog} slug={slug} />
-        <CommentList
-          comments={comments}
-          isLoading={isLoading}
-          isError={isError}
-          slug={slug}
-        />
+        <Suspense fallback={<div>Loading...</div>}>
+          <CommentList
+            comments={comments}
+            isLoading={isLoading}
+            isError={isError}
+            slug={slug}
+          />
+        </Suspense>
       </div>
     </div>
   );

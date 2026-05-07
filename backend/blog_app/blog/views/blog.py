@@ -9,6 +9,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 
+import cloudinary.uploader
 
 from ..models import *
 from ..serializers import *
@@ -42,7 +43,19 @@ class CreateBlogView(APIView):
         serializer = CreateBlogSerializer(data=request.data)
 
         if serializer.is_valid():
-            serializer.save(author=request.user)
+            image_file = request.FILES.get("image")
+            image_url = None
+            image_public_id = None
+
+            if image_file:
+                result = cloudinary.uploader.upload(image_file)
+                image_url = result["secure_url"]
+                image_public_id = result["public_id"]
+
+            serializer.save(
+                author=request.user, image=image_url, image_public_id=image_public_id
+            )
+
             return Response(
                 {"success": True, "message": "Blog created successfully"}, status=201
             )
@@ -126,9 +139,22 @@ class RecentBlogsView(APIView):
         return Response(serializer.data)
 
 
-class DeleteBlogView(DestroyAPIView):
-    queryset = Blog.objects.all()
+class DeleteBlogView(APIView):
     permission_classes = [IsAuthenticated, IsAdmin]
+
+    def delete(self, request, id):
+        try:
+            blog = Blog.objects.get(id=id)
+            print(blog)
+
+            if blog.image_public_id:
+                cloudinary.uploader.destroy(blog.image_public_id)
+
+            blog.delete()
+
+            return Response({"message": "Blog delete successfully"})
+        except Blog.DoesNotExist:
+            return Response({"error": "Blog not found!"}, status=404)
 
 
 class ToggleBlogStatusView(APIView):

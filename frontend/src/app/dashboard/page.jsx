@@ -1,10 +1,13 @@
 import Dashboard from "@/components/Dashboard";
-import React from "react";
+import GlobalLoader from "@/components/Loader/GlobalLoader";
+import React, { Suspense } from "react";
 
 const page = () => {
   return (
     <>
-      <Dashboard />
+      <Suspense fallback={<GlobalLoader />}>
+        <Dashboard />
+      </Suspense>
     </>
   );
 };

@@ -5,23 +5,8 @@ import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "@/redux/services/auth/authSlice";
 import { useLogoutMutation } from "@/redux/services/auth/authApi";
-
-// Heroicons (free, you can replace with any icon set)
-const UserIcon = () => (
-  <svg
-    className="w-5 h-5"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="1.5"
-      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-    />
-  </svg>
-);
+import { IoIosNotificationsOutline } from "react-icons/io";
+import { useNotificationListQuery } from "@/redux/services/blogs/notification";
 
 const DashboardIcon = () => (
   <svg
@@ -71,7 +56,7 @@ const LogoutIcon = () => (
   </svg>
 );
 
-const AdminDropdown = ({ isProfileOpen, data }) => {
+const AdminDropdown = ({ isProfileOpen, data, unreadNotificationLength }) => {
   const dispatch = useDispatch();
   const [logout] = useLogoutMutation();
 
@@ -79,6 +64,7 @@ const AdminDropdown = ({ isProfileOpen, data }) => {
     try {
       await logout().unwrap();
       dispatch(logoutUser());
+      window.location.reload();
     } catch (error) {
       console.error(error);
     }
@@ -89,17 +75,15 @@ const AdminDropdown = ({ isProfileOpen, data }) => {
       className={`absolute right-0 mt-2 w-72 bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-100/50 transition-all duration-300 origin-top-right z-50 ${
         isProfileOpen
           ? "scale-100 opacity-100 translate-y-0"
-          : "scale-95 opacity-0 translate-y-[-8px] pointer-events-none"
+          : "scale-95 opacity-0 translate-y-2 pointer-events-none"
       }`}
     >
-      {/* Decorative top accent */}
       <div className="absolute -top-1 right-4 w-3 h-3 rotate-45 bg-white border-l border-t border-gray-100/50"></div>
 
-      {/* Profile header */}
       <div className="p-5 border-b border-gray-100">
         <div className="flex items-center gap-4">
           <div className="relative">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-white flex items-center justify-center text-xl font-bold shadow-md">
+            <div className="w-14 h-14 rounded-full bg-linear-to-br from-amber-400 to-orange-500 text-white flex items-center justify-center text-xl font-bold shadow-md">
               {data?.username?.[0]?.toUpperCase()}
             </div>
             <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white"></div>
@@ -118,20 +102,41 @@ const AdminDropdown = ({ isProfileOpen, data }) => {
 
       <ul className="py-2 px-2 space-y-1">
         {data?.role === "admin" && (
-          <li>
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 transition-all duration-200 group"
-            >
-              <span className="text-gray-400 group-hover:text-yellow-500 transition">
-                <DashboardIcon />
-              </span>
-              <span className="font-medium">Dashboard</span>
-            </Link>
-          </li>
+          <>
+            <li>
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 transition-all duration-200 group"
+              >
+                <span className="text-gray-400 group-hover:text-yellow-500 transition">
+                  <DashboardIcon />
+                </span>
+                <span className="font-medium">Dashboard</span>
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                href="/notifications"
+                className="flex items-center justify-between px-4 py-3 rounded-xl bg-white shadow-sm hover:shadow-md hover:bg-yellow-50 transition-all duration-300 group"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-gray-400 group-hover:text-yellow-500 text-lg transition">
+                    <IoIosNotificationsOutline />
+                  </span>
+                  <span className="font-medium text-gray-700 group-hover:text-yellow-600 transition">
+                    Notifications
+                  </span>
+                </div>
+
+                <span className="min-w-6 h-6 px-2 flex items-center justify-center text-xs font-semibold text-white bg-red-500 rounded-full shadow-sm group-hover:bg-red-600 transition">
+                  {unreadNotificationLength?.unread_count}
+                </span>
+              </Link>
+            </li>
+          </>
         )}
 
-        {/* Saved blogs (for non-admin) */}
         {data?.role !== "admin" && (
           <li>
             <Link

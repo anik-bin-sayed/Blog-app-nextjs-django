@@ -15,9 +15,18 @@ import {
 } from "react-icons/fa";
 import { MdOutlineDescription } from "react-icons/md";
 import { IoWarningOutline } from "react-icons/io5";
+import { useSelector } from "react-redux";
 
 const SavedBlog = () => {
-  const { data: savedPosts, isLoading, isError } = useSavedBlogsListQuery();
+  const { auth } = useSelector((state) => state.auth);
+  console.log(auth);
+  const {
+    data: savedPosts,
+    isLoading,
+    isError,
+  } = useSavedBlogsListQuery(auth, {
+    skip: !auth,
+  });
   const [savedBlogs] = useSavedBlogsMutation();
 
   const handleUnsave = async (postId) => {

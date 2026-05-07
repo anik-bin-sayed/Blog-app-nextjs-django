@@ -260,6 +260,7 @@ const CreateBlog = () => {
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition"
+                    required
                   >
                     <option value="">Select a category</option>
                     {categories &&

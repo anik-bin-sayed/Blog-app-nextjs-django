@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useProfileQuery } from "@/redux/services/auth/authApi";
 import AdminDropdown from "./AdminDropdown";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   setAuth,
   setRole,
@@ -16,6 +16,12 @@ import {
 } from "@/redux/services/auth/authSlice";
 import BannedUserModal from "@/components/Modal/BannedAlertModal";
 import GlobalLoader from "@/components/Loader/GlobalLoader";
+import { IoIosNotifications } from "react-icons/io";
+import useNotifications from "@/hooks/useNotifications";
+import {
+  useNotificationLengthQuery,
+  useNotificationListQuery,
+} from "@/redux/services/blogs/notification";
 
 const navLinks = [
   { id: 1, name: "Home", href: "/" },
@@ -25,18 +31,25 @@ const navLinks = [
 ];
 
 const Header = () => {
+  const { auth } = useSelector((state) => state.auth);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const pathname = usePathname();
   const profileRef = useRef(null);
   const dispatch = useDispatch();
+
   const { data, isLoading } = useProfileQuery();
+  const { data: notifications } = useNotificationListQuery();
+
+  const { data: unreadNotificationLength } = useNotificationLengthQuery();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
 
   const toggleProfile = () => setIsProfileOpen(!isProfileOpen);
+
+  console.log(notifications);
 
   useEffect(() => {
     if (data) {
@@ -85,18 +98,36 @@ const Header = () => {
           </div>
 
           <div className="flex items-center space-x-2">
-            {data?.id ? (
-              <div
-                onClick={toggleProfile}
-                ref={profileRef}
-                className="relative"
+            {data?.id && data?.role == "admin" && (
+              <Link
+                href="/notifications"
+                className="relative cursor-pointer p-2 rounded-full hover:bg-gray-100 transition-all duration-200 group"
               >
-                <div className="w-10 h-10 rounded-full border bg-amber-600 flex items-center justify-center uppercase font-semibold text-md text-white cursor-pointer">
-                  {data?.username[0]}
+                <IoIosNotifications className="text-xl text-gray-600 group-hover:text-yellow-500 transition" />
+
+                <span className="absolute -top-1 -right-1 min-w-4.5 h-4.5 px-1 flex items-center justify-center text-[10px] font-semibold text-white bg-red-500 rounded-full">
+                  {unreadNotificationLength?.unread_count}
+                </span>
+              </Link>
+            )}
+            {data?.id ? (
+              <div className="flex gap-6">
+                <div
+                  onClick={toggleProfile}
+                  ref={profileRef}
+                  className="relative"
+                >
+                  <div className="w-10 h-10 rounded-full border bg-amber-600 flex items-center justify-center uppercase font-semibold text-md text-white cursor-pointer">
+                    {data?.username[0]}
+                  </div>
+                  {isProfileOpen && (
+                    <AdminDropdown
+                      isProfileOpen={isProfileOpen}
+                      data={data}
+                      unreadNotificationLength={unreadNotificationLength}
+                    />
+                  )}
                 </div>
-                {isProfileOpen && (
-                  <AdminDropdown isProfileOpen={isProfileOpen} data={data} />
-                )}
               </div>
             ) : (
               <Link

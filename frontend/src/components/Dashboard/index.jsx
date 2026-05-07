@@ -15,7 +15,7 @@ export default function Dashboard() {
   const searchParams = useSearchParams();
 
   const activeSection = searchParams.get("tab") || "activities";
-  // const [activeSection, setActiveSection] = useState("activities");
+
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const toggleSidebar = () => setMobileSidebarOpen(!mobileSidebarOpen);
@@ -132,9 +132,7 @@ export default function Dashboard() {
         </button>
 
         <div className="lg:pt-0 pt-12">
-          {activeSection === "blogs" && (
-            <Blogs setActiveSection={handleTabChange} />
-          )}
+          {activeSection === "blogs" && <Blogs />}
           {activeSection === "users" && <AllUser />}
           {activeSection === "activities" && <Activity />}
           {activeSection === "create" && <CreateBlog />}

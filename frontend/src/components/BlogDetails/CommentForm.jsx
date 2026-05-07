@@ -2,6 +2,7 @@ import React, { memo, useState } from "react";
 import SubmitButton from "../ui/submitButton";
 import { useCreateCommentMutation } from "@/redux/services/blogs/commentApi";
 import { useBlogDetailsQuery } from "@/redux/services/blogs/blogApi";
+import { useNotificationListQuery } from "@/redux/services/blogs/notification";
 
 const CommentForm = ({ auth, blog, slug }) => {
   const [comment, setComment] = useState("");
@@ -11,6 +12,7 @@ const CommentForm = ({ auth, blog, slug }) => {
   const { refetch } = useBlogDetailsQuery(slug, {
     skip: !slug,
   });
+  const { refetch: notificationRefetch } = useNotificationListQuery();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,6 +29,7 @@ const CommentForm = ({ auth, blog, slug }) => {
         blog: blog.id,
         content: comment.trim(),
       }).unwrap();
+      notificationRefetch();
       refetch();
       setComment("");
     } catch (error) {

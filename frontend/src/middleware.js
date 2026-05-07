@@ -30,7 +30,13 @@ export function middleware(request) {
     }
   }
 
-  const protectedRoutes = ["/saved-blog", "/dashboard"];
+  if (pathname.includes("/notifications")) {
+    if (role !== "admin") {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+  }
+
+  const protectedRoutes = ["/saved-blog", "/dashboard", "/notifications"];
   const isProtected = protectedRoutes.some((route) =>
     pathname.startsWith(route),
   );

@@ -18,7 +18,7 @@ urlpatterns = [
     path("admin/blogs/", AdminBlogListView.as_view(), name="admin-blogs"),
     path("blogs/<slug:slug>/", SingleBlogView.as_view(), name="single-blog"),
     path("blog/create/", CreateBlogView.as_view(), name="create-blog"),
-    path("blog/delete/<int:pk>/", DeleteBlogView.as_view(), name="delete-blog"),
+    path("blog/delete/<int:id>/", DeleteBlogView.as_view(), name="delete-blog"),
     # toggle blog status
     path(
         "blog/toggle-status/<int:pk>/",
@@ -36,4 +36,19 @@ urlpatterns = [
     # saved blogs
     path("blog/saved/", UserSavedBlogsView.as_view(), name="saved-blogs"),
     path("blog/save/<int:blog_id>/", SavedBlogsView.as_view(), name="save-blog"),
+    # notifications
+    path("notifications/", GetNotificationView.as_view()),
+    path("mark-all-as-read/", MarkAllAsRead.as_view(), name="mark-all-as-read"),
+    path("mark-as-read/<int:id>", MarkAsRead.as_view(), name="mark-as-read"),
+    path(
+        "delete-notification/<int:id>",
+        DeleteNotification.as_view(),
+        name="delete-notification",
+    ),
+    path(
+        "delete-all-notifications/",
+        DeleteAllNotificationView.as_view(),
+        name="delete-all-notifications",
+    ),
+    path("unread-count/", UnreadCountAPIView.as_view(), name="unread-count"),
 ]

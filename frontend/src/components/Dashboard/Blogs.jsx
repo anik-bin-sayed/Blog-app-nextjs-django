@@ -14,7 +14,7 @@ const initialFilterState = {
   search: "",
   category: "",
 };
-const Blogs = ({ setActiveSection }) => {
+const Blogs = () => {
   const [filters, setFilters] = useState(initialFilterState);
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);

@@ -2,11 +2,14 @@
 
 import { useBlogDetailsQuery } from "@/redux/services/blogs/blogApi";
 import { useDeleteCommentMutation } from "@/redux/services/blogs/commentApi";
-import React from "react";
+import { useSearchParams } from "next/navigation";
+import React, { useEffect } from "react";
 import { FaRegCommentDots } from "react-icons/fa";
 import { useSelector } from "react-redux";
 
 const CommentList = ({ comments = [], slug }) => {
+  const searchParams = useSearchParams();
+
   const { userId, role } = useSelector((state) => state.auth);
 
   const [deleteComment] = useDeleteCommentMutation();
@@ -39,6 +42,31 @@ const CommentList = ({ comments = [], slug }) => {
     }
   };
 
+  useEffect(() => {
+    const commentId = searchParams.get("comment");
+
+    if (!commentId) return;
+
+    const element = document.getElementById(`comment-${commentId}`);
+
+    if (element) {
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+
+      element.classList.add("bg-yellow-200", "border", "border-yellow-500");
+
+      setTimeout(() => {
+        element.classList.remove(
+          "bg-yellow-100",
+          "border",
+          "border-yellow-500",
+        );
+      }, 5000);
+    }
+  }, [searchParams]);
+
   if (comments.length === 0) {
     return (
       <div className="max-w-4xl mx-auto p-4 my-10">
@@ -61,8 +89,9 @@ const CommentList = ({ comments = [], slug }) => {
         {comments.map((comment, idx) => {
           return (
             <div
+              id={`comment-${comment.id}`}
               key={idx}
-              className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 p-5 group"
+              className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 p-5 group "
             >
               <div className="flex gap-4">
                 <div className="shrink-0">

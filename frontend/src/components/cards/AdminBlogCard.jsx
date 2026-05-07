@@ -10,7 +10,7 @@ import Link from "next/link";
 
 const AdminBlogCard = ({ blog, onEdit }) => {
   const [deleteBlogs] = useDeleteBlogsMutation();
-  const [toggleBlogStatus, { isLoading }] = useToggleBlogStatusMutation();
+  const [toggleBlogStatus] = useToggleBlogStatusMutation();
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);

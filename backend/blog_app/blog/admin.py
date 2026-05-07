@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Blog, Comment, Category, SavedBlog
+from .models import Blog, Comment, Category, SavedBlog, Notification
 
 # Register your models here.
 
@@ -27,3 +27,6 @@ class CommentAdmin(admin.ModelAdmin):
 class SavedBlogAdmin(admin.ModelAdmin):
     list_display = ("user", "blog", "created_at")
     list_filter = ("created_at",)
+
+
+admin.site.register(Notification)
