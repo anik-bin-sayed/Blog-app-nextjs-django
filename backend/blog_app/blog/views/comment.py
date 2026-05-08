@@ -7,7 +7,9 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 
 from ..models import Comment, Notification
-from ..serializers import CreateCommentSerializer
+from ..serializers import CreateCommentSerializer, CommentListSerializer
+from ..models import Blog
+from django.core.paginator import Paginator
 
 
 class CreateComment(APIView):
@@ -77,3 +79,35 @@ class NotificationListView(APIView):
         ]
 
         return Response(data)
+
+
+class BlogCommentsView(APIView):
+    def get(self, request, slug):
+        try:
+            page_number = request.GET.get("page", 1)
+
+            blog = Blog.objects.get(slug=slug, is_public=True)
+
+            comments_qs = (
+                Comment.objects.filter(blog=blog)
+                .select_related("user")
+                .order_by("-created_at")
+            )
+
+            paginator = Paginator(comments_qs, 5)
+            page_obj = paginator.get_page(page_number)
+
+            return Response(
+                {
+                    "comments": CommentListSerializer(page_obj, many=True).data,
+                    "pagination": {
+                        "count": paginator.count,
+                        "next": page_obj.has_next(),
+                        "previous": page_obj.has_previous(),
+                        "current_page": page_obj.number,
+                    },
+                }
+            )
+
+        except Blog.DoesNotExist:
+            return Response({"error": "Blog not found"}, status=404)

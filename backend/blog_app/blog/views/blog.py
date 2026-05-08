@@ -13,7 +13,7 @@ import cloudinary.uploader
 
 from ..models import *
 from ..serializers import *
-from ..pagination import BlogPagination
+from ..pagination import BlogPagination, CommentPagination
 from ..permissions import IsAdmin
 
 
@@ -106,7 +106,7 @@ class SingleBlogView(APIView):
             comments = (
                 Comment.objects.filter(blog=blog)
                 .select_related("user")
-                .order_by("-created_at")
+                .order_by("-created_at")[:5]
             )
 
             return Response(

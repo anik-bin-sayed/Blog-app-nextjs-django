@@ -28,6 +28,9 @@ urlpatterns = [
     # comments
     path("comment/create/", CreateComment.as_view(), name="create-comment"),
     path(
+        "blog/comments/<slug:slug>/", BlogCommentsView.as_view(), name="blog-comments"
+    ),
+    path(
         "comment/delete/<int:comment_id>/",
         DeleteComment.as_view(),
         name="delete-comment",
