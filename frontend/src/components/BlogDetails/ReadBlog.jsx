@@ -11,7 +11,6 @@ import {
   FaTwitter,
   FaInstagram,
 } from "react-icons/fa";
-import TextLink from "@/components/ui/textLink";
 
 const ReadBlog = ({ auth, blog, isLoading, isError }) => {
   const formatDate = (dateString) => {

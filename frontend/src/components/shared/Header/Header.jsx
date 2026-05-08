@@ -17,7 +17,6 @@ import {
 import BannedUserModal from "@/components/Modal/BannedAlertModal";
 import GlobalLoader from "@/components/Loader/GlobalLoader";
 import { IoIosNotifications } from "react-icons/io";
-import useNotifications from "@/hooks/useNotifications";
 import {
   useNotificationLengthQuery,
   useNotificationListQuery,
@@ -48,8 +47,6 @@ const Header = () => {
   const closeMenu = () => setIsMenuOpen(false);
 
   const toggleProfile = () => setIsProfileOpen(!isProfileOpen);
-
-  console.log(notifications);
 
   useEffect(() => {
     if (data) {

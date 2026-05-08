@@ -12,7 +12,7 @@ export const notificationApi = createApi({
         url: `/notifications/`,
         method: "GET",
       }),
-      providesTags: ["Notification"],
+      providesTags: ["Notification", "Comment"],
     }),
 
     markAllAsRead: builder.mutation({

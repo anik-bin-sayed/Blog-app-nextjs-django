@@ -56,7 +56,8 @@ export const blogApi = createApi({
         url: `/blogs/${slug}/`,
         method: "GET",
       }),
-      providesTags: (result, error, slug) => [{ type: "Blog", id: slug }],
+
+      providesTags: (result, error, arg) => [{ type: "Blog", id: arg.slug }],
     }),
 
     featuredBlogs: builder.query({
@@ -162,7 +163,6 @@ export const {
   useDeleteBlogsMutation,
   useToggleBlogStatusMutation,
   useUpdateBlogMutation,
-
   // saved blog
   useSavedBlogsMutation,
   useSavedBlogsListQuery,

@@ -21,11 +21,23 @@ export const commentApi = createApi({
         method: "DELETE",
       }),
       invalidatesTags: (result, error, arg) => [
-        { type: "Blog", id: arg.blogId },
+        { type: "Comment", id: arg.blogId },
       ],
+    }),
+
+    allComments: builder.query({
+      query: ({ slug, page = 1 }) => ({
+        url: `blog/comments/${slug}/?page=${page}`,
+        method: "GET",
+      }),
+
+      providesTags: (result, error, arg) => [{ type: "Comment", id: arg.slug }],
     }),
   }),
 });
 
-export const { useCreateCommentMutation, useDeleteCommentMutation } =
-  commentApi;
+export const {
+  useCreateCommentMutation,
+  useDeleteCommentMutation,
+  useAllCommentsQuery,
+} = commentApi;

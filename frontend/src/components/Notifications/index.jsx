@@ -11,6 +11,7 @@ import {
 } from "@/redux/services/blogs/notification";
 import Action from "./Action";
 import Link from "next/link";
+import { useSelector } from "react-redux";
 
 const Notifications = () => {
   const router = useRouter();
@@ -23,11 +24,22 @@ const Notifications = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const loaderRef = useRef(null);
 
-  const { data, isLoading, error } = useNotificationListQuery();
+  const { role, auth } = useSelector((state) => state.auth);
+
+  const isAdmin = role === "admin";
+
+  const { data, isLoading, error } = useNotificationListQuery(undefined, {
+    skip: !auth && !isAdmin,
+  });
 
   const [markAsRead] = useMarkAsReadMutation();
   const [deleteNotification] = useDeleteNotificationMutation();
-  const { data: unreadNotificationLength } = useNotificationLengthQuery();
+  const { data: unreadNotificationLength } = useNotificationLengthQuery(
+    undefined,
+    {
+      skip: !auth && !isAdmin,
+    },
+  );
 
   useEffect(() => {
     if (data?.results && Array.isArray(data.results)) {
@@ -74,7 +86,6 @@ const Notifications = () => {
     return () => observer.disconnect();
   }, [nextPage, loadingMore]);
 
-  // Better time formatter (singular/plural)
   const formatTime = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -174,7 +185,6 @@ const Notifications = () => {
           <Action />
         </div>
 
-        {/* FILTER TABS */}
         <div className="flex gap-2 bg-white p-1 rounded-2xl w-fit mb-8 shadow-sm">
           <button
             onClick={() => router.push("/notifications?tab=all")}
@@ -192,7 +202,7 @@ const Notifications = () => {
                   : "bg-gray-100 text-gray-600"
               }`}
             >
-              {data.count}
+              {data?.count}
             </span>
           </button>
           <button
@@ -216,7 +226,6 @@ const Notifications = () => {
           </button>
         </div>
 
-        {/* NOTIFICATION LIST */}
         <div className="space-y-4">
           {filteredNotifications.length === 0 ? (
             <div className="bg-white rounded-2xl p-12 text-center shadow-sm border border-gray-100">
@@ -227,9 +236,9 @@ const Notifications = () => {
             filteredNotifications.map((n) => {
               return (
                 <Link
+                  onClick={(e) => handleMarkAsRead(n.id, e)}
                   href={`/blogs/${n.blog_slug}?comment=${n.comment_id}`}
                   key={n.id}
-                  onClick={(e) => handleMarkAsRead(n.id, e)}
                   className={`group relative flex gap-4 p-5 rounded-2xl cursor-pointer transition-all duration-300 shadow-sm hover:shadow-md ${
                     n.is_read
                       ? "bg-white border border-gray-100"
@@ -276,7 +285,11 @@ const Notifications = () => {
                     className="relative shrink-0"
                   >
                     <button
-                      onClick={(e) => toggleDropdown(e, n.id)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleDropdown(e, n.id);
+                      }}
                       className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
                     >
                       <PiDotsThreeCircle className="w-5 h-5" />
@@ -288,7 +301,11 @@ const Notifications = () => {
                       >
                         {!n.is_read && (
                           <button
-                            onClick={(e) => handleMarkAsRead(n.id, e)}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleMarkAsRead(n.id, e);
+                            }}
                             className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors flex items-center gap-2"
                           >
                             <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
@@ -296,7 +313,11 @@ const Notifications = () => {
                           </button>
                         )}
                         <button
-                          onClick={(e) => handleDeleteNotification(n.id, e)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleDeleteNotification(n.id, e);
+                          }}
                           className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
                         >
                           <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
