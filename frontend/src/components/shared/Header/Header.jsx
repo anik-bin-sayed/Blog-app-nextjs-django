@@ -39,7 +39,6 @@ const Header = () => {
   const dispatch = useDispatch();
 
   const { data, isLoading } = useProfileQuery();
-  const { data: notifications } = useNotificationListQuery();
 
   const { data: unreadNotificationLength } = useNotificationLengthQuery();
 

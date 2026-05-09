@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  useBlogDetailsCommentsQuery,
-  useBlogDetailsQuery,
-} from "@/redux/services/blogs/blogApi";
+import { useBlogDetailsQuery } from "@/redux/services/blogs/blogApi";
 import { useParams } from "next/navigation";
 
 import ReadBlog from "@/components/BlogDetails/ReadBlog";
@@ -11,7 +8,7 @@ import RecentBlog from "@/components/BlogDetails/RelatedBlog";
 import CommentForm from "@/components/BlogDetails/CommentForm";
 import CommentList from "@/components/BlogDetails/CommentList";
 import { useSelector } from "react-redux";
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 
 const Page = () => {
   const params = useParams();

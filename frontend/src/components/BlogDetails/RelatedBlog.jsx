@@ -51,7 +51,7 @@ const RelatedBlog = ({ relatedBlog, isLoading, isError }) => {
   return (
     <div className="my-16">
       <div className="flex items-center justify-center mb-8 ">
-        <h2 className="text-2xl text-center md:text-3xl font-bold text-gray-900 ">
+        <h2 className="text-2xl text-center md:text-3xl font-bold text-gray-900 select-none">
           Related Articles
         </h2>
       </div>

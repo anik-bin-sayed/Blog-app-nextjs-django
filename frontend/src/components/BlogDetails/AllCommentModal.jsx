@@ -136,15 +136,17 @@ const AllCommentModal = ({
       onClick={() => setOpenModal(false)}
     >
       <div
-        className="bg-white rounded-xl w-full max-w-lg h-[80vh] flex flex-col shadow-xl animate-in slide-in-from-bottom-5 duration-300 "
+        className="bg-white rounded-xl w-full max-w-lg h-[80vh] flex flex-col shadow-xl animate-in slide-in-from-bottom-5 duration-300 select-none"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200 shrink-0">
-          <h2 className="text-xl font-semibold text-gray-900">All Comments</h2>
+          <h2 className="text-xl font-semibold text-gray-900 select-none">
+            All Comments
+          </h2>
 
           <button
             onClick={() => setOpenModal(false)}
-            className="group relative p-1 rounded-full text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition duration-300 hover:rotate-180 cursor-pointer"
+            className="group relative p-1 rounded-full text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition duration-300 hover:rotate-180 cursor-pointer select-none"
             aria-label="Close modal"
           >
             <RxCross2 className="w-5 h-5" />
@@ -172,19 +174,19 @@ const AllCommentModal = ({
               ))}
             </div>
           ) : comments.length === 0 ? (
-            <div className="text-center py-8 text-gray-500 text-sm">
+            <div className="text-center py-8 text-gray-500 text-sm select-none">
               No comments yet. Be the first to comment!
             </div>
           ) : (
             <>
               <div className="space-y-5">
-                {comments.map((comment, index) => (
+                {comments.map((comment) => (
                   <div
                     key={comment.id}
                     className="flex gap-3 p-2 rounded shadow-sm border border-gray-100"
                   >
                     <div className="shrink-0">
-                      <div className="w-10 h-10 rounded-full bg-yellow-500 flex items-center justify-center text-black font-medium text-base uppercase">
+                      <div className="w-10 h-10 rounded-full bg-yellow-500 flex items-center justify-center text-black font-medium text-base uppercase select-none">
                         {comment.name?.[0] || "U"}
                       </div>
                     </div>

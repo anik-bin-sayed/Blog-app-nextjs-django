@@ -44,7 +44,7 @@ const CommentForm = ({ auth, blog, slug }) => {
   return (
     <div className="rounded-2xl p-6 md:p-8 transition-all">
       <div className="flex items-center gap-3 my-6">
-        <h3 className="text-xl md:text-2xl font-bold text-gray-900 ">
+        <h3 className="text-xl md:text-2xl font-bold text-gray-900 select-none ">
           Leave a Comment
         </h3>
       </div>

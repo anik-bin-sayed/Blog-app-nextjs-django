@@ -142,7 +142,7 @@ const CommentList = ({ comments = [], slug, isLoading }) => {
             >
               <div className="flex gap-4">
                 <div className="shrink-0">
-                  <div className="w-11 h-11 rounded-full flex items-center justify-center text-white bg-amber-600 font-semibold text-sm shadow-sm">
+                  <div className="w-11 h-11 rounded-full flex items-center justify-center text-white bg-amber-600 font-semibold text-sm shadow-sm select-none">
                     {comment.name?.[0]?.toUpperCase()}
                   </div>
                 </div>
@@ -150,13 +150,13 @@ const CommentList = ({ comments = [], slug, isLoading }) => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div className="flex items-center gap-2">
-                      <h4 className="font-semibold text-gray-800 text-[15px] hover:text-blue-600 transition-colors capitalize">
+                      <h4 className="font-semibold text-gray-800 text-[15px] hover:text-blue-600 transition-colors capitalize select-none">
                         {comment.name}
                       </h4>
 
-                      <span className="text-gray-300">•</span>
+                      <span className="text-gray-300 select-none">•</span>
 
-                      <span className="text-xs text-gray-400 font-medium">
+                      <span className="text-xs text-gray-400 font-medium select-none">
                         {formatRelativeTime(comment.created_at)}
                       </span>
                     </div>
@@ -188,7 +188,7 @@ const CommentList = ({ comments = [], slug, isLoading }) => {
           <div className="flex justify-center">
             <button
               onClick={() => setOpenModal(true)}
-              className="px-4 py-2 rounded bg-yellow-400 cursor-pointer"
+              className="px-4 py-2 rounded bg-yellow-400 cursor-pointer select-none"
             >
               View all comments
             </button>
