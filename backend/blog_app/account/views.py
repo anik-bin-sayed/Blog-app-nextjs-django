@@ -82,7 +82,7 @@ class ActivateView(APIView):
         except:
             return Response("Invalid link")
 
-        if user.is_active or user.is_verified:
+        if user.is_verified:
             return Response({"error": "This link has already been used!"})
 
         if default_token_generator.check_token(user, token):
