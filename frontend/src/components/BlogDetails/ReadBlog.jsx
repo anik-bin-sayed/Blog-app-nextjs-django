@@ -28,7 +28,6 @@ const ReadBlog = ({ auth, blog, isLoading, isError }) => {
     }
   }, [showAskButton]);
 
-  // Text Selection + Ask AI Button
   useEffect(() => {
     const handleSelection = () => {
       const selection = window.getSelection();
@@ -38,11 +37,9 @@ const ReadBlog = ({ auth, blog, isLoading, isError }) => {
         const range = selection.getRangeAt(0);
         const rect = range.getBoundingClientRect();
 
-        // Calculate button position (viewport-relative for fixed positioning)
-        let left = rect.left + rect.width / 2 - 60; // center - half button width (approx 120px)
+        let left = rect.left + rect.width / 2 - 60;
         const top = rect.bottom + 15;
 
-        // Boundary check: prevent button from going off-screen left
         left = Math.max(10, Math.min(left, window.innerWidth - 130));
 
         setSelectedText(selectedTextStr);
@@ -117,7 +114,7 @@ const ReadBlog = ({ auth, blog, isLoading, isError }) => {
 
   if (isError || !blog) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-linear-to-br from-amber-50 via-white to-orange-50 flex items-center justify-center px-4">
         <div className="text-center max-w-md">
           <div className="text-6xl mb-4">😢</div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
@@ -208,10 +205,10 @@ const ReadBlog = ({ auth, blog, isLoading, isError }) => {
           )}
         </div>
 
-        {showAskButton && !isChatOpen && (
+        {showAskButton && !isChatOpen && auth && (
           <button
             onClick={handleAskAI}
-            className="fixed bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium px-5 py-2.5 rounded-full shadow-xl flex items-center gap-2 cursor-pointer z-50 transition-all duration-200 "
+            className="fixed bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium px-5 py-2.5 rounded-full shadow-xl flex items-center gap-2 cursor-pointer z-50 transition-all duration-200"
             style={{
               left: `${position.x}px`,
               top: `${position.y}px`,
@@ -221,6 +218,19 @@ const ReadBlog = ({ auth, blog, isLoading, isError }) => {
             <FaAirbnb />
             Ask AI To Explanation
           </button>
+        )}
+
+        {showAskButton && !auth && (
+          <p
+            className="fixed bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-5 py-2.5 rounded-full shadow-xl flex items-center gap-2 cursor-pointer z-50 transition-all duration-200"
+            style={{
+              left: `${position.x}px`,
+              top: `${position.y}px`,
+            }}
+            aria-label="Ask AI about selected text"
+          >
+            Please login to ask AI about selected text.
+          </p>
         )}
 
         {isChatOpen && (

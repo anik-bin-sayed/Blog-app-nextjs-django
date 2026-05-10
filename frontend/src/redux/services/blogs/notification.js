@@ -1,6 +1,5 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import fetchBaseQueryWithReauth from "../fetchBaseQueryWithReauth";
-import { markAssetError } from "next/dist/client/route-loader";
 
 export const notificationApi = createApi({
   reducerPath: "notificationApi",

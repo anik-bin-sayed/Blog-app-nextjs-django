@@ -5,6 +5,7 @@ import authReducer from "./services/auth/authSlice";
 import { userApi } from "./services/user/userApi";
 import { commentApi } from "./services/blogs/commentApi";
 import { notificationApi } from "./services/blogs/notification";
+import { agentApi } from "./services/blogs/agentApi";
 
 export const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ export const store = configureStore({
     [userApi.reducerPath]: userApi.reducer,
     [commentApi.reducerPath]: commentApi.reducer,
     [notificationApi.reducerPath]: notificationApi.reducer,
+    [agentApi.reducerPath]: agentApi.reducer,
     auth: authReducer,
   },
   middleware: (getDefaultMiddleware) =>
@@ -22,5 +24,6 @@ export const store = configureStore({
       userApi.middleware,
       commentApi.middleware,
       notificationApi.middleware,
+      agentApi.middleware,
     ),
 });

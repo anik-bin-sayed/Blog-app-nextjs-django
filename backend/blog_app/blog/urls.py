@@ -54,4 +54,6 @@ urlpatterns = [
         name="delete-all-notifications",
     ),
     path("unread-count/", UnreadCountAPIView.as_view(), name="unread-count"),
+    # agent
+    path("chatbot/", ChatBotView.as_view(), name="chatbot"),
 ]
