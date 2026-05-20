@@ -15,10 +15,13 @@ const Page = () => {
   const { slug } = params;
 
   const { auth } = useSelector((state) => state.auth);
+  console.log(auth);
 
-  const { data, isLoading, isError } = useBlogDetailsQuery(slug, {
+  const { data, isLoading, isError, isFetching } = useBlogDetailsQuery(slug, {
     skip: !slug,
   });
+
+  const isPageLoading = !slug || isLoading || isFetching;
 
   const blog = data?.blog;
   const relatedBlog = data?.relatedBlogs;
@@ -30,19 +33,21 @@ const Page = () => {
         <ReadBlog
           auth={auth}
           blog={blog}
-          isLoading={isLoading}
+          isLoading={isPageLoading}
           isError={isError}
         />
         <RecentBlog
           relatedBlog={relatedBlog}
-          isLoading={isLoading}
+          isLoading={isPageLoading}
           isError={isError}
         />
+      
         <CommentForm auth={auth} blog={blog} slug={slug} />
+
         <Suspense fallback={<div>Loading...</div>}>
           <CommentList
             comments={comments}
-            isLoading={isLoading}
+            isLoading={isPageLoading}
             isError={isError}
             slug={slug}
           />

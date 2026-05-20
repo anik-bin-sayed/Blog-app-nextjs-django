@@ -1,3 +1,5 @@
+"use client";
+
 import { createApi } from "@reduxjs/toolkit/query/react";
 import fetchBaseQueryWithReauth from "../fetchBaseQueryWithReauth";
 
@@ -39,7 +41,7 @@ export const blogApi = createApi({
         method: "GET",
         params,
       }),
-      providesTags: ["Blog"],
+      providesTags: ["Blog", "Category"],
     }),
 
     createBlog: builder.mutation({

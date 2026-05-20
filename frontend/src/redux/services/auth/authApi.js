@@ -1,5 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import fetchBaseQueryWithReauth from "../fetchBaseQueryWithReauth";
+import TokenManager from "@/utils/tokenManager";
 
 export const authApi = createApi({
   reducerPath: "authApi",
@@ -29,14 +30,42 @@ export const authApi = createApi({
         method: "POST",
         body: data,
       }),
+      // Handle login response to store tokens
+      async onQueryStarted(args, { queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+
+          if (data?.access) {
+            TokenManager.setAccessToken(data.access, data.expires_in || 3600);
+          } else {
+            TokenManager.markAccessTokenRefreshed(15 * 60);
+          }
+          if (data?.refresh) {
+            TokenManager.setRefreshToken(data.refresh);
+          }
+        } catch (error) {
+          console.error("Login failed:", error);
+        }
+      },
       invalidatesTags: ["Auth"],
     }),
 
     logout: builder.mutation({
-      query: (data) => ({
+      query: () => ({
         url: `/accounts/logout`,
         method: "POST",
       }),
+      // Clear tokens after logout
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          // Clear tokens on successful logout
+          TokenManager.clearAllTokens();
+        } catch (error) {
+          // Still clear tokens even if logout request fails
+          TokenManager.clearAllTokens();
+        }
+      },
       invalidatesTags: ["Auth"],
     }),
 
@@ -45,6 +74,23 @@ export const authApi = createApi({
         url: `/accounts/refresh`,
         method: "POST",
       }),
+      // Handle refresh response
+      async onQueryStarted(args, { queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+
+          if (data?.access) {
+            TokenManager.setAccessToken(data.access, data.expires_in || 3600);
+          } else {
+            TokenManager.markAccessTokenRefreshed(15 * 60);
+          }
+          if (data?.refresh) {
+            TokenManager.setRefreshToken(data.refresh);
+          }
+        } catch (error) {
+          console.error("Token refresh failed:", error);
+        }
+      },
       invalidatesTags: ["Auth"],
     }),
 

@@ -19,7 +19,7 @@ import { useSelector } from "react-redux";
 
 const SavedBlog = () => {
   const { auth } = useSelector((state) => state.auth);
-  console.log(auth);
+
   const {
     data: savedPosts,
     isLoading,

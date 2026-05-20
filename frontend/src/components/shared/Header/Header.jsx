@@ -17,10 +17,7 @@ import {
 import BannedUserModal from "@/components/Modal/BannedAlertModal";
 import GlobalLoader from "@/components/Loader/GlobalLoader";
 import { IoIosNotifications } from "react-icons/io";
-import {
-  useNotificationLengthQuery,
-  useNotificationListQuery,
-} from "@/redux/services/blogs/notification";
+import { useNotificationLengthQuery } from "@/redux/services/blogs/notification";
 
 const navLinks = [
   { id: 1, name: "Home", href: "/" },
@@ -40,7 +37,9 @@ const Header = () => {
 
   const { data, isLoading } = useProfileQuery();
 
-  const { data: unreadNotificationLength } = useNotificationLengthQuery();
+  const { data: unreadNotificationLength } = useNotificationLengthQuery(auth, {
+    skip: !auth,
+  });
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);

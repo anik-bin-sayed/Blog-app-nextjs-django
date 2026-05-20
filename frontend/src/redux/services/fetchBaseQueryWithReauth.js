@@ -1,60 +1,133 @@
 import { fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-// import { logout } from "../features/auth/authSlice";
+import { logoutUser } from "../services/auth/authSlice";
+import TokenManager from "@/utils/tokenManager";
 
 let isRefreshing = false;
-let pendingRequests = [];
+let refreshPromise = null;
 
 const baseQuery = fetchBaseQuery({
   baseUrl: "http://localhost:8000/api",
   credentials: "include",
-  prepareHeaders: (headers, { getState }) => {
-    return headers;
-  },
+  prepareHeaders: (headers) => headers,
 });
 
-const refreshToken = async (api, extraOptions) => {
+const waitForRefresh = () => {
+  if (!refreshPromise) {
+    refreshPromise = new Promise((resolve) => {
+      const checkInterval = setInterval(() => {
+        if (!isRefreshing) {
+          clearInterval(checkInterval);
+          refreshPromise = null;
+          resolve();
+        }
+      }, 100);
+    });
+  }
+  return refreshPromise;
+};
+
+const handleRefreshFailure = (api) => {
+  if (TokenManager.isAuthenticated()) {
+    api.dispatch(logoutUser());
+    TokenManager.clearAllTokens();
+  }
+};
+
+/**
+ * Refresh via httpOnly cookies (backend sets access_token on success)
+ */
+const performTokenRefresh = async (api, extraOptions) => {
   const silentBaseQuery = fetchBaseQuery({
     baseUrl: "http://localhost:8000/api",
     credentials: "include",
   });
-  return await silentBaseQuery(
-    { url: "/accounts/refresh", method: "POST" },
-    api,
-    extraOptions,
-  );
+
+  try {
+    const refreshResult = await silentBaseQuery(
+      { url: "/accounts/refresh", method: "POST" },
+      api,
+      extraOptions,
+    );
+
+    if (refreshResult?.data) {
+      const { access, refresh, expires_in } = refreshResult.data;
+
+      if (access) {
+        TokenManager.setAccessToken(access, expires_in || 3600);
+      } else {
+        TokenManager.markAccessTokenRefreshed(expires_in || 15 * 60);
+      }
+
+      if (refresh) {
+        TokenManager.setRefreshToken(refresh);
+      }
+
+      return { data: refreshResult.data };
+    }
+
+    return { error: refreshResult.error };
+  } catch (error) {
+    return { error };
+  }
 };
 
+/**
+ * Main fetch interceptor with automatic token refresh
+ */
 const fetchBaseQueryWithReauth = async (args, api, extraOptions) => {
-  const makeRequest = () => baseQuery(args, api, extraOptions);
-  let result = await makeRequest();
-
   const isRefreshRequest = args.url === "/accounts/refresh";
+  const isLoginRequest = args.url === "/accounts/login";
+  const isLogoutRequest = args.url === "/accounts/logout";
 
-  if (result?.error?.status === 401 && !isRefreshRequest) {
+  if (isLoginRequest || isLogoutRequest || isRefreshRequest) {
+    return baseQuery(args, api, extraOptions);
+  }
+
+  // Only logged-in users need token refresh (guests use public APIs)
+  if (!isRefreshing && TokenManager.shouldAttemptRefresh()) {
+    isRefreshing = true;
+
+    try {
+      const refreshResult = await performTokenRefresh(api, extraOptions);
+
+      if (refreshResult.error) {
+        handleRefreshFailure(api);
+      }
+    } catch {
+      handleRefreshFailure(api);
+    } finally {
+      isRefreshing = false;
+    }
+  }
+
+  if (isRefreshing) {
+    await waitForRefresh();
+  }
+
+  let result = await baseQuery(args, api, extraOptions);
+
+  if (result?.error?.status === 401 && TokenManager.isAuthenticated()) {
     if (!isRefreshing) {
       isRefreshing = true;
 
-      const refreshResult = await refreshToken(api, extraOptions);
+      try {
+        const refreshResult = await performTokenRefresh(api, extraOptions);
 
-      isRefreshing = false;
-
-      if (refreshResult?.error) {
-        pendingRequests.forEach(({ reject }) => reject(refreshResult.error));
-        pendingRequests = [];
-        // api.dispatch(logout());
-        return refreshResult;
+        if (refreshResult.data) {
+          result = await baseQuery(args, api, extraOptions);
+        } else {
+          handleRefreshFailure(api);
+          return refreshResult;
+        }
+      } catch (error) {
+        handleRefreshFailure(api);
+        return { error };
+      } finally {
+        isRefreshing = false;
       }
-
-      await Promise.all(
-        pendingRequests.map(({ resolve }) => resolve(makeRequest())),
-      );
-      pendingRequests = [];
-
-      return await makeRequest();
     } else {
-      return new Promise((resolve, reject) => {
-        pendingRequests.push({ resolve, reject });
-      });
+      await waitForRefresh();
+      result = await baseQuery(args, api, extraOptions);
     }
   }
 
@@ -62,3 +135,4 @@ const fetchBaseQueryWithReauth = async (args, api, extraOptions) => {
 };
 
 export default fetchBaseQueryWithReauth;
+export { TokenManager };

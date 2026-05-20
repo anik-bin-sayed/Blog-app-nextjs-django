@@ -12,21 +12,26 @@ import {
 import Action from "./Action";
 import Link from "next/link";
 import { useSelector } from "react-redux";
+import useNotifications from "@/hooks/useNotifications";
 
 const Notifications = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const filter = searchParams.get("tab") || "all";
-  const [openDropdownId, setOpenDropdownId] = useState(null);
-  const dropdownRef = useRef(null);
-  const [notifications, setNotifications] = useState([]);
   const [nextPage, setNextPage] = useState(null);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [openDropdownId, setOpenDropdownId] = useState(null);
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [filter, setFilter] = useState("all");
+
+  const dropdownRef = useRef(null);
   const loaderRef = useRef(null);
 
-  const { role, auth } = useSelector((state) => state.auth);
-
+  const { role, auth, userId } = useSelector((state) => state.auth);
   const isAdmin = role === "admin";
+
+  useNotifications(auth && userId ? userId : null, setNotifications);
 
   const { data, isLoading, error } = useNotificationListQuery(undefined, {
     skip: !auth && !isAdmin,
@@ -34,12 +39,10 @@ const Notifications = () => {
 
   const [markAsRead] = useMarkAsReadMutation();
   const [deleteNotification] = useDeleteNotificationMutation();
-  const { data: unreadNotificationLength } = useNotificationLengthQuery(
-    undefined,
-    {
-      skip: !auth && !isAdmin,
-    },
-  );
+
+  const { data: unreadNotificationLength } = useNotificationLengthQuery(auth, {
+    skip: !auth && !isAdmin,
+  });
 
   useEffect(() => {
     if (data?.results && Array.isArray(data.results)) {
@@ -47,6 +50,11 @@ const Notifications = () => {
       setNextPage(data.next);
     }
   }, [data]);
+
+  useEffect(() => {
+    const tab = searchParams.get("tab") || "all";
+    setFilter(tab);
+  }, [searchParams]);
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
@@ -58,13 +66,16 @@ const Notifications = () => {
   const loadMore = async () => {
     if (!nextPage || loadingMore) return;
     setLoadingMore(true);
+
     try {
       const response = await fetch(nextPage);
       const newData = await response.json();
+
       setNotifications((prev) => [
         ...prev,
         ...(Array.isArray(newData?.results) ? newData.results : []),
       ]);
+
       setNextPage(newData?.next || null);
     } catch (err) {
       console.error("Failed to load more", err);
@@ -73,28 +84,33 @@ const Notifications = () => {
     }
   };
 
-  // Intersection Observer for infinite scroll
   useEffect(() => {
     if (!loaderRef.current || !nextPage) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) loadMore();
       },
       { threshold: 0.5 },
     );
+
     observer.observe(loaderRef.current);
+
     return () => observer.disconnect();
   }, [nextPage, loadingMore]);
 
   const formatTime = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
+
     const diffMinutes = Math.floor((now - date) / 60000);
     if (diffMinutes < 1) return "Just now";
     if (diffMinutes < 60) return `${diffMinutes} min ago`;
+
     const diffHours = Math.floor(diffMinutes / 60);
     if (diffHours < 24)
       return `${diffHours} hr${diffHours === 1 ? "" : "s"} ago`;
+
     const diffDays = Math.floor(diffHours / 24);
     return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
   };
@@ -108,6 +124,7 @@ const Notifications = () => {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)),
     );
+
     try {
       await markAsRead(id).unwrap();
     } catch (err) {
@@ -122,8 +139,11 @@ const Notifications = () => {
   const handleDeleteNotification = async (id, e) => {
     e.stopPropagation();
     setOpenDropdownId(null);
+
     const previous = [...notifications];
+
     setNotifications((prev) => prev.filter((n) => n.id !== id));
+
     try {
       await deleteNotification(id).unwrap();
     } catch (err) {
@@ -143,7 +163,9 @@ const Notifications = () => {
         setOpenDropdownId(null);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
+
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
@@ -185,6 +207,7 @@ const Notifications = () => {
           <Action />
         </div>
 
+        {/* FILTER */}
         <div className="flex gap-2 bg-white p-1 rounded-2xl w-fit mb-8 shadow-sm">
           <button
             onClick={() => router.push("/notifications?tab=all")}
@@ -205,6 +228,7 @@ const Notifications = () => {
               {data?.count}
             </span>
           </button>
+
           <button
             onClick={() => router.push("/notifications?tab=unread")}
             className={`px-5 py-2 text-sm font-medium rounded-xl transition-all duration-200 ${
@@ -226,6 +250,7 @@ const Notifications = () => {
           </button>
         </div>
 
+        {/* LIST */}
         <div className="space-y-4">
           {filteredNotifications.length === 0 ? (
             <div className="bg-white rounded-2xl p-12 text-center shadow-sm border border-gray-100">
@@ -233,110 +258,94 @@ const Notifications = () => {
               <p className="text-gray-400 text-sm mt-1">All caught up!</p>
             </div>
           ) : (
-            filteredNotifications.map((n) => {
-              return (
-                <Link
-                  onClick={(e) => handleMarkAsRead(n.id, e)}
-                  href={`/blogs/${n.blog_slug}?comment=${n.comment_id}`}
-                  key={n.id}
-                  className={`group relative flex gap-4 p-5 rounded-2xl cursor-pointer transition-all duration-300 shadow-sm hover:shadow-md ${
+            filteredNotifications.map((n) => (
+              <Link
+                key={n.id}
+                href={`/blogs/${n.blog_slug}?comment=${n.comment_id}`}
+                onClick={(e) => handleMarkAsRead(n.id, e)}
+                className={`group relative flex gap-4 p-5 rounded-2xl cursor-pointer transition-all duration-300 shadow-sm hover:shadow-md ${
+                  n.is_read
+                    ? "bg-white border border-gray-100"
+                    : "bg-linear-to-r from-yellow-50 to-white border-l-4 border-yellow-500"
+                }`}
+              >
+                <div
+                  className={`relative shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold ${
                     n.is_read
-                      ? "bg-white border border-gray-100"
-                      : "bg-linear-to-r from-yellow-50 to-white border-l-4 border-yellow-500"
+                      ? "bg-yellow-100 text-gray-500"
+                      : "bg-yellow-300 text-black"
                   }`}
                 >
-                  {/* AVATAR */}
-                  <div
-                    className={`relative shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold ${
-                      n.is_read
-                        ? "bg-yellow-100 text-gray-500"
-                        : "bg-yellow-300 text-black"
-                    }`}
-                  >
-                    {getAvatar(n.actor_name)}
-                    {!n.is_read && (
-                      <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full ring-2 ring-white"></span>
-                    )}
-                  </div>
+                  {getAvatar(n.actor_name)}
+                  {!n.is_read && (
+                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full ring-2 ring-white"></span>
+                  )}
+                </div>
 
-                  {/* CONTENT */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-gray-800 text-sm font-medium leading-relaxed">
-                      {n.message}
-                    </p>
-                    <p className="text-xs text-gray-400 line-clamp-2 mt-1">
-                      {n.blog_title} • {n.comment}
-                    </p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="text-[11px] text-gray-400">
-                        {formatTime(n.created_at)}
-                      </span>
-                      {!n.is_read && (
-                        <span className="bg-yellow-100 text-yellow-600 text-[10px] px-2 py-0.5 rounded-full font-medium">
-                          New
-                        </span>
-                      )}
-                    </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-gray-800 text-sm font-medium leading-relaxed">
+                    {n.message}
+                  </p>
+                  <p className="text-xs text-gray-400 line-clamp-2 mt-1">
+                    {n.blog_title} • {n.comment}
+                  </p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="text-[11px] text-gray-400">
+                      {formatTime(n.created_at)}
+                    </span>
                   </div>
+                </div>
 
-                  {/* DROPDOWN */}
-                  <div
-                    ref={openDropdownId === n.id ? dropdownRef : null}
-                    className="relative shrink-0"
+                <div
+                  ref={openDropdownId === n.id ? dropdownRef : null}
+                  className="relative shrink-0"
+                >
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleDropdown(e, n.id);
+                    }}
+                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
                   >
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        toggleDropdown(e, n.id);
-                      }}
-                      className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                    <PiDotsThreeCircle className="w-5 h-5" />
+                  </button>
+
+                  {openDropdownId === n.id && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50"
                     >
-                      <PiDotsThreeCircle className="w-5 h-5" />
-                    </button>
-                    {openDropdownId === n.id && (
-                      <div
-                        onClick={(e) => e.stopPropagation()}
-                        className="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50"
-                      >
-                        {!n.is_read && (
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleMarkAsRead(n.id, e);
-                            }}
-                            className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors flex items-center gap-2"
-                          >
-                            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                            Mark as read
-                          </button>
-                        )}
+                      {!n.is_read && (
                         <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleDeleteNotification(n.id, e);
-                          }}
-                          className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+                          onClick={(e) => handleMarkAsRead(n.id, e)}
+                          className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700"
                         >
-                          <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
-                          Delete
+                          Mark as read
                         </button>
-                      </div>
-                    )}
-                  </div>
-                </Link>
-              );
-            })
+                      )}
+                      <button
+                        onClick={(e) => handleDeleteNotification(n.id, e)}
+                        className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </Link>
+            ))
           )}
         </div>
 
+        {/* FOOTER */}
         <div className="mt-8 text-center text-xs text-gray-400">
           <span className="inline-block px-3 py-1 bg-white rounded-full">
             Current tab: {filter}
           </span>
         </div>
+
+        {/* LOAD MORE */}
         {nextPage && (
           <div ref={loaderRef} className="py-6 text-center text-gray-500">
             {loadingMore ? "Loading..." : "Scroll for more"}

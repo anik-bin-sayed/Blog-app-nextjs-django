@@ -11,6 +11,7 @@ import {
   FaAirbnb,
 } from "react-icons/fa";
 import ChatBot from "./AI/ChatBot";
+import Voice from "./voice";
 
 const ReadBlog = ({ auth, blog, isLoading, isError }) => {
   const [selectedText, setSelectedText] = useState("");
@@ -18,6 +19,8 @@ const ReadBlog = ({ auth, blog, isLoading, isError }) => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isChatOpen, setIsChatOpen] = useState(false);
   const scrollTimeoutRef = useRef(null);
+
+  const [voice, setVoice] = useState(false);
 
   const handleScroll = useCallback(() => {
     if (showAskButton) {
@@ -103,7 +106,7 @@ const ReadBlog = ({ auth, blog, isLoading, isError }) => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-amber-50 via-white to-orange-50 flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-indigo-600 border-r-transparent"></div>
           <p className="mt-4 text-gray-600">Loading amazing content...</p>
@@ -123,13 +126,14 @@ const ReadBlog = ({ auth, blog, isLoading, isError }) => {
           <p className="text-gray-600 mb-6">
             We couldn't find the blog post you're looking for.
           </p>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          <button
+            onClick={() => window.history.back()}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-yellow-500 text-black rounded-lg hover:bg-yellow-600 transition-colors cursor-pointer"
+            aria-label="Go back to home"
           >
             <FaArrowLeft className="w-4 h-4" />
             Back to Home
-          </Link>
+          </button>
         </div>
       </div>
     );
@@ -204,6 +208,8 @@ const ReadBlog = ({ auth, blog, isLoading, isError }) => {
             </p>
           )}
         </div>
+
+        {auth && <Voice setVoice={setVoice} blog={blog} voice={voice} />}
 
         {showAskButton && !isChatOpen && auth && (
           <button

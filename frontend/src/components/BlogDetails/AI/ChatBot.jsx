@@ -4,11 +4,13 @@ import { useProfileQuery } from "@/redux/services/auth/authApi";
 import { useChatMutation } from "@/redux/services/blogs/agentApi";
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { BiSolidSend } from "react-icons/bi";
-import { FaAirbnb } from "react-icons/fa";
+import { FaAirbnb, FaLanguage } from "react-icons/fa";
+import { IoIosArrowDown } from "react-icons/io";
 import { RxCross2 } from "react-icons/rx";
-import { useSelector } from "react-redux";
 
 const ChatBot = ({ selectedText, setSelectedText, setIsChatOpen }) => {
+  const [language, setLanguage] = useState("english");
+
   const { data: userData } = useProfileQuery();
   const [chat, { isLoading: isChatLoading }] = useChatMutation();
 
@@ -49,9 +51,9 @@ const ChatBot = ({ selectedText, setSelectedText, setIsChatOpen }) => {
           message: userMessage,
           context: conversationHistory,
           selectedText: selectedText || null,
+          language: language,
         }).unwrap();
 
-        // Add AI response to UI
         setMessages((prev) => [
           ...prev,
           {
@@ -78,7 +80,15 @@ const ChatBot = ({ selectedText, setSelectedText, setIsChatOpen }) => {
         setIsSending(false);
       }
     },
-    [chat, isChatLoading, isSending, messages, selectedText, setSelectedText],
+    [
+      chat,
+      language,
+      isChatLoading,
+      isSending,
+      messages,
+      selectedText,
+      setSelectedText,
+    ],
   );
 
   useEffect(() => {
@@ -140,10 +150,10 @@ const ChatBot = ({ selectedText, setSelectedText, setIsChatOpen }) => {
           </div>
           <button
             onClick={() => setIsChatOpen(false)}
-            className="text-gray-600 hover:rotate-90 transition-all duration-200 bg-gray-300 hover:bg-gray-400 p-2 rounded-full cursor-pointer"
+            className="text-gray-600 hover:rotate-90 transition-all duration-200  rounded-full cursor-pointer border w-8 h-8 flex items-center justify-center"
             aria-label="Close chat"
           >
-            <RxCross2 size={14} />
+            <RxCross2 size={20} />
           </button>
         </div>
 
@@ -207,6 +217,27 @@ const ChatBot = ({ selectedText, setSelectedText, setIsChatOpen }) => {
         </div>
 
         <div className="p-3 border-t border-gray-200 bg-white shrink-0">
+          <div className="flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 shadow-sm border border-gray-200">
+            <span className="text-gray-700 text-sm font-medium flex items-center gap-1">
+              <FaLanguage className="h-4 w-4 text-black" />
+              Response language :
+            </span>
+            <div className="relative">
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                className="appearance-none bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-indigo-400 block w-32 py-2 px-3 pr-8 cursor-pointer hover:bg-gray-100 transition-colors duration-200 outline-0"
+              >
+                <option value="english">🇬🇧 English</option>
+                <option value="bangla">🇧🇩 Bangla</option>
+                <option value="hindi">🇮🇳 Hindi</option>
+                <option value="spanish">🇪🇸 Spanish</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                <IoIosArrowDown className="fill-current h-4 w-4" />
+              </div>
+            </div>
+          </div>
           <div className="flex items-end gap-2">
             <div className="flex-1 relative">
               <textarea

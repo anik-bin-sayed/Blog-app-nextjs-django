@@ -1,26 +1,47 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
-export default function useNotifications(auth, setNotifications) {
+const WS_BASE =
+  process.env.NEXT_PUBLIC_WS_URL || "ws://127.0.0.1:8000";
+
+export default function useNotifications(userId, setNotifications) {
+  const setNotificationsRef = useRef(setNotifications);
+  setNotificationsRef.current = setNotifications;
+
   useEffect(() => {
-    if (!auth) return;
+    if (!userId) return;
 
-    const socket = new WebSocket(`ws://127.0.0.1:8000/ws/notifications/`);
+    let closedByCleanup = false;
+    const socket = new WebSocket(
+      `${WS_BASE}/ws/notifications/${userId}/`,
+    );
 
     socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      setNotifications((prev) => [data, ...prev]);
+      try {
+        const data = JSON.parse(event.data);
+        setNotificationsRef.current((prev) => [data, ...prev]);
+      } catch {
+        console.error("Invalid WebSocket message:", event.data);
+      }
     };
 
-    socket.onerror = (error) => {
-      console.log("WebSocket error:", error);
+    socket.onerror = () => {
+      if (!closedByCleanup) {
+        console.error(
+          `WebSocket connection failed (${WS_BASE}/ws/notifications/${userId}/)`,
+        );
+      }
     };
 
-    socket.onclose = () => {
-      console.log("Disconnected");
+    return () => {
+      closedByCleanup = true;
+      if (
+        socket.readyState === WebSocket.OPEN ||
+        socket.readyState === WebSocket.CONNECTING
+      ) {
+        socket.close();
+      }
     };
-
-    return () => socket.close();
-  }, [auth]);
+  }, [userId]);
 }

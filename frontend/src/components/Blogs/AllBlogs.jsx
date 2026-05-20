@@ -16,8 +16,11 @@ import { FcSearch } from "react-icons/fc";
 import { HiOutlineSearch } from "react-icons/hi";
 import { GrFormNextLink, GrFormPreviousLink } from "react-icons/gr";
 import { TbCategory } from "react-icons/tb";
+import { useSelector } from "react-redux";
 
 const AllBlogs = () => {
+  const { auth } = useSelector((state) => state.auth);
+
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -36,7 +39,9 @@ const AllBlogs = () => {
   );
   const { data: categories } = useGetAllCategoriesQuery();
   const [savedBlogs] = useSavedBlogsMutation();
-  const { data: savedPosts, refetch } = useSavedBlogsListQuery();
+  const { data: savedPosts } = useSavedBlogsListQuery(auth, {
+    skip: !auth,
+  });
 
   const posts = data?.results || [];
   const totalCount = data?.count || 0;

@@ -7,15 +7,21 @@ import {
   useNotificationLengthQuery,
   useNotificationListQuery,
 } from "@/redux/services/blogs/notification";
+import { useSelector } from "react-redux";
 
 const Action = () => {
+  const { auth } = useSelector((state) => state.auth);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   const [markAllAsRead] = useMarkAllAsReadMutation();
   const [deleteAllNotification] = useDeleteAllNotificationMutation();
-  const { data: unreadNotificationLength } = useNotificationLengthQuery();
-  const { data, refetch } = useNotificationListQuery();
+  const { data: unreadNotificationLength } = useNotificationLengthQuery(auth, {
+    skip: !auth,
+  });
+  const { data, refetch } = useNotificationListQuery(auth, {
+    skip: !auth,
+  });
 
   const isUnreadNotificationAvailable =
     unreadNotificationLength?.unread_count == 0;
