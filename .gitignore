@@ -1,0 +1,30 @@
+# Dependencies & build
+node_modules/
+frontend/.next/
+frontend/out/
+
+# Python
+backend/env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+backend/blog_app/.env
+!.env.docker.example
+
+# Database & IDE
+backend/blog_app/db.sqlite3
+.idea/
+.vscode/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+.cursor
