@@ -27,15 +27,15 @@ class MarkAllAsRead(APIView):
     permission_classes = [IsAuthenticated, IsAdmin]
 
     def patch(self, request):
-        notifications = Notification.objects.filter(user=request.user)
+        notifications = Notification.objects.filter(is_read=False)
 
         for notification in notifications:
-            notification.is_read = not notification.is_read
+            notification.is_read = True
 
         Notification.objects.bulk_update(notifications, ["is_read"])
 
         return Response(
-            {"message": "All notifications toggled"},
+            {"message": "All notifications marked as read"},
             status=200,
         )
 
@@ -44,7 +44,7 @@ class MarkAsRead(APIView):
     permission_classes = [IsAuthenticated, IsAdmin]
 
     def patch(self, request, id):
-        notification = get_object_or_404(Notification, id=id, user=request.user)
+        notification = get_object_or_404(Notification, id=id)
 
         if not notification.is_read:
             notification.is_read = True
@@ -56,10 +56,10 @@ class MarkAsRead(APIView):
 
 
 class DeleteNotification(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
     def delete(self, request, id):
-        notification = get_object_or_404(Notification, id=id, user=request.user)
+        notification = get_object_or_404(Notification, id=id)
 
         notification.delete()
 
@@ -70,10 +70,10 @@ class DeleteNotification(APIView):
 
 
 class DeleteAllNotificationView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
     def delete(self, request):
-        Notification.objects.filter(user=request.user).delete()
+        Notification.objects.all().delete()
 
         return Response(
             {"success": True, "message": "All notifications deleted successfully"},
@@ -82,9 +82,9 @@ class DeleteAllNotificationView(APIView):
 
 
 class UnreadCountAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
     def get(self, request):
-        count = Notification.objects.filter(user=request.user, is_read=False).count()
+        count = Notification.objects.filter(is_read=False).count()
 
         return Response({"unread_count": count})

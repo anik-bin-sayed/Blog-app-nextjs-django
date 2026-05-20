@@ -332,7 +332,7 @@
       </div>
 
       <div class="card-content">
-        <div class="greeting">Hello, <span>{{ user.username }}</span></div>
+        <div class="greeting">Hello, <span>{{ user.full_name|default:user.username }}</span></div>
         <div class="message">
           <strong>You're almost there!</strong> Please confirm your email
           address to unlock full access to your account. Click the secure button

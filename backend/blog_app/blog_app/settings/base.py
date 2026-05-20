@@ -152,6 +152,13 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 ASGI_APPLICATION = "blog_app.asgi.application"
 
+# Overridden in production.py for HTTPS deployments
+COOKIE_SECURE = os.getenv("COOKIE_SECURE", "false").lower() in (
+    "1",
+    "true",
+    "yes",
+)
+
 REDIS_HOST = os.getenv("REDIS_HOST", "127.0.0.1")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 

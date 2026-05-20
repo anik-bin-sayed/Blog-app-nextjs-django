@@ -1,3 +1,5 @@
+import os
+
 from django.db.models import Q
 from datetime import timedelta
 from django.utils.timezone import now
@@ -9,6 +11,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 
+from django.conf import settings
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -23,16 +26,24 @@ from .pagination import UserPagination
 User = get_user_model()
 
 
+def _jwt_cookie_kwargs():
+    return {
+        "httponly": True,
+        "secure": getattr(settings, "COOKIE_SECURE", False),
+        "samesite": "lax",
+    }
+
+
 class RegisterView(APIView):
     def post(self, request):
         username = request.data.get("username")
         email = request.data.get("email")
 
         if User.objects.filter(username=username).exists():
-            return Response({"error": "Username already exits"}, status=400)
+            return Response({"error": "Username already exists"}, status=400)
 
         if User.objects.filter(email=email).exists():
-            return Response({"error": "Email already exits"}, status=400)
+            return Response({"error": "Email already exists"}, status=400)
 
         serializer = RegisterSerializer(data=request.data)
 
@@ -42,7 +53,10 @@ class RegisterView(APIView):
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = default_token_generator.make_token(user)
 
-            activation_link = f"http://localhost:3000/activate/{uid}/{token}"
+            frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000").rstrip(
+                "/"
+            )
+            activation_link = f"{frontend_url}/activate/{uid}/{token}"
 
             subject = "Activate your account"
 
@@ -57,7 +71,7 @@ class RegisterView(APIView):
             email = EmailMultiAlternatives(
                 subject=subject,
                 body="Activate your account",
-                from_email="your_email@gmail.com",
+                from_email=os.getenv("EMAIL_HOST_USER", "noreply@example.com"),
                 to=[user.email],
             )
 
@@ -66,12 +80,12 @@ class RegisterView(APIView):
 
             return Response(
                 {
-                    "message": "User registered successfully. Please check your email.",
+                    "message": "Registration successful. An activation link has been sent to your email.",
                 },
                 status=201,
             )
 
-        return Response(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ActivateView(APIView):
@@ -79,8 +93,8 @@ class ActivateView(APIView):
         try:
             uid = urlsafe_base64_decode(uidb64).decode()
             user = User.objects.get(pk=uid)
-        except:
-            return Response("Invalid link")
+        except (TypeError, ValueError, User.DoesNotExist, OverflowError):
+            return Response({"error": "Invalid activation link"}, status=400)
 
         if user.is_verified:
             return Response({"error": "This link has already been used!"})
@@ -100,7 +114,6 @@ class LoginView(APIView):
         password = request.data.get("password")
 
         user = authenticate(request, email=email, password=password)
-        print(user)
         if not user:
             return Response({"error": "Invalid credentials"}, status=401)
 
@@ -117,19 +130,15 @@ class LoginView(APIView):
         response.set_cookie(
             key="access_token",
             value=access,
-            httponly=True,
-            secure=False,
-            samesite="lax",
             max_age=60 * 15,
+            **_jwt_cookie_kwargs(),
         )
 
         response.set_cookie(
             key="refresh_token",
             value=str(refresh),
-            httponly=True,
-            secure=False,
-            samesite="lax",
             max_age=60 * 60 * 24,
+            **_jwt_cookie_kwargs(),
         )
 
         return response
@@ -151,10 +160,8 @@ class RefreshTokenView(APIView):
             response.set_cookie(
                 key="access_token",
                 value=access,
-                httponly=True,
-                secure=False,
-                samesite="lax",
                 max_age=60 * 15,
+                **_jwt_cookie_kwargs(),
             )
 
             return response
@@ -183,7 +190,9 @@ class GetAllUserView(APIView):
 
         if search:
             users = users.filter(
-                Q(username__icontains=search) | Q(email__icontains=search)
+                Q(username__icontains=search)
+                | Q(email__icontains=search)
+                | Q(full_name__icontains=search)
             )
 
         is_active = request.GET.get("is_active")
@@ -217,6 +226,8 @@ class GetAllUserView(APIView):
 
 
 class ActiveUserAnalyticsView(APIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+
     def get(self, request):
 
         data = []

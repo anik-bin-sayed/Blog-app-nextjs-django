@@ -43,6 +43,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     userRole = [("user", "User"), ("admin", "Admin")]
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=30, unique=True)
+    full_name = models.CharField(max_length=150, blank=True, default="")
 
     is_active = models.BooleanField(default=True)
     role = models.CharField(max_length=50, choices=userRole, default="user")
