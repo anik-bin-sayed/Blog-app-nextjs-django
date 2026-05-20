@@ -1,6 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import fetchBaseQueryWithReauth from "../fetchBaseQueryWithReauth";
 import TokenManager from "@/utils/tokenManager";
+import { setAuth, setRole, setStatus, setUserId } from "./authSlice";
 
 export const authApi = createApi({
   reducerPath: "authApi",
@@ -99,7 +100,7 @@ export const authApi = createApi({
         url: `/accounts/profile`,
         method: "GET",
       }),
-      invalidatesTags: ["Auth"],
+      providesTags: ["Auth"],
     }),
   }),
 });

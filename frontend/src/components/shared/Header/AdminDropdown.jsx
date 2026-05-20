@@ -84,14 +84,17 @@ const AdminDropdown = ({ isProfileOpen, data, unreadNotificationLength }) => {
         <div className="flex items-center gap-4">
           <div className="relative">
             <div className="w-14 h-14 rounded-full bg-linear-to-br from-amber-400 to-orange-500 text-white flex items-center justify-center text-xl font-bold shadow-md">
-              {data?.username?.[0]?.toUpperCase()}
+              {(data?.full_name || data?.username)?.[0]?.toUpperCase()}
             </div>
             <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white"></div>
           </div>
           <div className="flex-1">
             <h3 className="font-semibold text-gray-800 text-lg">
-              {data?.username}
+              {data?.full_name || data?.username}
             </h3>
+            {data?.full_name && (
+              <p className="text-xs text-gray-400">@{data?.username}</p>
+            )}
             <p className="text-xs text-gray-500 truncate">{data?.email}</p>
             <span className="inline-block mt-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
               {data?.role === "admin" ? "Administrator" : "Member"}

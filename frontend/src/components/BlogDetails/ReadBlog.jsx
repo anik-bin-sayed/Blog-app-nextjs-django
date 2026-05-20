@@ -203,9 +203,9 @@ const ReadBlog = ({ auth, blog, isLoading, isError }) => {
           {auth ? (
             formatContent(blog.content)
           ) : (
-            <p className="text-center text-red-500 font-medium select-none">
+            <Link href="/login" className="text-center text-red-500 font-medium select-none hover:text-red-700 transition-colors">
               Please login to read the full blog post.
-            </p>
+            </Link>
           )}
         </div>
 
@@ -235,7 +235,9 @@ const ReadBlog = ({ auth, blog, isLoading, isError }) => {
             }}
             aria-label="Ask AI about selected text"
           >
-            Please login to ask AI about selected text.
+          <Link href="/login" className="text-center  font-medium select-none">
+          Please login to ask AI about selected text.
+          </Link>
           </p>
         )}
 

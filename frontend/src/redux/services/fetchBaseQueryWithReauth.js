@@ -5,8 +5,11 @@ import TokenManager from "@/utils/tokenManager";
 let isRefreshing = false;
 let refreshPromise = null;
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+
 const baseQuery = fetchBaseQuery({
-  baseUrl: "http://localhost:8000/api",
+  baseUrl: API_BASE_URL,
   credentials: "include",
   prepareHeaders: (headers) => headers,
 });
@@ -38,7 +41,7 @@ const handleRefreshFailure = (api) => {
  */
 const performTokenRefresh = async (api, extraOptions) => {
   const silentBaseQuery = fetchBaseQuery({
-    baseUrl: "http://localhost:8000/api",
+    baseUrl: API_BASE_URL,
     credentials: "include",
   });
 
@@ -49,7 +52,7 @@ const performTokenRefresh = async (api, extraOptions) => {
       extraOptions,
     );
 
-    if (refreshResult?.data) {
+    if (refreshResult?.data && !refreshResult.error) {
       const { access, refresh, expires_in } = refreshResult.data;
 
       if (access) {
@@ -65,7 +68,7 @@ const performTokenRefresh = async (api, extraOptions) => {
       return { data: refreshResult.data };
     }
 
-    return { error: refreshResult.error };
+    return { error: refreshResult?.error || { status: 401 } };
   } catch (error) {
     return { error };
   }
@@ -78,8 +81,15 @@ const fetchBaseQueryWithReauth = async (args, api, extraOptions) => {
   const isRefreshRequest = args.url === "/accounts/refresh";
   const isLoginRequest = args.url === "/accounts/login";
   const isLogoutRequest = args.url === "/accounts/logout";
+  const isRegisterRequest = args.url === "/accounts/register";
+  const isProfileRequest = args.url === "/accounts/profile";
 
-  if (isLoginRequest || isLogoutRequest || isRefreshRequest) {
+  if (
+    isLoginRequest ||
+    isLogoutRequest ||
+    isRefreshRequest ||
+    isRegisterRequest
+  ) {
     return baseQuery(args, api, extraOptions);
   }
 
@@ -106,7 +116,11 @@ const fetchBaseQueryWithReauth = async (args, api, extraOptions) => {
 
   let result = await baseQuery(args, api, extraOptions);
 
-  if (result?.error?.status === 401 && TokenManager.isAuthenticated()) {
+  if (
+    result?.error?.status === 401 &&
+    TokenManager.isAuthenticated() &&
+    !isProfileRequest
+  ) {
     if (!isRefreshing) {
       isRefreshing = true;
 

@@ -188,7 +188,7 @@ const CommentList = ({ comments = [], slug, isLoading }) => {
           <div className="flex justify-center">
             <button
               onClick={() => setOpenModal(true)}
-              className="px-4 py-2 rounded bg-yellow-400 cursor-pointer select-none"
+              className="px-4 py-2 rounded bg-yellow-400 text-black hover:bg-yellow-500 cursor-pointer select-none"
             >
               View all comments
             </button>

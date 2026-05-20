@@ -35,7 +35,12 @@ const Header = () => {
   const profileRef = useRef(null);
   const dispatch = useDispatch();
 
-  const { data, isLoading } = useProfileQuery();
+  const isAuthPage =
+    pathname === "/login" || pathname === "/register";
+
+  const { data, isLoading } = useProfileQuery(undefined, {
+    skip: isAuthPage,
+  });
 
   const { data: unreadNotificationLength } = useNotificationLengthQuery(auth, {
     skip: !auth,
@@ -113,7 +118,7 @@ const Header = () => {
                   className="relative"
                 >
                   <div className="w-10 h-10 rounded-full border bg-amber-600 flex items-center justify-center uppercase font-semibold text-md text-white cursor-pointer">
-                    {data?.username[0]}
+                    {(data?.full_name || data?.username)?.[0]}
                   </div>
                   {isProfileOpen && (
                     <AdminDropdown

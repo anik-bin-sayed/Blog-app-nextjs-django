@@ -5,6 +5,7 @@ import Header from "@/components/shared/Header/Header";
 
 import FooterController from "@/components/layout/FooterController";
 import AutoRefreshProvider from "@/hooks/AutoRefreshProvider";
+import AppToaster from "@/components/ui/AppToaster";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,6 +30,7 @@ export default function RootLayout({ children }) {
     >
       <body className="min-h-full flex flex-col">
         <ReduxProvider>
+          <AppToaster />
           <Header />
           <AutoRefreshProvider>{children}</AutoRefreshProvider>
           <FooterController />

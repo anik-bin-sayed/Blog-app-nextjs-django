@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import Cookies from "js-cookie";
+import { clientCookieOptions } from "@/utils/cookieOptions";
 
 const initialState = {
   userId: Cookies.get("vo__c") || null,
@@ -18,41 +19,27 @@ const authSlice = createSlice({
       state.auth = action.payload;
       state.error = null;
       if (action.payload) {
-        Cookies.set("auth", action.payload, { 
-          path: "/",
-          secure: true,
-          sameSite: "Lax"
-        });
+        Cookies.set("auth", "true", clientCookieOptions);
+      } else {
+        Cookies.remove("auth", { path: "/" });
       }
     },
     setUserId: (state, action) => {
       state.userId = action.payload;
       if (action.payload) {
-        Cookies.set("vo__c", action.payload, { 
-          path: "/",
-          secure: true,
-          sameSite: "Lax"
-        });
+        Cookies.set("vo__c", String(action.payload), clientCookieOptions);
       }
     },
     setRole: (state, action) => {
       state.role = action.payload;
       if (action.payload) {
-        Cookies.set("role", action.payload, { 
-          path: "/",
-          secure: true,
-          sameSite: "Lax"
-        });
+        Cookies.set("role", action.payload, clientCookieOptions);
       }
     },
     setStatus: (state, action) => {
       state.status = action.payload;
       if (action.payload) {
-        Cookies.set("is_banned", action.payload, { 
-          path: "/",
-          secure: true,
-          sameSite: "Lax"
-        });
+        Cookies.set("is_banned", String(action.payload), clientCookieOptions);
       }
     },
     setAuthLoading: (state, action) => {

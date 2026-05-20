@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 import Input from "@/components/ui/input";
 import TextLink from "@/components/ui/textLink";
 import SubmitButton from "@/components/ui/submitButton";
-import { MdOutlineErrorOutline } from "react-icons/md";
 import { useRegisterMutation } from "@/redux/services/auth/authApi";
+import { getApiErrorMessage } from "@/utils/getApiErrorMessage";
 
 const initialFormData = {
+  full_name: "",
   username: "",
   email: "",
   password: "",
@@ -17,10 +19,7 @@ const initialFormData = {
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState(initialFormData);
-  const [acceptTerms, setAcceptTerms] = useState(false);
   const [errors, setErrors] = useState({});
-  const [error, setError] = useState("");
-  const [serverMessage, setServerMessage] = useState(null);
 
   const [register, { isLoading }] = useRegisterMutation();
 
@@ -30,38 +29,37 @@ const RegisterPage = () => {
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
-    if (serverMessage) setServerMessage(null);
   };
-
-  useEffect(() => {
-    setTimeout(() => {
-      setError("");
-    }, 5000);
-  }, [error]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.confirmPassword != formData.password) {
-      setError("Password does not match");
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Password does not match");
       return;
     }
 
-    setServerMessage(null);
+    const { confirmPassword, ...payload } = formData;
 
     try {
-      const { confirmPassword, ...filteredData } = formData;
-      const response = await register(filteredData).unwrap();
-      console.log(response);
+      const response = await register(payload).unwrap();
+
+      toast.success(
+        response?.message ||
+          "Registration successful. An activation link has been sent to your email.",
+      );
+
       setFormData(initialFormData);
-      setAcceptTerms(false);
+      setErrors({});
     } catch (err) {
-      console.log(err);
+      toast.error(
+        getApiErrorMessage(err, "Registration failed. Please try again."),
+      );
     }
   };
 
   return (
-    <div className=" h-[calc(100vh-65px)]  bg-linear-to-br from-amber-50 via-white to-orange-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen  bg-linear-to-br from-amber-50 via-white to-orange-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-xl mx-auto">
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-amber-100">
           <div className="p-8 md:p-10">
@@ -75,6 +73,16 @@ const RegisterPage = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
+              <Input
+                label="Full name"
+                type="text"
+                name="full_name"
+                value={formData.full_name}
+                onChange={handleChange}
+                error={errors.full_name}
+                required
+                placeholder="Your full name"
+              />
               <Input
                 label="Username"
                 type="text"
@@ -116,28 +124,8 @@ const RegisterPage = () => {
                 placeholder="Confirm Password"
               />
 
-              {errors.terms && (
-                <p className="text-red-500 text-xs -mt-2">{errors.terms}</p>
-              )}
-              {serverMessage && (
-                <div
-                  className={`p-3 rounded-xl text-sm ${
-                    serverMessage.type === "success"
-                      ? "bg-green-50 text-green-800 border border-green-200"
-                      : "bg-red-50 text-red-800 border border-red-200"
-                  }`}
-                >
-                  {serverMessage.text}
-                </div>
-              )}
-              {error && (
-                <p className="text-red-800 flex items-center gap-1">
-                  <MdOutlineErrorOutline />
-                  {error}
-                </p>
-              )}
               <SubmitButton
-                text="Sign un"
+                text="Sign up"
                 type="submit"
                 isLoading={isLoading}
                 isLoadingText="Creating account..."

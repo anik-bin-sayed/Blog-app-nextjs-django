@@ -19,7 +19,8 @@ import { TbCategory } from "react-icons/tb";
 import { useSelector } from "react-redux";
 
 const AllBlogs = () => {
-  const { auth } = useSelector((state) => state.auth);
+  const { auth, role } = useSelector((state) => state.auth);
+
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -94,6 +95,15 @@ const AllBlogs = () => {
     setTempSearch("");
     updateURL(1, "", "-created_at");
   };
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 500,
+      behavior: "smooth",
+    });
+  };
+  
+
 
   const serverSavedIds = new Set(savedPosts?.map((item) => item.blog));
 
@@ -277,6 +287,7 @@ const AllBlogs = () => {
                 <Card
                   key={post.id}
                   post={post}
+                  role={role}
                   onSave={handleSaveClick}
                   savedButton={true}
                   isSaved={isSaved}
@@ -288,7 +299,10 @@ const AllBlogs = () => {
           {totalPages > 1 && (
             <div className="flex justify-center items-center gap-3 mt-12 flex-wrap">
               <button
-                onClick={() => goToPage(page - 1)}
+                onClick={() =>{
+                  goToPage(page - 1);
+                  scrollToTop();
+                }}
                 disabled={!hasPrev}
                 className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-sm flex items-center gap-2 hover:border hover:border-amber-700 cursor-pointer"
               >
@@ -305,7 +319,10 @@ const AllBlogs = () => {
               </div>
 
               <button
-                onClick={() => goToPage(page + 1)}
+                onClick={() =>{
+                  goToPage(page + 1);
+                  scrollToTop();
+                }}
                 disabled={!hasNext}
                 className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-sm flex items-center gap-2 hover:border hover:border-amber-700 cursor-pointer"
               >

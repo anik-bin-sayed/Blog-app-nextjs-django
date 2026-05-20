@@ -1,4 +1,5 @@
 import Cookies from "js-cookie";
+import { clientCookieOptions } from "@/utils/cookieOptions";
 
 /**
  * Secure Token Manager
@@ -17,11 +18,7 @@ const TokenManager = {
   /**
    * Cookie options for secure storage
    */
-  COOKIE_OPTIONS: {
-    path: "/",
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "Lax",
-  },
+  COOKIE_OPTIONS: clientCookieOptions,
 
   /**
    * Set access token with expiry
@@ -45,10 +42,7 @@ const TokenManager = {
    */
   setRefreshToken(token) {
     if (!token) return;
-    Cookies.set(this.KEYS.REFRESH_TOKEN, token, {
-      ...this.COOKIE_OPTIONS,
-      secure: true,
-    });
+    Cookies.set(this.KEYS.REFRESH_TOKEN, token, this.COOKIE_OPTIONS);
   },
 
   /**
@@ -155,9 +149,11 @@ const TokenManager = {
    */
   markAccessTokenRefreshed(expiresIn = 15 * 60) {
     const expiryTime = Date.now() + expiresIn * 1000;
-    Cookies.set(this.KEYS.ACCESS_TOKEN_EXPIRY, expiryTime.toString(), {
-      ...this.COOKIE_OPTIONS,
-    });
+    Cookies.set(
+      this.KEYS.ACCESS_TOKEN_EXPIRY,
+      expiryTime.toString(),
+      this.COOKIE_OPTIONS,
+    );
   },
 
   /**

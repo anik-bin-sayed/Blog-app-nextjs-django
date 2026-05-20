@@ -30,9 +30,12 @@ const useAutoRefresh = () => {
       const now = Date.now();
       const timeUntilExpiry = expiryMs - now;
 
-      // If token already expired, don't set up auto-refresh
+      // Expired client-side timer: try refresh once (httpOnly token may still be valid)
       if (timeUntilExpiry <= 0) {
-        dispatch(logoutUser());
+        refresh()
+          .unwrap()
+          .then(setupAutoRefresh)
+          .catch(() => dispatch(logoutUser()));
         return;
       }
 

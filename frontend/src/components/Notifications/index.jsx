@@ -14,11 +14,22 @@ import Link from "next/link";
 import { useSelector } from "react-redux";
 import useNotifications from "@/hooks/useNotifications";
 
+export function NotificationsLoader() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="text-yellow-500 animate-pulse font-medium">
+        Loading notifications...
+      </div>
+    </div>
+  );
+}
+
 const Notifications = () => {
   const [nextPage, setNextPage] = useState(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [openDropdownId, setOpenDropdownId] = useState(null);
+  const [mounted, setMounted] = useState(false);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -169,14 +180,19 @@ const Notifications = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-yellow-500 animate-pulse font-medium">
-          Loading notifications...
-        </div>
-      </div>
-    );
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const queryActive = auth || isAdmin;
+
+
+  if (!mounted) {
+    return <NotificationsLoader />;
+  }
+
+  if (queryActive && isLoading) {
+    return <NotificationsLoader />;
   }
 
   if (error) {
@@ -190,9 +206,8 @@ const Notifications = () => {
   }
 
   return (
-    <div className="min-h-screen py-10 px-4">
+    <div className="min-h-screen py-10 px-4 bg-gray-50">
       <div className="max-w-3xl mx-auto">
-        {/* HEADER */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
             <h1 className="text-2xl font-bold text-black">Notifications</h1>
@@ -207,7 +222,7 @@ const Notifications = () => {
           <Action />
         </div>
 
-        {/* FILTER */}
+
         <div className="flex gap-2 bg-white p-1 rounded-2xl w-fit mb-8 shadow-sm">
           <button
             onClick={() => router.push("/notifications?tab=all")}
@@ -250,7 +265,7 @@ const Notifications = () => {
           </button>
         </div>
 
-        {/* LIST */}
+
         <div className="space-y-4">
           {filteredNotifications.length === 0 ? (
             <div className="bg-white rounded-2xl p-12 text-center shadow-sm border border-gray-100">

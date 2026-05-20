@@ -4,7 +4,7 @@ import React from "react";
 import { FaArrowRight, FaBookmark, FaRegBookmark } from "react-icons/fa";
 import { useSelector } from "react-redux";
 
-const Card = ({ post, onSave, savedButton = false, isSaved }) => {
+const Card = ({ post, onSave, savedButton = false, isSaved, role }) => {
   const { auth } = useSelector((state) => state.auth);
 
   const handleSaveClick = (e) => {
@@ -13,7 +13,7 @@ const Card = ({ post, onSave, savedButton = false, isSaved }) => {
     if (onSave) onSave(post.id);
   };
 
-  const isButtonShown = savedButton && auth;
+  const isButtonShown = savedButton && auth && role === "user";
 
   return (
     <article className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer border border-gray-100">

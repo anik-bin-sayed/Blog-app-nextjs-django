@@ -75,6 +75,15 @@ const Blogs = () => {
 
   if (isLoading) return <ComponentLoader />;
 
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto p-4 m-4 bg-white rounded-xl shadow mt-6 flex flex-col sm:flex-row justify-between gap-4">
@@ -103,7 +112,7 @@ const Blogs = () => {
               className={`px-4 py-1 rounded-md text-sm capitalize transition font-medium cursor-pointer ${
                 filters.status === item
                   ? "bg-yellow-500 text-black  shadow"
-                  : "bg-gray-200 hover:bg-gray-300"
+                  : "bg-gray-200 text-black hover:bg-gray-300"
               }`}
             >
               {item}
@@ -129,9 +138,12 @@ const Blogs = () => {
 
       <div className="flex justify-center items-center gap-2 py-10 flex-wrap">
         <button
-          onClick={() => goToPage(currentPage - 1)}
+          onClick={() =>{
+            goToPage(currentPage - 1);
+            scrollToTop();
+          }}
           disabled={!data?.previous}
-          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+          className="px-3 py-1 bg-gray-200 text-black hover:bg-gray-300 rounded disabled:opacity-50 cursor-pointer"
         >
           Prev
         </button>
@@ -142,8 +154,8 @@ const Blogs = () => {
             onClick={() => goToPage(page)}
             className={`px-3 py-1 rounded ${
               currentPage === page
-                ? "bg-yellow-500 text-white"
-                : "bg-gray-200 hover:bg-gray-300"
+                ? "bg-yellow-500 text-black"
+                : "bg-gray-200 text-black hover:bg-gray-300 cursor-pointer"
             }`}
           >
             {page}
@@ -151,9 +163,12 @@ const Blogs = () => {
         ))}
 
         <button
-          onClick={() => goToPage(currentPage + 1)}
+          onClick={() => {
+            goToPage(currentPage + 1);
+            scrollToTop();
+          }}
           disabled={!data?.next}
-          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+          className="px-3 py-1 bg-gray-200 text-black hover:bg-gray-300 rounded disabled:opacity-50 cursor-pointer"
         >
           Next
         </button>

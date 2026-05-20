@@ -99,7 +99,12 @@ const AllUser = () => {
                 users.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50 transition">
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                      {user.username}
+                      <div>{user.full_name || user.username}</div>
+                      {user.full_name && (
+                        <div className="text-xs text-gray-400">
+                          @{user.username}
+                        </div>
+                      )}
                     </td>
 
                     <td className="px-6 py-4 text-sm text-gray-500">

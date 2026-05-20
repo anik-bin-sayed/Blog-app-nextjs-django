@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import Input from "@/components/ui/input";
 import TextLink from "@/components/ui/textLink";
 import SubmitButton from "@/components/ui/submitButton";
-import { MdOutlineErrorOutline } from "react-icons/md";
 import { useLoginMutation } from "@/redux/services/auth/authApi";
+import { getApiErrorMessage } from "@/utils/getApiErrorMessage";
 
 const initialFormData = {
   email: "",
@@ -17,8 +18,6 @@ const initialFormData = {
 const Login = () => {
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState({});
-  const [error, setError] = useState("");
-  const [serverMessage, setServerMessage] = useState(null);
 
   const router = useRouter();
 
@@ -30,22 +29,19 @@ const Login = () => {
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
-    if (serverMessage) setServerMessage(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    setServerMessage(null);
-
     try {
       const res = await login(formData).unwrap();
-      console.log(formData);
-      window.location.reload();
-      router.push("/");
+
+      toast.success(res?.message || "Login successful");
       setFormData(initialFormData);
+      router.replace("/");
     } catch (err) {
-      console.log(err);
+      toast.error(getApiErrorMessage(err, "Login failed. Please try again."));
     }
   };
 
@@ -83,26 +79,6 @@ const Login = () => {
                 placeholder="Password"
               />
 
-              {errors.terms && (
-                <p className="text-red-500 text-xs -mt-2">{errors.terms}</p>
-              )}
-              {serverMessage && (
-                <div
-                  className={`p-3 rounded-xl text-sm ${
-                    serverMessage.type === "success"
-                      ? "bg-green-50 text-green-800 border border-green-200"
-                      : "bg-red-50 text-red-800 border border-red-200"
-                  }`}
-                >
-                  {serverMessage.text}
-                </div>
-              )}
-              {error && (
-                <p className="text-red-800 flex items-center gap-1">
-                  <MdOutlineErrorOutline />
-                  {error}
-                </p>
-              )}
               <SubmitButton
                 text="Sign in"
                 type="submit"
@@ -110,7 +86,7 @@ const Login = () => {
                 isLoadingText="Please wait"
               />
               <div className="text-center text-sm text-gray-500">
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <TextLink text="Sign up" link="/register" />
               </div>
             </form>

@@ -15,7 +15,6 @@ const Page = () => {
   const { slug } = params;
 
   const { auth } = useSelector((state) => state.auth);
-  console.log(auth);
 
   const { data, isLoading, isError, isFetching } = useBlogDetailsQuery(slug, {
     skip: !slug,
