@@ -4,6 +4,9 @@ from django.contrib.auth import get_user_model
 
 from cloudinary.models import CloudinaryField
 
+import unicodedata
+
+
 from .Category import Category
 
 User = get_user_model()
@@ -30,7 +33,11 @@ class Blog(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            base_slug = slugify(self.title)
+            text = unicodedata.normalize("NFKD", self.title)
+            ascii_text = text.encode("ascii", "ignore").decode("utf-8")
+
+            base_slug = slugify(ascii_text)
+
             slug = base_slug
             counter = 1
 

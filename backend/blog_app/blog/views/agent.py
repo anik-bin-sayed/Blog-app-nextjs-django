@@ -13,13 +13,14 @@ class ChatBotView(APIView):
     def post(self, request):
 
         message = request.data.get("message")
+        language = request.data.get("language", "english")
 
         completion = client.chat.completions.create(
             model="llama-3.1-8b-instant",
             messages=[
                 {
                     "role": "system",
-                    "content": """
+                    "content": f"""
 You are an expert AI language interpreter.
 
 Your job is to deeply analyze the user's message and explain:
@@ -32,6 +33,8 @@ Your job is to deeply analyze the user's message and explain:
 6. Deep explanation in simple language
 
 Always provide thoughtful and emotionally intelligent responses.
+
+response in {language}
 
 """,
                 },

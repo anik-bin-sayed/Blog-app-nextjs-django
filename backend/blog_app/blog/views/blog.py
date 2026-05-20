@@ -56,9 +56,7 @@ class CreateBlogView(APIView):
                 author=request.user, image=image_url, image_public_id=image_public_id
             )
 
-            return Response(
-                {"success": True, "message": "Blog created successfully"}, status=201
-            )
+            return Response({"message": "Blog created successfully"}, status=201)
         else:
             return Response(serializer.errors, status=400)
 
@@ -165,9 +163,7 @@ class ToggleBlogStatusView(APIView):
             blog = Blog.objects.get(pk=pk)
             blog.is_public = not blog.is_public
             blog.save()
-            return Response(
-                {"success": True, "message": "Blog status updated successfully"}
-            )
+            return Response({"message": "Blog status updated successfully"})
         except Blog.DoesNotExist:
             return Response({"error": "Blog not found"}, status=404)
 
@@ -182,9 +178,7 @@ class EditBlogView(APIView):
 
             if serializer.is_valid():
                 serializer.save()
-                return Response(
-                    {"success": True, "message": "Blog updated successfully"}
-                )
+                return Response({"message": "Blog updated successfully"})
             else:
                 return Response(serializer.errors, status=400)
 
@@ -207,19 +201,17 @@ class SavedBlogsView(APIView):
 
             if existing:
                 existing.delete()
-                return Response(
-                    {"success": True, "message": "Blog removed from saved list"}
-                )
+                return Response({"message": "Blog removed from saved list"})
 
             if saved_qs.count() >= 8:
                 return Response(
-                    {"success": False, "message": "You can save maximum 8 blogs only"},
+                    {"message": "You can save maximum 8 blogs only"},
                     status=400,
                 )
 
             SavedBlog.objects.create(user=user, blog=blog)
 
-        return Response({"success": True, "message": "Blog added to saved list"})
+        return Response({"message": "Blog added to saved list"})
 
 
 class UserSavedBlogsView(APIView):

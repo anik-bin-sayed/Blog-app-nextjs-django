@@ -7,6 +7,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 
 from ..models import Comment, Notification
+from ..realtime import push_notification
 from ..serializers import CreateCommentSerializer, CommentListSerializer
 from ..models import Blog
 from django.core.paginator import Paginator
@@ -32,13 +33,14 @@ class CreateComment(APIView):
 
                 name = first[0].upper() + first[1:] if first else ""
 
-                Notification.objects.create(
+                notification = Notification.objects.create(
                     user=post_user,
                     actor=request.user,
                     blog=blog,
                     comment=comment,
                     message=f"{name} commented {blog.title}",
                 )
+                push_notification(notification)
 
             return Response(
                 {"success": True, "message": "Comment created successfully"}, status=201
