@@ -138,19 +138,19 @@ const CreateBlog = () => {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded shadow-xl overflow-hidden transition-all duration-300">
-          <div className="bg-linear-to-r from-yellow-400 to-yellow-500 px-6 py-5 sm:px-8">
-            <h1 className="text-xl sm:text-3xl font-semibold text-black tracking-tight">
+    <div className="py-1">
+      <div className="mx-auto max-w-4xl">
+        <div className="overflow-hidden rounded-2xl border border-stone-200 bg-[#fffdf9] shadow-sm transition-all duration-300">
+          <div className="border-b border-stone-800 bg-stone-900 px-6 py-5 sm:px-8">
+            <h1 className="font-serif text-2xl font-medium tracking-tight text-white sm:text-3xl">
               Create New Blog
             </h1>
-            <p className="text-black text-sm mt-1">
+            <p className="mt-1 text-sm text-stone-300">
               Share your stories with the world
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6 p-5 sm:p-8">
             {errors.form && (
               <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg text-sm">
                 {errors.form}
@@ -158,16 +158,16 @@ const CreateBlog = () => {
             )}
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
-                Title <span className="text-red-500">*</span>
+              <label className="mb-1.5 block text-sm font-semibold text-stone-700">
+                Title <span className="text-amber-800">*</span>
               </label>
               <input
                 type="text"
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                className={`w-full px-4 py-2.5 rounded border focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none placeholder:text-gray-500 text-gray-700 ${
-                  errors.title ? "border-red-500 bg-red-50" : "border-gray-300"
+                className={`w-full rounded-xl border bg-[#faf9f6] px-4 py-3 text-sm text-stone-800 outline-none transition placeholder:text-stone-400 focus:border-amber-700 focus:ring-4 focus:ring-amber-700/10 ${
+                  errors.title ? "border-rose-500" : "border-stone-200"
                 }`}
                 placeholder="Enter an engaging title"
                 required
@@ -193,19 +193,19 @@ const CreateBlog = () => {
 
             {/* Thumbnail Upload */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
-                Thumbnail Image <span className="text-red-500">*</span>
+              <label className="mb-1.5 block text-sm font-semibold text-stone-700">
+                Thumbnail Image <span className="text-amber-800">*</span>
               </label>
               <div className="flex flex-col sm:flex-row gap-5 items-start">
                 <div className="flex-1 w-full">
-                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition border-gray-300">
+                  <label className="flex h-36 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-stone-300 bg-[#faf9f6] transition hover:border-amber-700 hover:bg-amber-50/50">
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <RiUploadCloud2Line className="w-8 h-8 mb-2 text-gray-500" />
-                      <p className="mb-1 text-sm text-gray-600">
+                      <RiUploadCloud2Line className="mb-2 h-8 w-8 text-amber-800" />
+                      <p className="mb-1 text-sm text-stone-600">
                         <span className="font-semibold">Click to upload</span>{" "}
                         or drag and drop
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-stone-500">
                         JPG, PNG, WEBP (max 5MB)
                       </p>
                     </div>
@@ -251,15 +251,15 @@ const CreateBlog = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
-                Category <span className="text-red-500">*</span>
+              <label className="mb-1.5 block text-sm font-semibold text-stone-700">
+                Category <span className="text-amber-800">*</span>
               </label>
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="flex-1">
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition"
+                    className="w-full rounded-xl border border-stone-200 bg-[#faf9f6] px-4 py-3 text-sm text-stone-700 outline-none transition focus:border-amber-700 focus:ring-4 focus:ring-amber-700/10"
                     required
                   >
                     <option value="">Select a category</option>
@@ -279,7 +279,7 @@ const CreateBlog = () => {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(true)}
-                  className="bg-yellow-400 hover:bg-yellow-500 text-black font-medium px-5 py-2.5 rounded-md transition"
+                  className="rounded-xl border border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold text-stone-700 transition hover:border-amber-800 hover:bg-amber-50"
                 >
                   + New Category
                 </button>
@@ -290,13 +290,13 @@ const CreateBlog = () => {
                   {categories.slice(0, 5).map((cat) => (
                     <div
                       key={cat.id}
-                      className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1 text-sm"
+                      className="inline-flex items-center gap-2 rounded-full bg-[#f5f1e9] px-3 py-1 text-sm"
                     >
-                      <span>{cat.name}</span>
+                      <span className="text-stone-700">{cat.name}</span>
                       <button
                         type="button"
                         onClick={() => handleDeleteCategory(cat.id)}
-                        className="text-red-500 hover:text-red-700 transition"
+                        className="text-stone-400 transition hover:text-rose-700"
                       >
                         <RxCross2 />
                       </button>
@@ -307,7 +307,7 @@ const CreateBlog = () => {
               {categories && categories.length > 5 && (
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="items-center px-3 py-1 my-1 text-sm hover:underline cursor-pointer"
+                  className="my-1 items-center px-3 py-1 text-sm font-medium text-amber-900 hover:underline cursor-pointer"
                 >
                   See more
                 </button>
@@ -330,13 +330,13 @@ const CreateBlog = () => {
               </div>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+            <div className="flex flex-col gap-3 border-t border-stone-200 pt-5 sm:flex-row">
               <button
                 type="submit"
                 name="action"
                 value="publish"
                 disabled={loadingAction === "publish"}
-                className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-3 px-6 rounded-md transition duration-200 transform focus:outline-none focus:ring-yellow-500 disabled:opacity-70 disabled:cursor-not-allowed shadow-sm cursor-pointer"
+                className="flex-1 cursor-pointer rounded-full bg-amber-700 px-6 py-3 font-semibold text-white shadow-sm transition hover:bg-amber-800 focus:outline-none focus:ring-4 focus:ring-amber-700/20 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loadingAction === "publish" ? "Loading..." : "Publish"}
               </button>
@@ -346,7 +346,7 @@ const CreateBlog = () => {
                 name="action"
                 value="draft"
                 disabled={loadingAction === "draft"}
-                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-md transition duration-200 transform focus:outline-none focus:ring-blue-500 disabled:opacity-70 disabled:cursor-not-allowed shadow-sm cursor-pointer"
+                className="flex-1 cursor-pointer rounded-full border border-stone-300 bg-white px-6 py-3 font-semibold text-stone-700 transition hover:bg-stone-100 focus:outline-none focus:ring-4 focus:ring-stone-500/10 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loadingAction === "draft"
                   ? "Saving Draft..."

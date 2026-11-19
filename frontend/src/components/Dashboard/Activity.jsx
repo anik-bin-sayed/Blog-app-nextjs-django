@@ -28,15 +28,15 @@ const Activity = () => {
   }));
 
   if (isError) {
-    return <div>Error loading data</div>;
+    return <div className="rounded-2xl border border-rose-200 bg-white p-6 text-sm text-rose-700">Activity data couldn’t be loaded.</div>;
   }
 
   if (isLoading) return <ComponentLoader />;
 
   if (!monthlyData.length) {
     return (
-      <div className="bg-white rounded-2xl p-8 text-center border border-gray-200">
-        <p className="text-gray-500">No activity data available.</p>
+      <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-10 text-center">
+        <p className="text-sm text-stone-500">No activity data available yet.</p>
       </div>
     );
   }
@@ -57,30 +57,30 @@ const Activity = () => {
     : 0;
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="bg-white rounded shadow-md p-5 border border-gray-100">
-          <p className="text-sm font-medium text-gray-500">
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="rounded-2xl border border-stone-200 bg-[#fffdf9] p-5 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">
             Active Users (This Month)
           </p>
-          <p className="text-3xl font-bold text-gray-800 mt-2">
+          <p className="mt-3 font-serif text-4xl text-stone-900">
             {currentMonth?.activeUsers ?? 0}
           </p>
-          <p className="text-xs text-gray-400 mt-1">{currentMonth?.month}</p>
+          <p className="mt-1 text-xs text-stone-500">{currentMonth?.month}</p>
         </div>
-        <div className="bg-white rounded shadow-md p-5 border border-gray-100">
-          <p className="text-sm font-medium text-gray-500">Previous Month</p>
-          <p className="text-3xl font-bold text-gray-800 mt-2">
+        <div className="rounded-2xl border border-stone-200 bg-[#fffdf9] p-5 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">Previous Month</p>
+          <p className="mt-3 font-serif text-4xl text-stone-900">
             {previousMonth?.activeUsers ?? 0}
           </p>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="mt-1 text-xs text-stone-500">
             {previousMonth?.month ?? "—"}
           </p>
         </div>
-        <div className="bg-white rounded shadow-md p-5 border border-gray-100">
-          <p className="text-sm font-medium text-gray-500">Change</p>
+        <div className="rounded-2xl border border-stone-200 bg-[#fffdf9] p-5 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">Change</p>
           <div className="flex items-baseline gap-2 mt-2">
-            <p className="text-3xl font-bold text-gray-800">
+            <p className="font-serif text-4xl text-stone-900">
               {percentChange > 0 ? "+" : ""}
               {percentChange.toFixed(1)}%
             </p>
@@ -90,7 +90,7 @@ const Activity = () => {
               <span className="text-red-500 text-xl">↓</span>
             ) : null}
           </div>
-          <p className="text-xs text-gray-400 mt-1">compared to last month</p>
+          <p className="mt-1 text-xs text-stone-500">compared to last month</p>
         </div>
       </div>
 
@@ -99,10 +99,10 @@ const Activity = () => {
           <button
             key={type}
             onClick={() => setSelectedChart(type)}
-            className={`px-3 py-1.5 text-sm rounded transition capitalize ${
+            className={`rounded-full px-4 py-2 text-xs font-semibold transition capitalize ${
               selectedChart === type
-                ? "bg-yellow-400 text-black"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                ? "bg-stone-900 text-white"
+                : "border border-stone-200 bg-[#fffdf9] text-stone-600 hover:bg-amber-50"
             }`}
           >
             {type} Chart
@@ -110,8 +110,8 @@ const Activity = () => {
         ))}
       </div>
 
-      <div className="bg-white rounded shadow-md p-5 border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+      <div className="rounded-2xl border border-stone-200 bg-[#fffdf9] p-5 shadow-sm sm:p-6">
+        <h3 className="mb-4 font-serif text-xl text-stone-900">
           Monthly Active Users Trend
         </h3>
         <ResponsiveContainer width="100%" height={350}>
@@ -186,45 +186,45 @@ const Activity = () => {
         </ResponsiveContainer>
       </div>
 
-      <div className="bg-white rounded shadow-md border border-gray-200 overflow-hidden">
-        <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-800">
+      <div className="overflow-hidden rounded-2xl border border-stone-200 bg-[#fffdf9] shadow-sm">
+        <div className="border-b border-stone-200 bg-[#faf7f0] px-6 py-4">
+          <h3 className="font-serif text-xl text-stone-900">
             Monthly Activity Breakdown
           </h3>
         </div>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="min-w-full divide-y divide-stone-200">
             <thead className="bg-white">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-stone-500">
                   Month
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-stone-500">
                   Active Users
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-stone-500">
                   Previous Month
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-stone-500">
                   Change
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-stone-100">
               {[...monthlyData].reverse().map((item, idx) => {
                 const change = calculatePercentageChange(
                   item.activeUsers,
                   item.previousMonth,
                 );
                 return (
-                  <tr key={idx} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <tr key={idx} className="transition hover:bg-[#faf7f0]">
+                    <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-stone-900">
                       {item.month}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-stone-700">
                       {item.activeUsers}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-stone-500">
                       {item.previousMonth}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">

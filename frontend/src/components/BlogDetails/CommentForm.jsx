@@ -3,6 +3,7 @@ import SubmitButton from "../ui/submitButton";
 import { useCreateCommentMutation } from "@/redux/services/blogs/commentApi";
 import { useBlogDetailsQuery } from "@/redux/services/blogs/blogApi";
 import { useNotificationListQuery } from "@/redux/services/blogs/notification";
+import Link from "next/link";
 
 const CommentForm = ({ auth, blog, slug }) => {
   const [mounted, setMounted] = useState(false);
@@ -47,16 +48,16 @@ const CommentForm = ({ auth, blog, slug }) => {
   if (!mounted) return null;
 
   return (
-    <div className="rounded-2xl p-6 md:p-8 transition-all">
-      <div className="flex items-center gap-3 my-6">
-        <h3 className="text-xl md:text-2xl font-bold text-gray-900 select-none ">
-          Leave a Comment
-        </h3>
+    <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_12px_35px_-28px_rgba(41,32,22,0.4)] sm:p-7">
+      <div className="mb-5">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-800">Join the conversation</p>
+        <h3 className="mt-2 font-serif text-2xl text-stone-900">Leave a comment</h3>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <div className="relative">
+          <label htmlFor="comment" className="sr-only">Your comment</label>
           <textarea
   id="comment"
   name="comment"
@@ -64,7 +65,7 @@ const CommentForm = ({ auth, blog, slug }) => {
   disabled={!auth}
   value={comment}
   onChange={(e) => setComment(e.target.value)}
-  className={`w-full px-4 py-2 rounded-xl border border-gray-300 focus:ring-amber-500 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 bg-white text-gray-900 focus:outline-none focus:ring-2 transition-colors resize-none`}
+  className={`w-full resize-none rounded-xl border border-stone-200 bg-[#faf9f6] px-4 py-3 text-sm text-stone-800 outline-none transition focus:border-amber-700 focus:ring-4 focus:ring-amber-700/10 disabled:cursor-not-allowed disabled:bg-stone-100 disabled:text-stone-400`}
   placeholder={
     auth
       ? "Share your thoughts..."
@@ -74,7 +75,9 @@ const CommentForm = ({ auth, blog, slug }) => {
           </div>
         </div>
 
-        <div className="pt-1">
+        {!auth && <p className="text-sm text-stone-500">Please <Link href="/login" className="font-semibold text-amber-900 underline decoration-amber-300 underline-offset-2">log in</Link> to join the conversation.</p>}
+
+        <div className="pt-1 sm:max-w-56">
           <SubmitButton
             disabled={!auth}
             isLoading={isLoading}

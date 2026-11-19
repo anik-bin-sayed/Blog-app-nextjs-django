@@ -1,246 +1,100 @@
 "use client";
 
-import {
-  useSavedBlogsListQuery,
-  useSavedBlogsMutation,
-} from "@/redux/services/blogs/blogApi";
-import React from "react";
+import { useSavedBlogsListQuery, useSavedBlogsMutation } from "@/redux/services/blogs/blogApi";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  FaBookmark,
-  FaRegBookmark,
-  FaRegClock,
-  FaRegCalendarAlt,
-} from "react-icons/fa";
-import { MdOutlineDescription } from "react-icons/md";
+import { FaBookmark, FaRegBookmark, FaRegCalendarAlt, FaArrowRight } from "react-icons/fa";
 import { IoWarningOutline } from "react-icons/io5";
+import { MdOutlineDescription } from "react-icons/md";
 import { useSelector } from "react-redux";
 
-const SavedBlog = () => {
-  const { auth } = useSelector((state) => state.auth);
+function SavedStoriesSkeleton() {
+  return (
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {Array.from({ length: 8 }, (_, index) => (
+        <div key={index} className="overflow-hidden rounded-2xl border border-stone-200 bg-white">
+          <div className="aspect-[1.45/1] animate-pulse bg-stone-200" />
+          <div className="space-y-3 p-5"><div className="h-3 w-1/3 animate-pulse rounded bg-stone-200" /><div className="h-5 w-4/5 animate-pulse rounded bg-stone-200" /><div className="h-3 w-full animate-pulse rounded bg-stone-100" /><div className="h-3 w-2/3 animate-pulse rounded bg-stone-100" /></div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
-  const {
-    data: savedPosts,
-    isLoading,
-    isError,
-  } = useSavedBlogsListQuery(auth, {
-    skip: !auth,
-  });
-  const [savedBlogs] = useSavedBlogsMutation();
+export default function SavedBlog() {
+  const { auth } = useSelector((state) => state.auth);
+  const { data: savedPosts, isLoading, isError, refetch } = useSavedBlogsListQuery(auth, { skip: !auth });
+  const [toggleSaved, { isLoading: isUpdating }] = useSavedBlogsMutation();
+  const posts = Array.isArray(savedPosts) ? savedPosts : [];
 
   const handleUnsave = async (postId) => {
     try {
-      await savedBlogs(postId).unwrap();
+      await toggleSaved(postId).unwrap();
     } catch (error) {
-      console.log(error);
+      console.error("Could not remove saved story:", error);
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-linear-to-br from-gray-50 to-indigo-50/40 py-10 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto">
-          {/* Header skeleton */}
-          <div className="text-center mb-12">
-            <div className="h-10 w-64 bg-gray-200 rounded-full mx-auto mb-3 animate-pulse"></div>
-            <div className="h-5 w-96 bg-gray-200 rounded-full mx-auto animate-pulse"></div>
-          </div>
-          {/* Grid skeletons */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[...Array(6)].map((_, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-2xl shadow-md overflow-hidden animate-pulse"
-              >
-                <div className="h-48 bg-gray-200"></div>
-                <div className="p-5 space-y-3">
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                  <div className="h-20 bg-gray-200 rounded"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className="min-h-[70vh] flex items-center justify-center px-4">
-        <div className="text-center max-w-md bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-red-100">
-          <div className="text-red-500 text-5xl flex justify-center mb-4">
-            <IoWarningOutline />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            Failed to load saved blogs
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Please try again later or refresh the page.
-          </p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-5 py-2 bg-yellow-400 text-black rounded-xl hover:bg-yellow-500 transition"
-          >
-            Refresh
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const hasSavedPosts = savedPosts && savedPosts.length > 0;
-
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-indigo-50/30 py-10 px-4 sm:px-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-10 md:mb-14">
-          <div className="inline-flex items-center justify-center p-2 bg-amber-100 rounded-full mb-4">
-            <FaBookmark className="text-amber-600 text-xl" />
+    <main className="min-h-[70vh] flex-1 bg-[#faf7f0] px-5 py-12 sm:px-8 sm:py-16 lg:px-10 lg:py-20">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-9 flex flex-col justify-between gap-5 border-b border-stone-200 pb-8 sm:mb-11 sm:flex-row sm:items-end">
+          <div>
+            <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-amber-800"><FaBookmark className="text-[11px]" /> Your personal collection</p>
+            <h1 className="mt-3 font-serif text-4xl font-medium tracking-tight text-stone-900 sm:text-5xl">Saved <span className="italic text-amber-800">for later.</span></h1>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-stone-600 sm:text-base">A thoughtful little reading list, ready whenever you are.</p>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-3">
-            Your Saved{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-500">
-              Collection
-            </span>
-          </h1>
-          <p className="text-gray-500 max-w-xl mx-auto">
-            All the articles you've bookmarked for later reading, neatly
-            organized.
-          </p>
+          {!isLoading && !isError && posts.length > 0 && (
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-stone-500"><strong className="text-stone-900">{posts.length}</strong> of 8 saved</span>
+              <Link href="/blogs" className="group inline-flex items-center gap-2 rounded-full bg-stone-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-900">Find more stories <FaArrowRight className="text-xs transition-transform group-hover:translate-x-1" /></Link>
+            </div>
+          )}
         </div>
 
-        {!hasSavedPosts ? (
-          // Empty state
-          <div className="flex flex-col items-center justify-center py-16 bg-white/50 rounded-3xl border border-dashed border-gray-200 backdrop-blur-sm">
-            <div className="w-24 h-24 bg-amber-50 rounded-full flex items-center justify-center mb-5">
-              <FaRegBookmark className="text-amber-400 text-4xl" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">
-              No saved blogs yet
-            </h3>
-            <p className="text-gray-500 text-center max-w-sm mb-6">
-              When you find an interesting article, click the bookmark icon to
-              save it here.
-            </p>
-            <Link
-              href="/blogs"
-              className="px-6 py-2.5 bg-linear-to-r from-yellow-400 to-yellow-500 text-black rounded-xl font-medium shadow-md hover:shadow-lg transition-all hover:scale-[1.02]"
-            >
-              Explore Blogs
-            </Link>
+        {isLoading ? <SavedStoriesSkeleton /> : isError ? (
+          <div className="rounded-[2rem] border border-stone-200 bg-white px-6 py-14 text-center shadow-sm">
+            <IoWarningOutline className="mx-auto text-4xl text-amber-800" />
+            <h2 className="mt-4 font-serif text-2xl text-stone-900">Your reading list didn’t load.</h2>
+            <p className="mt-2 text-sm text-stone-500">Please try again in a moment.</p>
+            <button type="button" onClick={() => refetch()} className="mt-5 rounded-full bg-stone-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-900">Try again</button>
+          </div>
+        ) : posts.length === 0 ? (
+          <div className="rounded-[2rem] border border-dashed border-stone-300 bg-white/70 px-6 py-16 text-center sm:py-20">
+            <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 text-amber-900"><FaRegBookmark className="text-2xl" /></span>
+            <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em] text-amber-800">Room for a good read</p>
+            <h2 className="mt-2 font-serif text-3xl text-stone-900">Your collection is waiting.</h2>
+            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-600">When a story catches your eye, save it here and come back whenever you’re ready.</p>
+            <Link href="/blogs" className="mt-6 inline-flex items-center gap-2 rounded-full bg-stone-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-amber-900">Explore the journal <FaArrowRight className="text-xs" /></Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-            {savedPosts.map((post) => (
-              <article
-                key={post.id}
-                className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col border border-gray-100 hover:border-amber-200 relative"
-              >
-                {/* Remove button (optional) */}
-                <button
-                  onClick={() => handleUnsave(post.id)}
-                  className="absolute top-4 right-4 z-10 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-red-50 transition-all duration-200 group-hover:opacity-100 focus:outline-none"
-                  aria-label="Remove from saved"
-                >
-                  <FaBookmark className="text-amber-600 w-4 h-4" />
-                </button>
+          <>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {posts.map((post) => (
+                <article key={post.id} className="group relative flex flex-col overflow-hidden rounded-2xl border border-stone-200/90 bg-[#fffdf9] shadow-[0_10px_30px_-24px_rgba(41,32,22,0.45)] transition duration-300 hover:-translate-y-1 hover:border-amber-900/20 hover:shadow-[0_24px_45px_-28px_rgba(41,32,22,0.4)]">
+                  <button type="button" onClick={() => handleUnsave(post.id)} disabled={isUpdating} className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/70 bg-[#fffdf9]/95 text-amber-900 shadow-sm backdrop-blur transition hover:bg-rose-50 hover:text-rose-700 disabled:cursor-wait disabled:opacity-60" aria-label={`Remove ${post.title} from saved stories`} title="Remove from saved">
+                    <FaBookmark className="text-sm" />
+                  </button>
 
-                <Link href={`/blogs/${post.slug}`} className="flex-1">
-                  <div className="relative h-48 overflow-hidden bg-gray-100">
-                    {post.image ? (
-                      <Image
-                        src={post.image}
-                        alt={post.title}
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-linear-to-br from-amber-100 to-orange-100 flex items-center justify-center">
-                        <MdOutlineDescription className="text-6xl text-amber-400" />
-                      </div>
-                    )}
-                    {post.category && (
-                      <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-amber-700 text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm">
-                        {post.category}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="p-5 flex-1 flex flex-col">
-                    {/* Meta info */}
-                    <div className="flex items-center gap-3 text-xs text-gray-500 mb-2 flex-wrap">
-                      <div className="flex items-center gap-1">
-                        <FaRegCalendarAlt className="text-amber-400" />
-                        <span>
-                          {post.created_at
-                            ? new Date(post.created_at).toLocaleDateString(
-                                "en-BD",
-                                {
-                                  year: "numeric",
-                                  month: "short",
-                                  day: "numeric",
-                                },
-                              )
-                            : "Recent"}
-                        </span>
-                      </div>
-                      {post.readTime && (
-                        <div className="flex items-center gap-1">
-                          <FaRegClock className="text-amber-400" />
-                          <span>{post.readTime}</span>
-                        </div>
-                      )}
+                  <Link href={`/blogs/${post.slug}`} className="flex flex-1 flex-col">
+                    <div className="relative aspect-[1.45/1] overflow-hidden bg-stone-200">
+                      {post.image ? <Image src={post.image} alt={post.title} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="object-cover transition-transform duration-700 group-hover:scale-[1.04]" /> : <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-amber-100 to-stone-200"><MdOutlineDescription className="text-5xl text-amber-800/40" /></div>}
+                      {post.category && <span className="absolute left-4 top-4 rounded-full border border-white/70 bg-[#fffdf9]/95 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-amber-950 shadow-sm backdrop-blur-sm">{post.category}</span>}
                     </div>
-
-                    {/* Title */}
-                    <h3 className="text-lg font-bold text-gray-800 mb-2 group-hover:text-amber-600 transition-colors line-clamp-2">
-                      {post.title}
-                    </h3>
-
-                    {/* Excerpt */}
-                    <p className="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-4">
-                      {post.excerpt ||
-                        post.content?.slice(0, 120) ||
-                        "No description available."}
-                    </p>
-
-                    {/* Read more link */}
-                    <div className="mt-auto flex items-center text-amber-600 font-medium text-sm hover:text-amber-700 transition-colors group-hover/btn:translate-x-1">
-                      <span>Read full article</span>
-                      <svg
-                        className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
+                    <div className="flex flex-1 flex-col p-5 sm:p-6">
+                      <span className="mb-3 inline-flex items-center gap-2 text-[11px] font-medium tracking-wide text-stone-500"><FaRegCalendarAlt className="text-amber-800" />{post.created_at ? new Date(post.created_at).toLocaleDateString("en-BD", { year: "numeric", month: "long", day: "numeric" }) : "Recently published"}</span>
+                      <h2 className="mb-2 line-clamp-2 font-serif text-xl font-semibold leading-snug text-stone-900 transition-colors group-hover:text-amber-900">{post.title}</h2>
+                      <p className="mb-5 line-clamp-3 flex-1 text-sm leading-6 text-stone-600">{post.excerpt || post.content?.slice(0, 140) || "A story from the Globira journal."}</p>
+                      <span className="inline-flex items-center self-start text-sm font-semibold text-amber-900">Continue reading <FaArrowRight className="ml-2 text-xs transition-transform group-hover:translate-x-1" /></span>
                     </div>
-                  </div>
-                </Link>
-              </article>
-            ))}
-          </div>
-        )}
-
-        {/* Decorative footer note */}
-        {hasSavedPosts && (
-          <div className="text-center mt-12 text-sm text-gray-400 border-t border-gray-200 pt-6">
-            <p> Saved articles are private to your account.</p>
-          </div>
+                  </Link>
+                </article>
+              ))}
+            </div>
+            <p className="mt-10 border-t border-stone-200 pt-5 text-center text-xs text-stone-500">Your saved stories are private to your account.</p>
+          </>
         )}
       </div>
-    </div>
+    </main>
   );
-};
-
-export default SavedBlog;
+}

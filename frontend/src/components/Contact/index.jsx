@@ -1,145 +1,114 @@
 "use client";
+
 import React, { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import SubmitButton from "../ui/submitButton";
 import Input from "../ui/input";
+import { FaArrowRight, FaEnvelope, FaRegClock } from "react-icons/fa";
 
-const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
+const initialFormData = { name: "", email: "", subject: "", message: "" };
+
+export default function Contact() {
+  const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState({});
+  const [submitted, setSubmitted] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+  const handleChange = (event) => {
+    const { id, value } = event.target;
+    setFormData((previous) => ({ ...previous, [id]: value }));
+    setErrors((previous) => ({ ...previous, [id]: "" }));
+    setSubmitted(false);
   };
 
   const validate = () => {
-    const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = "Name is required";
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Invalid email address";
-    }
-    if (formData.message.length < 10) {
-      newErrors.message = "Message must be at least 10 characters long";
-    }
-    return newErrors;
+    const nextErrors = {};
+    if (!formData.name.trim()) nextErrors.name = "Please enter your name.";
+    if (!formData.email.trim()) nextErrors.email = "Please enter your email address.";
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) nextErrors.email = "Enter a valid email address.";
+    if (!formData.subject.trim()) nextErrors.subject = "Please add a subject.";
+    if (formData.message.trim().length < 10) nextErrors.message = "Your message needs at least 10 characters.";
+    return nextErrors;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-    } else {
-      setErrors({});
-      alert("Form submitted successfully!");
-      setFormData({
-        name: "",
-        email: "",
-        subject: "",
-        message: "",
-      });
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const nextErrors = validate();
+    if (Object.keys(nextErrors).length) {
+      setErrors(nextErrors);
+      setSubmitted(false);
+      return;
     }
+    setErrors({});
+    const emailBody = `From: ${formData.name} (${formData.email})\n\n${formData.message}`;
+    window.location.href = `mailto:info@sophiaellis.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(emailBody)}`;
+    setSubmitted(true);
   };
 
   return (
-    <section className="bg-linear-to-b from-white to-gray-50 py-16 md:py-24">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative flex flex-col items-center mb-16">
-          <h1 className="text-5xl md:text-6xl font-bold italic text-gray-800 text-center relative z-10">
-            say{" "}
-            <span className="text-amber-600 relative inline-block">
-              hello!
-              <span className="absolute bottom-0 left-0 w-full h-1 bg-amber-200 rounded-full -mb-2"></span>
-            </span>
-          </h1>
-          <div className="absolute top-10 left-1/2 transform -translate-x-1/2 -translate-y-5 md:-translate-y-7.5 z-0">
-            <div className="relative w-28 h-28 md:w-32 md:h-32">
-              <Image
-                src="https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=200"
-                alt="Contact profile"
-                fill
-                className="rounded-full object-cover border-4 border-white shadow-lg"
-                sizes="(max-width: 768px) 7rem, 8rem"
-              />
-            </div>
-          </div>
+    <section className="bg-[#faf7f0] px-5 py-12 sm:px-8 sm:py-16 lg:px-10 lg:py-20">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-9 max-w-2xl sm:mb-12">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-800">The conversation starts here</p>
+          <h1 className="mt-3 font-serif text-4xl font-medium leading-tight tracking-tight text-stone-900 sm:text-5xl lg:text-6xl">Say hello. <span className="italic text-amber-800">I’d love to hear from you.</span></h1>
+          <p className="mt-4 max-w-xl text-sm leading-7 text-stone-600 sm:text-base sm:leading-8">Have a question, an idea for a story, or simply want to share what you’ve been reading? Drop me a note.</p>
         </div>
 
-        <p className="text-center text-gray-600 text-base md:text-lg max-w-2xl mx-auto mt-20 mb-12">
-          Contact me to find out more or how I can help you better.
-        </p>
-
-        <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <Input
-              label="Name"
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              error={errors.email}
-              required
-              placeholder="Anik Bin Sayed"
+        <div className="grid overflow-hidden rounded-[2rem] border border-stone-200 bg-white shadow-[0_28px_70px_-44px_rgba(41,32,22,0.4)] lg:grid-cols-[0.82fr_1.18fr]">
+          <aside className="relative isolate flex min-h-[360px] flex-col justify-between overflow-hidden bg-stone-900 p-7 text-white sm:p-10 lg:min-h-[650px] lg:p-12">
+            <Image
+              src="https://images.pexels.com/photos/3244513/pexels-photo-3244513.jpeg?auto=compress&cs=tinysrgb&w=1200"
+              alt="A peaceful desk ready for a thoughtful conversation"
+              fill
+              sizes="(max-width: 1024px) 100vw, 40vw"
+              className="-z-20 object-cover object-center"
             />
-            <Input
-              label="Email"
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              error={errors.email}
-              required
-              placeholder="hello@example.com"
-            />
-          </div>
+            <div className="absolute inset-0 -z-10 bg-gradient-to-t from-stone-950/95 via-stone-950/65 to-stone-950/30" />
+            <div className="relative">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-200">A note is always welcome</p>
+              <h2 className="mt-4 max-w-sm font-serif text-3xl leading-tight sm:text-4xl">Good things begin with a conversation.</h2>
+              <p className="mt-4 max-w-sm text-sm leading-7 text-white/75">Whether it’s about a story, a place, or a new idea, I’m glad you stopped by.</p>
+            </div>
+            <div className="relative mt-10 space-y-5">
+              <a href="mailto:info@sophiaellis.com" className="flex items-center gap-4 text-sm text-white/90 transition hover:text-amber-200">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-amber-200"><FaEnvelope /></span>
+                <span><span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-white/55">Email me</span><span className="mt-1 block">info@sophiaellis.com</span></span>
+              </a>
+              <div className="flex items-center gap-4 text-sm text-white/90">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-amber-200"><FaRegClock /></span>
+                <span><span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-white/55">A little patience</span><span className="mt-1 block">I’ll get back to you as soon as I can.</span></span>
+              </div>
+            </div>
+          </aside>
 
-          <div className="mb-6">
-            <Input
-              label="Subject"
-              type="text"
-              name="subject"
-              value={formData.subject}
-              onChange={handleChange}
-              error={errors.email}
-              required
-              placeholder="hello@example.com"
-            />
+          <div className="p-6 sm:p-9 lg:p-12">
+            <div className="mb-7">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-800">Write a message</p>
+              <h2 className="mt-2 font-serif text-2xl text-stone-900 sm:text-3xl">What’s on your mind?</h2>
+            </div>
+            <form onSubmit={handleSubmit} noValidate>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <Input label="Your name" id="name" name="name" type="text" value={formData.name} onChange={handleChange} error={errors.name} required placeholder="Jane Smith" className="rounded-xl border-stone-200 bg-[#faf9f6] px-4 py-3 focus:border-amber-700 focus:ring-amber-700/10" />
+                <Input label="Email address" id="email" name="email" type="email" value={formData.email} onChange={handleChange} error={errors.email} required placeholder="jane@example.com" className="rounded-xl border-stone-200 bg-[#faf9f6] px-4 py-3 focus:border-amber-700 focus:ring-amber-700/10" />
+              </div>
+              <div className="mt-5">
+                <Input label="Subject" id="subject" name="subject" type="text" value={formData.subject} onChange={handleChange} error={errors.subject} required placeholder="What would you like to talk about?" className="rounded-xl border-stone-200 bg-[#faf9f6] px-4 py-3 focus:border-amber-700 focus:ring-amber-700/10" />
+              </div>
+              <div className="mt-5">
+                <label htmlFor="message" className="mb-1.5 block text-sm font-medium text-stone-700">Message <span className="text-amber-800">*</span></label>
+                <textarea id="message" name="message" rows={6} value={formData.message} onChange={handleChange} required aria-invalid={!!errors.message} aria-describedby={errors.message ? "message-error" : undefined} className={`w-full resize-y rounded-xl border bg-[#faf9f6] px-4 py-3 text-sm text-stone-800 outline-none transition placeholder:text-stone-400 focus:ring-4 focus:ring-amber-700/10 ${errors.message ? "border-rose-500 focus:border-rose-500" : "border-stone-200 focus:border-amber-700"}`} placeholder="Tell me a little about it..." />
+                {errors.message && <p id="message-error" className="mt-1.5 text-xs text-rose-700">{errors.message}</p>}
+              </div>
+              {submitted && <p role="status" className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">Your email app should open with your message ready to send.</p>}
+              <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-xs leading-5 text-stone-500">Fields marked <span className="text-amber-800">*</span> are required.</p>
+                <div className="w-full sm:w-48"><SubmitButton text="Send message" type="submit" /></div>
+              </div>
+            </form>
+            <Link href="/blogs" className="mt-7 inline-flex items-center gap-2 border-t border-stone-100 pt-5 text-xs font-semibold text-stone-500 transition hover:text-amber-900">Or browse the journal <FaArrowRight className="text-[10px]" /></Link>
           </div>
-
-          <div className="mb-8">
-            <label
-              htmlFor="message"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Message <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              id="message"
-              rows="5"
-              value={formData.message}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-200 focus:border-amber-500 outline-none transition-all"
-              placeholder="Write your message..."
-            ></textarea>
-            {errors.message && (
-              <p className="text-red-500 text-sm mt-1">{errors.message}</p>
-            )}
-          </div>
-
-          <div className="text-center">
-            <SubmitButton text="Send" />
-          </div>
-        </form>
+        </div>
       </div>
     </section>
   );
-};
-
-export default Contact;
+}

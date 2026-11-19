@@ -1,64 +1,34 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "@/redux/services/auth/authSlice";
 import { useLogoutMutation } from "@/redux/services/auth/authApi";
 import { IoIosNotificationsOutline } from "react-icons/io";
-import { useNotificationListQuery } from "@/redux/services/blogs/notification";
 
 const DashboardIcon = () => (
-  <svg
-    className="w-5 h-5"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="1.5"
-      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-    />
+  <svg aria-hidden="true" className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6m-6 0v-4a1 1 0 011-1h2a1 1 0 011 1v4" />
   </svg>
 );
 
 const BookmarkIcon = () => (
-  <svg
-    className="w-5 h-5"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="1.5"
-      d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
-    />
+  <svg aria-hidden="true" className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
   </svg>
 );
 
 const LogoutIcon = () => (
-  <svg
-    className="w-5 h-5"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="1.5"
-      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-    />
+  <svg aria-hidden="true" className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" d="M10 17l5-5-5-5m5 5H3m9-9h5a2 2 0 012 2v14a2 2 0 01-2 2h-5" />
   </svg>
 );
 
-const AdminDropdown = ({ isProfileOpen, data, unreadNotificationLength }) => {
+export default function AdminDropdown({ data, unreadNotificationLength }) {
   const dispatch = useDispatch();
-  const [logout] = useLogoutMutation();
+  const [logout, { isLoading }] = useLogoutMutation();
+  const isAdmin = data?.role === "admin";
+  const unreadCount = Number(unreadNotificationLength?.unread_count || 0);
 
   const handleLogout = async () => {
     try {
@@ -71,104 +41,56 @@ const AdminDropdown = ({ isProfileOpen, data, unreadNotificationLength }) => {
   };
 
   return (
-    <div
-      className={`absolute right-0 mt-2 w-72 bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-100/50 transition-all duration-300 origin-top-right z-50 ${
-        isProfileOpen
-          ? "scale-100 opacity-100 translate-y-0"
-          : "scale-95 opacity-0 translate-y-2 pointer-events-none"
-      }`}
-    >
-      <div className="absolute -top-1 right-4 w-3 h-3 rotate-45 bg-white border-l border-t border-gray-100/50"></div>
+    <div className="absolute right-0 z-50 mt-3 w-[min(360px,calc(100vw-24px))] origin-top-right overflow-visible rounded-[1.4rem] border border-stone-200/90 bg-[#fffdf9]/95 text-stone-800 shadow-[0_24px_70px_-28px_rgba(41,32,22,0.38)] backdrop-blur-xl transition duration-200">
+      <span aria-hidden="true" className="absolute -top-2 right-5 h-4 w-4 rotate-45 rounded-tl border-l border-t border-stone-200/90 bg-[#fffdf9]" />
 
-      <div className="p-5 border-b border-gray-100">
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <div className="w-14 h-14 rounded-full bg-linear-to-br from-amber-400 to-orange-500 text-white flex items-center justify-center text-xl font-bold shadow-md">
-              {(data?.full_name || data?.username)?.[0]?.toUpperCase()}
-            </div>
-            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white"></div>
+      <div className="relative flex items-center gap-4 border-b border-stone-200/80 px-5 py-5">
+        <div className="relative shrink-0">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-orange-600 text-xl font-bold uppercase text-white shadow-[0_8px_18px_-8px_rgba(194,94,0,0.65)]">
+            {(data?.full_name || data?.username || "U")[0]?.toUpperCase()}
           </div>
-          <div className="flex-1">
-            <h3 className="font-semibold text-gray-800 text-lg">
-              {data?.full_name || data?.username}
-            </h3>
-            {data?.full_name && (
-              <p className="text-xs text-gray-400">@{data?.username}</p>
-            )}
-            <p className="text-xs text-gray-500 truncate">{data?.email}</p>
-            <span className="inline-block mt-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
-              {data?.role === "admin" ? "Administrator" : "Member"}
-            </span>
-          </div>
+          <span className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full border-[3px] border-[#fffdf9] bg-emerald-500" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <h2 className="truncate text-[15px] font-bold tracking-tight text-stone-900">{data?.full_name || data?.username || "Reader"}</h2>
+          {data?.full_name && <p className="mt-0.5 truncate text-xs text-stone-500">@{data?.username}</p>}
+          <p className="mt-1 truncate text-xs text-stone-500">{data?.email}</p>
+          <span className="mt-2 inline-flex rounded-full border border-stone-200 bg-stone-100/80 px-2.5 py-1 text-[10px] font-semibold text-stone-600">
+            {isAdmin ? "Administrator" : "Member"}
+          </span>
         </div>
       </div>
 
-      <ul className="py-2 px-2 space-y-1">
-        {data?.role === "admin" && (
+      <nav aria-label="Account navigation" className="space-y-1.5 p-2.5">
+        {isAdmin ? (
           <>
-            <li>
-              <Link
-                href="/dashboard"
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 transition-all duration-200 group"
-              >
-                <span className="text-gray-400 group-hover:text-yellow-500 transition">
-                  <DashboardIcon />
-                </span>
-                <span className="font-medium">Dashboard</span>
-              </Link>
-            </li>
-
-            <li>
-              <Link
-                href="/notifications"
-                className="flex items-center justify-between px-4 py-3 rounded-xl bg-white shadow-sm hover:shadow-md hover:bg-yellow-50 transition-all duration-300 group"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-gray-400 group-hover:text-yellow-500 text-lg transition">
-                    <IoIosNotificationsOutline />
-                  </span>
-                  <span className="font-medium text-gray-700 group-hover:text-yellow-600 transition">
-                    Notifications
-                  </span>
-                </div>
-
-                <span className="min-w-6 h-6 px-2 flex items-center justify-center text-xs font-semibold text-white bg-red-500 rounded-full shadow-sm group-hover:bg-red-600 transition">
-                  {unreadNotificationLength?.unread_count}
-                </span>
-              </Link>
-            </li>
-          </>
-        )}
-
-        {data?.role !== "admin" && (
-          <li>
-            <Link
-              href="/saved-blog"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 transition-all duration-200 group"
-            >
-              <span className="text-gray-400 group-hover:text-yellow-500 transition">
-                <BookmarkIcon />
-              </span>
-              <span className="font-medium">Saved Blogs</span>
+            <Link href="/dashboard" className="group flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium text-stone-700 transition hover:bg-amber-50 hover:text-amber-950">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-stone-100 text-stone-500 transition group-hover:bg-amber-100 group-hover:text-amber-900"><DashboardIcon /></span>
+              <span className="flex-1">Dashboard</span>
+              <svg aria-hidden="true" className="h-4 w-4 text-stone-300 transition group-hover:translate-x-0.5 group-hover:text-amber-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
             </Link>
-          </li>
+            <Link href="/notifications" className="group flex items-center gap-3 rounded-xl border border-stone-200 bg-white px-3.5 py-3 text-sm font-medium text-stone-700 shadow-[0_5px_14px_-12px_rgba(41,32,22,0.5)] transition hover:border-amber-200 hover:bg-amber-50/70">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-50 text-amber-800 transition group-hover:bg-amber-100"><IoIosNotificationsOutline className="text-xl" /></span>
+              <span className="flex-1">Notifications</span>
+              {unreadCount > 0 && <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-rose-600 px-2 text-[11px] font-bold text-white shadow-sm">{unreadCount > 99 ? "99+" : unreadCount}</span>}
+              {unreadCount === 0 && <span className="text-[10px] font-medium text-stone-400">All caught up</span>}
+            </Link>
+          </>
+        ) : (
+          <Link href="/saved-blog" className="group flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium text-stone-700 transition hover:bg-amber-50 hover:text-amber-950">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-stone-100 text-stone-500 transition group-hover:bg-amber-100 group-hover:text-amber-900"><BookmarkIcon /></span>
+            <span className="flex-1">Saved stories</span>
+            <svg aria-hidden="true" className="h-4 w-4 text-stone-300 transition group-hover:translate-x-0.5 group-hover:text-amber-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+          </Link>
         )}
+      </nav>
 
-        {/* Divider */}
-        <li className="pt-2 mt-1 border-t border-gray-100">
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-red-500 hover:bg-red-50 transition-all duration-200 group"
-          >
-            <span className="text-red-400 group-hover:text-red-500 transition">
-              <LogoutIcon />
-            </span>
-            <span className="font-medium">Logout</span>
-          </button>
-        </li>
-      </ul>
+      <div className="border-t border-stone-200/80 p-2.5">
+        <button type="button" onClick={handleLogout} disabled={isLoading} className="group flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium text-rose-700 transition hover:bg-rose-50 disabled:cursor-wait disabled:opacity-60">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-rose-50 text-rose-600 transition group-hover:bg-rose-100"><LogoutIcon /></span>
+          <span>{isLoading ? "Signing out…" : "Log out"}</span>
+        </button>
+      </div>
     </div>
   );
-};
-
-export default AdminDropdown;
+}

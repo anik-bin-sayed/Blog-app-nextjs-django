@@ -27,32 +27,38 @@ const Page = () => {
   const comments = data?.comments;
 
   return (
-    <div className="min-h-screen  bg-linear-to-br from-amber-50 via-white to-orange-50">
-      <div className="max-w-4xl mx-auto">
-        <ReadBlog
-          auth={auth}
-          blog={blog}
-          isLoading={isPageLoading}
-          isError={isError}
-        />
-        <RecentBlog
-          relatedBlog={relatedBlog}
-          isLoading={isPageLoading}
-          isError={isError}
-        />
-      
-        <CommentForm auth={auth} blog={blog} slug={slug} />
-
-        <Suspense fallback={<div>Loading...</div>}>
-          <CommentList
-            comments={comments}
-            isLoading={isPageLoading}
-            isError={isError}
-            slug={slug}
-          />
-        </Suspense>
-      </div>
-    </div>
+    <main className="min-h-screen flex-1 bg-[#faf7f0]">
+      <ReadBlog
+        auth={auth}
+        blog={blog}
+        isLoading={isPageLoading}
+        isError={isError}
+      />
+      <RecentBlog
+        relatedBlog={relatedBlog}
+        isLoading={isPageLoading}
+        isError={isError}
+      />
+      {blog && !isPageLoading && (
+        <section className="bg-[#faf7f0] px-5 py-14 sm:px-8 sm:py-20 lg:px-10">
+          <div className="mx-auto max-w-3xl">
+            <div className="mb-6">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-800">Community notes</p>
+              <h2 className="mt-2 font-serif text-3xl font-medium text-stone-900 sm:text-4xl">Thoughts from readers</h2>
+            </div>
+            <CommentForm auth={auth} blog={blog} slug={slug} />
+            <Suspense fallback={<div className="mt-6 h-24 animate-pulse rounded-2xl bg-stone-200" />}>
+              <CommentList
+                comments={comments}
+                isLoading={isPageLoading}
+                isError={isError}
+                slug={slug}
+              />
+            </Suspense>
+          </div>
+        </section>
+      )}
+    </main>
   );
 };
 

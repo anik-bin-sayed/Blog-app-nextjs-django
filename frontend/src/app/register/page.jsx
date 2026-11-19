@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import Input from "@/components/ui/input";
 import TextLink from "@/components/ui/textLink";
 import SubmitButton from "@/components/ui/submitButton";
+import AuthShell from "@/components/Auth/AuthShell";
+import Link from "next/link";
 import { useRegisterMutation } from "@/redux/services/auth/authApi";
 import { getApiErrorMessage } from "@/utils/getApiErrorMessage";
 
@@ -58,87 +60,38 @@ const RegisterPage = () => {
     }
   };
 
+  const fieldClass = "!rounded-xl !border-stone-200 !bg-[#faf9f6] !py-3 focus:!border-amber-700 focus:!ring-amber-700/10";
+
   return (
-    <div className="min-h-screen  bg-linear-to-br from-amber-50 via-white to-orange-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-xl mx-auto">
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-amber-100">
-          <div className="p-8 md:p-10">
-            <div className="mb-6">
-              <h3 className="text-2xl font-bold text-gray-800">
-                Create account
-              </h3>
-              <p className="text-gray-500 mt-1">
-                Start your blogging journey today
-              </p>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <Input
-                label="Full name"
-                type="text"
-                name="full_name"
-                value={formData.full_name}
-                onChange={handleChange}
-                error={errors.full_name}
-                required
-                placeholder="Your full name"
-              />
-              <Input
-                label="Username"
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                error={errors.username}
-                required
-                placeholder="username"
-              />
-              <Input
-                label="Email"
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                error={errors.email}
-                required
-                placeholder="hello@example.com"
-              />
-              <Input
-                label="Password"
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                error={errors.password}
-                required
-                placeholder="Password"
-              />
-              <Input
-                label="Confirm Password"
-                type="password"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                error={errors.confirmPassword}
-                required
-                placeholder="Confirm Password"
-              />
-
-              <SubmitButton
-                text="Sign up"
-                type="submit"
-                isLoading={isLoading}
-                isLoadingText="Creating account..."
-              />
-              <div className="text-center text-sm text-gray-500">
-                Already have an account?{" "}
-                <TextLink text="Sign in" link="/login" />
-              </div>
-            </form>
-          </div>
-        </div>
+    <AuthShell
+      visualEyebrow="Start something lovely"
+      visualTitle="Make yourself at home in the world of stories."
+      visualDescription="Create your account to join the conversation, save favorite reads, and explore the journal at your own pace."
+    >
+      <Link href="/" className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-500 transition hover:text-amber-900">← Back to Globira</Link>
+      <div className="mb-6 mt-6">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-800">A new chapter</p>
+        <h1 className="mt-2 font-serif text-4xl font-medium tracking-tight text-stone-900 sm:text-5xl">Join Globira.</h1>
+        <p className="mt-3 text-sm leading-6 text-stone-600">Create an account and make space for a few good stories.</p>
       </div>
-    </div>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Input label="Full name" id="full-name" type="text" name="full_name" value={formData.full_name} onChange={handleChange} error={errors.full_name} required placeholder="Your full name" className={fieldClass} />
+          <Input label="Username" id="username" type="text" name="username" value={formData.username} onChange={handleChange} error={errors.username} required placeholder="Choose a username" className={fieldClass} />
+        </div>
+        <Input label="Email address" id="email" type="email" name="email" value={formData.email} onChange={handleChange} error={errors.email} required placeholder="hello@example.com" className={fieldClass} />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Input label="Password" id="password" type="password" name="password" value={formData.password} onChange={handleChange} error={errors.password} required placeholder="Create a password" className={fieldClass} />
+          <Input label="Confirm password" id="confirm-password" type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} error={errors.confirmPassword} required placeholder="Enter it again" className={fieldClass} />
+        </div>
+        <div className="pt-1">
+          <SubmitButton text="Create account" type="submit" isLoading={isLoading} isLoadingText="Creating account..." />
+        </div>
+        <p className="text-center text-xs leading-5 text-stone-500">We’ll send an activation link to your email to finish setting up your account.</p>
+        <p className="border-t border-stone-100 pt-4 text-center text-sm text-stone-500">Already a member? <TextLink text="Sign in" link="/login" /></p>
+      </form>
+    </AuthShell>
   );
 };
 

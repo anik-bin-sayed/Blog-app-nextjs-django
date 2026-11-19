@@ -205,20 +205,20 @@ const EditBlogDrawer = ({ isOpen, onClose, editBlog = null }) => {
 
       <div
         ref={drawerRef}
-        className={`fixed right-0 top-0 h-full w-full max-w-2xl bg-white rounded shadow-2xl z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto ${
+        className={`fixed right-0 top-0 z-50 h-full w-full max-w-2xl transform overflow-y-auto border-l border-stone-200 bg-[#fffdf9] shadow-2xl transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="sticky top-0 z-10 bg-linear-to-r from-yellow-400 to-yellow-500 px-6 py-5 flex justify-between items-center">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-stone-800 bg-stone-900 px-6 py-5">
           <div>
-            <h2 className="text-xl sm:text-2xl font-semibold text-black">
+            <h2 className="font-serif text-xl text-white sm:text-2xl">
               Edit Blog
             </h2>
-            <p className="text-black text-sm mt-1">Update your story</p>
+            <p className="mt-1 text-sm text-stone-300">Update your story</p>
           </div>
           <button
             onClick={onClose}
-            className="text-black hover:text-gray-800 transition p-1 rounded-full bg-white/20 hover:rotate-90 hover:border border-gray-500 cursor-pointer"
+            className="rounded-full bg-white/10 p-2 text-white transition hover:bg-white/20 cursor-pointer"
             aria-label="Close drawer"
           >
             <RxCross2 size={24} />
@@ -237,18 +237,18 @@ const EditBlogDrawer = ({ isOpen, onClose, editBlog = null }) => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 p-6 sm:p-8">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
-              Title <span className="text-red-500">*</span>
+            <label className="mb-1.5 block text-sm font-semibold text-stone-700">
+              Title <span className="text-amber-800">*</span>
             </label>
             <input
               type="text"
               name="title"
               value={formData.title}
               onChange={handleChange}
-              className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition placeholder:text-gray-500 text-gray-700 ${
-                errors.title ? "border-red-500 bg-red-50" : "border-gray-300"
+              className={`w-full rounded-xl border bg-[#faf9f6] px-4 py-3 text-sm text-stone-800 outline-none transition placeholder:text-stone-400 focus:border-amber-700 focus:ring-4 focus:ring-amber-700/10 ${
+                errors.title ? "border-rose-500" : "border-stone-200"
               }`}
               placeholder="Enter an engaging title"
               required
@@ -276,19 +276,19 @@ const EditBlogDrawer = ({ isOpen, onClose, editBlog = null }) => {
           />
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="mb-1.5 block text-sm font-semibold text-stone-700">
               Thumbnail Image
             </label>
             <div className="flex flex-col sm:flex-row gap-5 items-start">
               <div className="flex-1 w-full">
-                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition border-gray-300">
+                <label className="flex h-36 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-stone-300 bg-[#faf9f6] transition hover:border-amber-700 hover:bg-amber-50/50">
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <RiUploadCloud2Line className="w-8 h-8 mb-2 text-gray-500" />
-                    <p className="mb-1 text-sm text-gray-600">
+                  <RiUploadCloud2Line className="mb-2 h-8 w-8 text-amber-800" />
+                  <p className="mb-1 text-sm text-stone-600">
                       <span className="font-semibold">Click to upload</span> or
                       drag and drop
                     </p>
-                    <p className="text-xs text-gray-500">
+                  <p className="text-xs text-stone-500">
                       JPG, PNG, WEBP (max 5MB)
                     </p>
                   </div>
@@ -335,7 +335,7 @@ const EditBlogDrawer = ({ isOpen, onClose, editBlog = null }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="mb-1.5 block text-sm font-semibold text-stone-700">
               Category <span className="text-red-500">*</span>
             </label>
             <div className="flex flex-col sm:flex-row gap-3">
@@ -343,7 +343,7 @@ const EditBlogDrawer = ({ isOpen, onClose, editBlog = null }) => {
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition"
+                className="w-full rounded-xl border border-stone-200 bg-[#faf9f6] px-4 py-3 text-sm outline-none transition focus:border-amber-700 focus:ring-4 focus:ring-amber-700/10"
                 >
                   <option value="">Select a category</option>
                   {categories?.map((cat) => (
@@ -373,30 +373,30 @@ const EditBlogDrawer = ({ isOpen, onClose, editBlog = null }) => {
             )}
           </div>
 
-          <label className="flex items-center gap-3 cursor-pointer select-none group">
+          <label className="group flex cursor-pointer select-none items-center gap-3">
             <input
               type="checkbox"
               checked={featured}
               onChange={handleFeaturedChange}
-              className="w-4 h-4 text-yellow-500 rounded focus:ring-yellow-500"
+              className="h-4 w-4 rounded accent-amber-800"
             />
-            <span className="text-sm text-gray-700 group-hover:text-yellow-600 transition">
+            <span className="text-sm text-stone-700 transition group-hover:text-amber-900">
               Featured (highlight this blog)
             </span>
           </label>
 
-          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+          <div className="flex flex-col gap-3 border-t border-stone-200 pt-5 sm:flex-row">
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-3 px-6 rounded-md transition duration-200 disabled:opacity-70 disabled:cursor-not-allowed shadow-sm cursor-pointer"
+              className="flex-1 cursor-pointer rounded-full bg-amber-700 px-6 py-3 font-semibold text-white shadow-sm transition hover:bg-amber-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isLoading ? "Updating..." : "Update Blog"}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-md transition duration-200 cursor-pointer"
+              className="flex-1 cursor-pointer rounded-full border border-stone-300 bg-white px-6 py-3 font-semibold text-stone-700 transition hover:bg-stone-100"
             >
               Cancel
             </button>

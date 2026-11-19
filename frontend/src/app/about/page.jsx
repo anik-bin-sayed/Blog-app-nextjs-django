@@ -4,19 +4,22 @@ import Quote from "@/components/About/Quote";
 import Status from "@/components/About/Status";
 import Story from "@/components/About/Story";
 import Travel from "@/components/About/Travel";
-import React from "react";
 
-const page = () => {
+export const metadata = {
+  title: "About Sophia | Globira",
+  description:
+    "Meet Sophia Ellis: marketer, traveler, and storyteller behind the Globira journal.",
+};
+
+export default function AboutPage() {
   return (
-    <div className="bg-linear-to-br from-amber-50 via-white to-orange-50">
+    <main className="flex-1 bg-[#fffdf9]">
       <AboutHero />
       <Status />
       <Quote />
       <Story />
       <Mission />
       <Travel />
-    </div>
+    </main>
   );
-};
-
-export default page;
+}

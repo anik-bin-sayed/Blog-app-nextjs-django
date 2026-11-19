@@ -159,7 +159,7 @@ COOKIE_SECURE = os.getenv("COOKIE_SECURE", "false").lower() in (
     "yes",
 )
 
-REDIS_HOST = os.getenv("REDIS_HOST", "127.0.0.1")
+REDIS_HOST = os.getenv("REDIS_HOST", "redis-container")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 
 CHANNEL_LAYERS = {

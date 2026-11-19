@@ -39,15 +39,15 @@ const CategoryModal = ({ setIsModalOpen }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-        <h3 className="text-xl font-semibold mb-4">Create New Category</h3>
+      <div className="w-full max-w-md rounded-2xl border border-stone-200 bg-[#fffdf9] p-6 shadow-2xl">
+        <h3 className="mb-4 font-serif text-2xl text-stone-900">Create new category</h3>
         <form onSubmit={handleSubmit}>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Category name"
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none mb-4"
+            className="mb-4 w-full rounded-xl border border-stone-200 bg-[#faf9f6] px-4 py-3 text-sm outline-none focus:border-amber-700 focus:ring-4 focus:ring-amber-700/10"
             autoFocus
           />
 
@@ -65,36 +65,36 @@ const CategoryModal = ({ setIsModalOpen }) => {
                 setIsModalOpen(false);
                 setName("");
               }}
-              className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
+              className="rounded-full border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-yellow-400 text-black rounded-md hover:bg-yellow-500"
+              className="rounded-full bg-stone-900 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-900"
             >
               {isLoading ? "Creating..." : "Create"}
             </button>
           </div>
         </form>
         <div className="mt-6">
-          <h3 className="text-xl font-semibold mb-4">All Category</h3>
+          <h3 className="mb-3 font-serif text-xl text-stone-900">All categories</h3>
 
-          <div className="category border border-gray-200 rounded-xl p-3 max-h-80 overflow-y-auto">
+          <div className="category max-h-80 overflow-y-auto rounded-xl border border-stone-200 p-3">
             <div className="flex flex-wrap gap-3">
               {data &&
                 data.map((cat) => (
                   <div
                     key={cat.id}
-                    className="flex items-center gap-3 px-3 py-1.5 bg-white border border-gray-200 rounded-full shadow-sm hover:shadow-md transition"
+                    className="flex items-center gap-3 rounded-full border border-stone-200 bg-white px-3 py-1.5 shadow-sm transition hover:shadow-md"
                   >
-                    <p className="text-gray-800 text-sm font-medium">
+                    <p className="text-sm font-medium text-stone-800">
                       {cat.name}
                     </p>
 
                     <button
                       onClick={() => handleDelete(cat.id)}
-                      className="w-6 h-6 flex items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition"
+                      className="flex h-6 w-6 items-center justify-center rounded-full bg-rose-50 text-rose-600 transition hover:bg-rose-600 hover:text-white"
                     >
                       <RxCross2 className="text-sm" />
                     </button>

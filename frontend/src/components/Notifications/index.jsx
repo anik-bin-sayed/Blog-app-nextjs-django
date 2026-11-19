@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PiDotsThreeCircle } from "react-icons/pi";
 import {
@@ -16,9 +16,12 @@ import useNotifications from "@/hooks/useNotifications";
 
 export function NotificationsLoader() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
-      <div className="text-yellow-500 animate-pulse font-medium">
-        Loading notifications...
+    <div className="min-h-[70vh] bg-[#faf7f0] px-5 py-12 sm:px-8">
+      <div className="mx-auto max-w-4xl animate-pulse">
+        <div className="mb-8 h-3 w-40 rounded bg-stone-200" />
+        <div className="mb-3 h-10 w-72 rounded bg-stone-200" />
+        <div className="mb-9 h-4 w-64 rounded bg-stone-100" />
+        <div className="space-y-3">{[1, 2, 3].map((item) => <div key={item} className="h-24 rounded-2xl border border-stone-200 bg-white" />)}</div>
       </div>
     </div>
   );
@@ -28,6 +31,8 @@ const Notifications = () => {
   const [nextPage, setNextPage] = useState(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [liveUnreadCount, setLiveUnreadCount] = useState(null);
+
   const [openDropdownId, setOpenDropdownId] = useState(null);
   const [mounted, setMounted] = useState(false);
 
@@ -42,7 +47,7 @@ const Notifications = () => {
   const { role, auth, userId } = useSelector((state) => state.auth);
   const isAdmin = role === "admin";
 
-  useNotifications(auth && userId ? userId : null, setNotifications);
+  useNotifications(userId, setNotifications, setLiveUnreadCount);
 
   const { data, isLoading, error } = useNotificationListQuery(undefined, {
     skip: !auth && !isAdmin,
@@ -67,7 +72,7 @@ const Notifications = () => {
     setFilter(tab);
   }, [searchParams]);
 
-  const unreadCount = notifications.filter((n) => !n.is_read).length;
+  const unreadCount = liveUnreadCount ?? unreadNotificationLength?.unread_count ?? notifications.filter((n) => !n.is_read).length;
 
   const filteredNotifications = notifications.filter((n) => {
     if (filter === "all") return true;
@@ -79,13 +84,15 @@ const Notifications = () => {
     setLoadingMore(true);
 
     try {
-      const response = await fetch(nextPage);
+      const response = await fetch(nextPage, { credentials: "include" });
+      if (!response.ok) throw new Error("Could not load more notifications");
       const newData = await response.json();
 
-      setNotifications((prev) => [
-        ...prev,
-        ...(Array.isArray(newData?.results) ? newData.results : []),
-      ]);
+      setNotifications((prev) => {
+        const existingIds = new Set(prev.map((notification) => notification.id));
+        const nextNotifications = Array.isArray(newData?.results) ? newData.results : [];
+        return [...prev, ...nextNotifications.filter((notification) => !existingIds.has(notification.id))];
+      });
 
       setNextPage(newData?.next || null);
     } catch (err) {
@@ -132,9 +139,11 @@ const Notifications = () => {
     e.stopPropagation();
     setOpenDropdownId(null);
 
+    const notification = notifications.find((item) => item.id === id);
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)),
     );
+    if (notification && !notification.is_read) setLiveUnreadCount((count) => Math.max(0, (count ?? unreadCount) - 1));
 
     try {
       await markAsRead(id).unwrap();
@@ -144,6 +153,7 @@ const Notifications = () => {
       setNotifications((prev) =>
         prev.map((n) => (n.id === id ? { ...n, is_read: false } : n)),
       );
+      if (notification && !notification.is_read) setLiveUnreadCount((count) => (count ?? unreadCount) + 1);
     }
   };
 
@@ -152,14 +162,17 @@ const Notifications = () => {
     setOpenDropdownId(null);
 
     const previous = [...notifications];
+    const deletedNotification = notifications.find((notification) => notification.id === id);
 
     setNotifications((prev) => prev.filter((n) => n.id !== id));
+    if (deletedNotification && !deletedNotification.is_read) setLiveUnreadCount((count) => Math.max(0, (count ?? unreadCount) - 1));
 
     try {
       await deleteNotification(id).unwrap();
     } catch (err) {
       console.error("Delete failed", err);
       setNotifications(previous);
+      if (deletedNotification && !deletedNotification.is_read) setLiveUnreadCount((count) => (count ?? unreadCount) + 1);
     }
   };
 
@@ -186,7 +199,6 @@ const Notifications = () => {
 
   const queryActive = auth || isAdmin;
 
-
   if (!mounted) {
     return <NotificationsLoader />;
   }
@@ -206,168 +218,141 @@ const Notifications = () => {
   }
 
   return (
-    <div className="min-h-screen py-10 px-4 bg-gray-50">
-      <div className="max-w-3xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+    <main className="min-h-[calc(100dvh-76px)] flex-1 bg-[#faf7f0] px-5 py-10 sm:px-8 sm:py-14 lg:px-10">
+      <div className="mx-auto max-w-4xl">
+        <div className="mb-8 flex flex-col gap-5 border-b border-stone-200 pb-7 sm:mb-9 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-black">Notifications</h1>
-            <p className="text-gray-500 mt-1 text-sm">
-              You have{" "}
-              <span className="font-semibold text-black">
-                {unreadNotificationLength?.unread_count}
-              </span>{" "}
-              unread {unreadCount === 1 ? "notification" : "notifications"}
-            </p>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-800">Your activity</p>
+            <h1 className="mt-2 font-serif text-4xl font-medium tracking-tight text-stone-900 sm:text-5xl">Notifications</h1>
+            <p className="mt-3 text-sm text-stone-600">You have <span className="font-semibold text-stone-900">{unreadCount}</span> unread {unreadCount === 1 ? "notification" : "notifications"}.</p>
           </div>
-          <Action />
+          <div className="flex items-center gap-3 self-start sm:self-auto">
+            <div className="rounded-xl border border-stone-200 bg-[#fffdf9] px-4 py-2.5 text-right shadow-sm">
+              <span className="block font-serif text-xl leading-none text-stone-900">{data?.count ?? notifications.length}</span>
+              <span className="mt-1 block text-[9px] font-semibold uppercase tracking-[0.14em] text-stone-500">Total</span>
+            </div>
+            <Action onMarkAllRead={() => setLiveUnreadCount(0)} onDeleteAll={() => { setNotifications([]); setLiveUnreadCount(0); }} />
+          </div>
         </div>
 
-
-        <div className="flex gap-2 bg-white p-1 rounded-2xl w-fit mb-8 shadow-sm">
+        <div className="mb-7 flex w-fit gap-1 rounded-full border border-stone-200 bg-[#fffdf9] p-1 shadow-sm" role="tablist" aria-label="Notification filters">
           <button
+            type="button"
+            role="tab"
+            aria-selected={filter === "all"}
             onClick={() => router.push("/notifications?tab=all")}
-            className={`px-5 py-2 text-sm font-medium rounded-xl transition-all duration-200 ${
+            className={`rounded-full px-5 py-2.5 text-sm font-semibold transition ${
               filter === "all"
-                ? "bg-white shadow-md text-black"
-                : "text-gray-500 hover:text-gray-700"
+                ? "bg-stone-900 text-white shadow-sm"
+                : "text-stone-500 hover:text-stone-900"
             }`}
           >
             All
             <span
-              className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
+              className={`ml-2 rounded-full px-2 py-0.5 text-[10px] ${
                 filter === "all"
-                  ? "bg-indigo-100 text-indigo-700"
-                  : "bg-gray-100 text-gray-600"
+                  ? "bg-white/15 text-white"
+                  : "bg-stone-100 text-stone-600"
               }`}
             >
-              {data?.count}
+              {data?.count ?? notifications.length}
             </span>
           </button>
 
           <button
+            type="button"
+            role="tab"
+            aria-selected={filter === "unread"}
             onClick={() => router.push("/notifications?tab=unread")}
-            className={`px-5 py-2 text-sm font-medium rounded-xl transition-all duration-200 ${
+            className={`rounded-full px-5 py-2.5 text-sm font-semibold transition ${
               filter === "unread"
-                ? "bg-white shadow-md text-indigo-700"
-                : "text-gray-500 hover:text-gray-700"
+                ? "bg-stone-900 text-white shadow-sm"
+                : "text-stone-500 hover:text-stone-900"
             }`}
           >
             Unread
             <span
-              className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
+              className={`ml-2 rounded-full px-2 py-0.5 text-[10px] ${
                 filter === "unread"
-                  ? "bg-red-100 text-red-600"
-                  : "bg-gray-100 text-gray-600"
+                  ? "bg-white/15 text-white"
+                  : "bg-amber-100 text-amber-900"
               }`}
             >
-              {unreadNotificationLength?.unread_count}
+              {unreadCount}
             </span>
           </button>
         </div>
 
-
-        <div className="space-y-4">
+        <div className="space-y-3">
           {filteredNotifications.length === 0 ? (
-            <div className="bg-white rounded-2xl p-12 text-center shadow-sm border border-gray-100">
-              <p className="text-gray-500 font-medium">No notifications</p>
-              <p className="text-gray-400 text-sm mt-1">All caught up!</p>
+            <div className="rounded-2xl border border-dashed border-stone-300 bg-[#fffdf9] px-6 py-16 text-center">
+              <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-amber-900"><PiDotsThreeCircle className="text-3xl" /></span>
+              <p className="mt-4 font-serif text-2xl text-stone-900">{filter === "unread" ? "You’re all caught up." : "No notifications yet."}</p>
+              <p className="mt-2 text-sm text-stone-500">New activity from your stories will show up here.</p>
             </div>
           ) : (
             filteredNotifications.map((n) => (
-              <Link
-                key={n.id}
-                href={`/blogs/${n.blog_slug}?comment=${n.comment_id}`}
-                onClick={(e) => handleMarkAsRead(n.id, e)}
-                className={`group relative flex gap-4 p-5 rounded-2xl cursor-pointer transition-all duration-300 shadow-sm hover:shadow-md ${
-                  n.is_read
-                    ? "bg-white border border-gray-100"
-                    : "bg-linear-to-r from-yellow-50 to-white border-l-4 border-yellow-500"
-                }`}
-              >
-                <div
-                  className={`relative shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold ${
-                    n.is_read
-                      ? "bg-yellow-100 text-gray-500"
-                      : "bg-yellow-300 text-black"
-                  }`}
-                >
-                  {getAvatar(n.actor_name)}
-                  {!n.is_read && (
-                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full ring-2 ring-white"></span>
-                  )}
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <p className="text-gray-800 text-sm font-medium leading-relaxed">
-                    {n.message}
-                  </p>
-                  <p className="text-xs text-gray-400 line-clamp-2 mt-1">
-                    {n.blog_title} • {n.comment}
-                  </p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="text-[11px] text-gray-400">
-                      {formatTime(n.created_at)}
-                    </span>
+              <article key={n.id} className={`group relative flex gap-3 rounded-2xl border p-4 shadow-sm transition duration-200 hover:shadow-md sm:gap-4 sm:p-5 ${n.is_read ? "border-stone-200 bg-[#fffdf9]" : "border-amber-200 bg-[#fffdf9] ring-1 ring-amber-900/5"}`}>
+                <Link href={`/blogs/${n.blog_slug || ""}${n.comment_id ? `?comment=${n.comment_id}` : ""}`} onClick={(e) => handleMarkAsRead(n.id, e)} className="flex min-w-0 flex-1 items-start gap-3 sm:gap-4">
+                  <div className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold ${n.is_read ? "bg-stone-100 text-stone-500" : "bg-amber-100 text-amber-950"}`}>
+                    {getAvatar(n.actor_name)}
+                    {!n.is_read && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-[#fffdf9] bg-amber-700" />}
                   </div>
-                </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold leading-relaxed text-stone-800">{n.message}</p>
+                    {(n.blog_title || n.comment) && <p className="mt-1 line-clamp-2 text-xs leading-5 text-stone-500">{n.blog_title}{n.blog_title && n.comment ? " · " : ""}{n.comment}</p>}
+                    <span className="mt-2 block text-[11px] font-medium text-stone-400">{formatTime(n.created_at)}</span>
+                  </div>
+                </Link>
 
-                <div
-                  ref={openDropdownId === n.id ? dropdownRef : null}
-                  className="relative shrink-0"
-                >
+                <div ref={openDropdownId === n.id ? dropdownRef : null} className="relative shrink-0">
                   <button
+                    type="button"
                     onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
                       toggleDropdown(e, n.id);
                     }}
-                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                    aria-label="Notification actions"
+                    aria-expanded={openDropdownId === n.id}
+                    className="rounded-full p-2 text-stone-400 transition hover:bg-stone-100 hover:text-stone-700"
                   >
-                    <PiDotsThreeCircle className="w-5 h-5" />
+                    <PiDotsThreeCircle className="h-5 w-5" />
                   </button>
 
                   {openDropdownId === n.id && (
                     <div
                       onClick={(e) => e.stopPropagation()}
-                      className="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                      className="absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-xl border border-stone-200 bg-[#fffdf9] shadow-xl"
                     >
                       {!n.is_read && (
                         <button
                           onClick={(e) => handleMarkAsRead(n.id, e)}
-                          className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700"
+                          className="w-full px-4 py-2.5 text-left text-sm text-stone-700 transition hover:bg-amber-50 hover:text-amber-950"
                         >
                           Mark as read
                         </button>
                       )}
                       <button
                         onClick={(e) => handleDeleteNotification(n.id, e)}
-                        className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50"
+                          className="w-full border-t border-stone-100 px-4 py-2.5 text-left text-sm text-rose-700 transition hover:bg-rose-50"
                       >
                         Delete
                       </button>
                     </div>
                   )}
                 </div>
-              </Link>
+              </article>
             ))
           )}
         </div>
 
-        {/* FOOTER */}
-        <div className="mt-8 text-center text-xs text-gray-400">
-          <span className="inline-block px-3 py-1 bg-white rounded-full">
-            Current tab: {filter}
-          </span>
-        </div>
-
         {/* LOAD MORE */}
         {nextPage && (
-          <div ref={loaderRef} className="py-6 text-center text-gray-500">
-            {loadingMore ? "Loading..." : "Scroll for more"}
+          <div ref={loaderRef} className="py-7 text-center text-xs text-stone-500">
+            {loadingMore ? "Loading more activity…" : "Scroll for more"}
           </div>
         )}
       </div>
-    </div>
+    </main>
   );
 };
 

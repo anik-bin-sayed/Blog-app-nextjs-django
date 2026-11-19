@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { PiDotsThreeVertical } from "react-icons/pi";
+import { IoCheckmarkDoneOutline, IoTrashOutline } from "react-icons/io5";
 
 import {
   useDeleteAllNotificationMutation,
@@ -9,7 +10,7 @@ import {
 } from "@/redux/services/blogs/notification";
 import { useSelector } from "react-redux";
 
-const Action = () => {
+const Action = ({ onMarkAllRead, onDeleteAll }) => {
   const { auth } = useSelector((state) => state.auth);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -42,6 +43,7 @@ const Action = () => {
     try {
       await markAllAsRead().unwrap();
       refetch();
+      onMarkAllRead?.();
       setIsOpen(false);
     } catch (error) {
       console.error("Failed to mark all as read", error);
@@ -56,6 +58,7 @@ const Action = () => {
 
     try {
       await deleteAllNotification().unwrap();
+      onDeleteAll?.();
       setIsOpen(false);
     } catch (error) {
       console.error("Failed to delete all notifications", error);
@@ -66,28 +69,32 @@ const Action = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 focus:outline-none cursor-pointer"
+        className="rounded-full border border-stone-200 bg-[#fffdf9] p-2.5 text-stone-600 shadow-sm transition hover:border-amber-200 hover:bg-amber-50 hover:text-amber-900 focus:outline-none cursor-pointer"
         aria-label="Actions"
+        aria-expanded={isOpen}
       >
         <PiDotsThreeVertical className="w-6 h-6 text-gray-600 " />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-200">
-          <div className="py-1">
+        <div className="absolute right-0 z-50 mt-2 w-60 overflow-hidden rounded-2xl border border-stone-200 bg-[#fffdf9] shadow-xl animate-in fade-in slide-in-from-top-1 duration-200">
+          <div className="border-b border-stone-100 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-stone-400">Manage notifications</div>
+          <div className="p-1.5">
             <button
               onClick={handleMarkAllRead}
               disabled={isUnreadNotificationAvailable}
-              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium text-stone-700 transition hover:bg-amber-50 hover:text-amber-950 disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
             >
+              <IoCheckmarkDoneOutline className="text-lg text-amber-800" />
               <span>Mark all as read</span>
             </button>
 
             <button
               onClick={handleDeleteAll}
               disabled={isNotificationAvailable}
-              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium text-rose-700 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
             >
+              <IoTrashOutline className="text-lg" />
               <span>Delete all notifications</span>
             </button>
           </div>

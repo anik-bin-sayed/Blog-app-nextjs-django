@@ -4,15 +4,19 @@ import AllBlogs from "@/components/Blogs/AllBlogs";
 import BlogHero from "@/components/Blogs/BlogHero";
 import GlobalLoader from "@/components/Loader/GlobalLoader";
 
-const page = () => {
+export const metadata = {
+  title: "Stories & Journal | Globira",
+  description:
+    "Browse Globira's collection of stories, field notes, ideas, and discoveries.",
+};
+
+export default function BlogsPage() {
   return (
-    <div className="bg-linear-to-br from-amber-50 via-white to-orange-50">
+    <main className="flex-1 bg-[#faf7f0]">
       <BlogHero />
       <Suspense fallback={<GlobalLoader />}>
         <AllBlogs />
       </Suspense>
-    </div>
+    </main>
   );
-};
-
-export default page;
+}

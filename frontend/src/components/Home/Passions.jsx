@@ -1,85 +1,42 @@
 import Link from "next/link";
-import React from "react";
-import { FaBookReader } from "react-icons/fa";
-import { HiOutlinePhotograph } from "react-icons/hi";
+import { FaBookOpen, FaCamera, FaArrowUpRightFromSquare } from "react-icons/fa6";
 import { MdTravelExplore } from "react-icons/md";
 import { PiCookingPotFill } from "react-icons/pi";
 
-const passionsData = [
-  {
-    id: 1,
-    icon: <MdTravelExplore />,
-    title: "Traveling",
-    description: "Exploring new places and cultures to broaden my horizons.",
-  },
-  {
-    id: 2,
-    icon: <PiCookingPotFill />,
-    title: "Cooking",
-    description: "Experimenting with new recipes and flavors in the kitchen.",
-  },
-  {
-    id: 3,
-    icon: <HiOutlinePhotograph />,
-    title: "Photography",
-    description: "Capturing moments and landscapes through my camera lens.",
-  },
-  {
-    id: 4,
-    icon: <FaBookReader />,
-    title: "Reading",
-    description:
-      "Diving into books to gain knowledge and escape into different worlds.",
-  },
+const topics = [
+  { icon: MdTravelExplore, title: "Travel", note: "Places, people & perspective", number: "01" },
+  { icon: PiCookingPotFill, title: "Food & culture", note: "Good things around the table", number: "02" },
+  { icon: FaCamera, title: "Photography", note: "Small moments, held still", number: "03" },
+  { icon: FaBookOpen, title: "Reading & ideas", note: "Curiosity with no borders", number: "04" },
 ];
 
-const Passions = () => {
+export default function Passions() {
   return (
-    <section className="py-16 px-4 md:px-8 bg-linear-to-br from-white via-amber-50/30 to-orange-50/40">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800">
-            What Drives{" "}
-            <span className="text-amber-600 relative inline-block">
-              Me
-              <span className="absolute bottom-0 left-0 w-full h-1 bg-amber-200 rounded-full -mb-2"></span>
-            </span>
-          </h2>
-          <p className="mt-4 text-gray-500 max-w-2xl mx-auto">
-            The passions that fuel my creativity and work
-          </p>
+    <section className="bg-[#24221e] px-5 py-16 text-white sm:px-8 sm:py-20 lg:px-10 lg:py-24">
+      <div className="mx-auto max-w-7xl">
+        <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-300">Follow your curiosity</p>
+            <h2 className="mt-3 max-w-2xl font-serif text-3xl font-medium tracking-tight sm:text-4xl lg:text-5xl">A little bit of <span className="italic text-amber-200">everything.</span></h2>
+          </div>
+          <p className="max-w-md text-sm leading-6 text-stone-400">From faraway places to everyday rituals, find a subject that feels like yours.</p>
         </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-          {passionsData.map(({ id, icon, title, description }) => (
-            <div
-              key={id}
-              className="group relative bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 p-6 text-center"
-            >
-              <div className="flex justify-center">
-                <div className="absolute -top-8 inline-flex items-center justify-center w-16 h-16 bg-white rounded-full shadow-md group-hover:shadow-lg transition-shadow duration-300 border border-gray-100">
-                  <div className="text-3xl text-amber-600 group-hover:text-amber-700 transition-colors">
-                    {icon}
-                  </div>
-                </div>
+        <div className="mt-10 grid overflow-hidden rounded-2xl border border-white/10 sm:grid-cols-2 lg:grid-cols-4">
+          {topics.map(({ icon: Icon, title, note, number }, index) => (
+            <Link href="/blogs" key={title} className={`group relative min-h-52 border-white/10 p-6 transition hover:bg-white/[0.06] sm:p-7 ${index > 0 ? "border-t sm:border-l sm:border-t-0" : ""}`}>
+              <div className="flex items-start justify-between">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full border border-amber-200/20 bg-amber-200/10 text-lg text-amber-200 transition group-hover:bg-amber-200 group-hover:text-stone-900"><Icon /></span>
+                <span className="font-serif text-sm text-stone-600">{number}</span>
               </div>
-
-              <div className="mt-8">
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  {title}
-                </h3>
-                <p className="text-gray-500 text-sm leading-relaxed">
-                  {description}
-                </p>
+              <h3 className="mt-8 font-serif text-xl text-stone-100">{title}</h3>
+              <div className="mt-2 flex items-center justify-between gap-3">
+                <p className="text-sm text-stone-400">{note}</p>
+                <FaArrowUpRightFromSquare className="shrink-0 text-xs text-stone-600 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-amber-200" />
               </div>
-
-              <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-amber-200 rounded-full group-hover:w-20 transition-all duration-300"></div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
     </section>
   );
-};
-
-export default Passions;
+}

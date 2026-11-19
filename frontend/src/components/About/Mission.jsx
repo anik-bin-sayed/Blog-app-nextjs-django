@@ -1,74 +1,33 @@
-import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { FaArrowRight } from "react-icons/fa";
 
-const Mission = () => {
+export default function Mission() {
   return (
-    <section className="py-16 md:py-24 bg-white">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row overflow-hidden rounded-2xl shadow-xl bg-gray-50">
-          <div className="w-full lg:w-1/2">
-            <div className="relative h-64 lg:h-full min-h-80 overflow-hidden">
-              <Image
-                src="https://images.pexels.com/photos/3201268/pexels-photo-3201268.jpeg?auto=compress&cs=tinysrgb&w=800"
-                alt="Blog Mission"
-                fill
-                className="object-cover transition-transform duration-500 hover:scale-105"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                priority={false}
-              />
-              <div className="absolute inset-0 bg-linear-to-r from-teal-500/20 to-transparent lg:bg-linear-to-l"></div>
-            </div>
+    <section className="bg-[#f5f1e9] px-5 py-16 sm:px-8 sm:py-20 lg:px-10 lg:py-24">
+      <div className="mx-auto grid max-w-7xl overflow-hidden rounded-[2rem] border border-stone-200/80 bg-[#fffdf9] shadow-[0_25px_65px_-42px_rgba(41,32,22,0.35)] lg:grid-cols-2">
+        <div className="relative min-h-[270px] bg-stone-200 sm:min-h-[360px] lg:min-h-[500px]">
+          <Image
+            src="https://images.pexels.com/photos/3201268/pexels-photo-3201268.jpeg?auto=compress&cs=tinysrgb&w=1200"
+            alt="A quiet moment outdoors in the afternoon light"
+            fill
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-stone-950/25 to-transparent" />
+        </div>
+        <div className="flex flex-col justify-center p-7 sm:p-10 lg:p-14 xl:p-16">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-800">Why this journal exists</p>
+          <h2 className="mt-3 font-serif text-3xl font-medium leading-tight tracking-tight text-stone-900 sm:text-4xl">A place to inspire, learn, and <span className="italic text-amber-800">connect.</span></h2>
+          <div className="mt-5 space-y-4 text-sm leading-7 text-stone-600 sm:text-base sm:leading-8">
+            <p>At the heart of this journal is a simple mission: to share useful insights and honest experiences that stay with you. I write about travel, technology, wellness, and the ideas that help us grow.</p>
+            <p>Come along as we explore new places, welcome change, and make a little more room for a balanced, fulfilling life.</p>
           </div>
-
-          <div className="w-full lg:w-1/2 flex flex-col justify-center p-8 md:p-12 lg:p-16 space-y-6">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800 leading-tight">
-              My Blog’s{" "}
-              <span className="text-amber-600 relative inline-block">
-                Mission
-                <span className="absolute bottom-0 left-0 w-full h-1 bg-amber-200 rounded-full -mb-2"></span>
-              </span>
-            </h2>
-
-            <div className="space-y-4 text-gray-600 leading-relaxed">
-              <p>
-                At the heart of this blog is a simple mission: to inspire,
-                educate, and connect. As a marketing professional with a passion
-                for travel, technology, and wellness, I aim to share valuable
-                insights and personal stories that resonate with you.
-              </p>
-              <p>
-                Join me in this journey of discovery as we explore the world,
-                embrace change, and strive for a balanced, fulfilling life.
-              </p>
-            </div>
-
-            <div className="pt-4">
-              <Link
-                href="/subscribe"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-amber-600 text-white font-medium rounded-full shadow-md hover:bg-amber-700 hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
-              >
-                Subscribe Now
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </Link>
-            </div>
-          </div>
+          <Link href="/blogs" className="group mt-7 inline-flex w-fit items-center gap-3 rounded-full bg-stone-900 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-amber-900">
+            Read the stories <FaArrowRight className="text-xs transition-transform group-hover:translate-x-1" />
+          </Link>
         </div>
       </div>
     </section>
   );
-};
-
-export default Mission;
+}

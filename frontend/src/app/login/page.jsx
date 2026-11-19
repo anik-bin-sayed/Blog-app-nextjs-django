@@ -7,6 +7,8 @@ import { toast } from "sonner";
 import Input from "@/components/ui/input";
 import TextLink from "@/components/ui/textLink";
 import SubmitButton from "@/components/ui/submitButton";
+import AuthShell from "@/components/Auth/AuthShell";
+import Link from "next/link";
 import { useLoginMutation } from "@/redux/services/auth/authApi";
 import { getApiErrorMessage } from "@/utils/getApiErrorMessage";
 
@@ -46,54 +48,27 @@ const Login = () => {
   };
 
   return (
-    <div className=" h-[calc(100vh-65px)] bg-linear-to-br from-amber-50 via-white to-orange-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-xl mx-auto">
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-amber-100">
-          <div className="p-8 md:p-10">
-            <div className="mb-6">
-              <h3 className="text-2xl font-bold text-gray-800">Sign in</h3>
-              <p className="text-gray-500 mt-1">
-                Start your blogging journey today
-              </p>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <Input
-                label="Email"
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                error={errors.email}
-                required
-                placeholder="hello@example.com"
-              />
-              <Input
-                label="Password"
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                error={errors.password}
-                required
-                placeholder="Password"
-              />
-
-              <SubmitButton
-                text="Sign in"
-                type="submit"
-                isLoading={isLoading}
-                isLoadingText="Please wait"
-              />
-              <div className="text-center text-sm text-gray-500">
-                Don&apos;t have an account?{" "}
-                <TextLink text="Sign up" link="/register" />
-              </div>
-            </form>
-          </div>
-        </div>
+    <AuthShell
+      visualEyebrow="Welcome to the journal"
+      visualTitle="A good story is even better when it’s shared."
+      visualDescription="Pick up where you left off, save the pieces you love, and keep discovering something new."
+    >
+      <Link href="/" className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-500 transition hover:text-amber-900">← Back to Globira</Link>
+      <div className="mb-7 mt-7">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-800">Your reading corner</p>
+        <h1 className="mt-2 font-serif text-4xl font-medium tracking-tight text-stone-900 sm:text-5xl">Welcome back.</h1>
+        <p className="mt-3 text-sm leading-6 text-stone-600">Sign in to continue your journey through the journal.</p>
       </div>
-    </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <Input label="Email address" id="email" type="email" name="email" value={formData.email} onChange={handleChange} error={errors.email} required placeholder="hello@example.com" className="!rounded-xl !border-stone-200 !bg-[#faf9f6] !py-3 focus:!border-amber-700 focus:!ring-amber-700/10" />
+        <Input label="Password" id="password" type="password" name="password" value={formData.password} onChange={handleChange} error={errors.password} required placeholder="Enter your password" className="!rounded-xl !border-stone-200 !bg-[#faf9f6] !py-3 focus:!border-amber-700 focus:!ring-amber-700/10" />
+        <div className="pt-1">
+          <SubmitButton text="Sign in" type="submit" isLoading={isLoading} isLoadingText="Please wait" />
+        </div>
+        <p className="border-t border-stone-100 pt-5 text-center text-sm text-stone-500">Don&apos;t have an account? <TextLink text="Create one" link="/register" /></p>
+      </form>
+    </AuthShell>
   );
 };
 

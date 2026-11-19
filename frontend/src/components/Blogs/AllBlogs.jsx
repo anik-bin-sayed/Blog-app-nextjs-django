@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   useBlogListQuery,
@@ -9,331 +9,206 @@ import {
   useSavedBlogsMutation,
 } from "@/redux/services/blogs/blogApi";
 import Card from "../cards/card";
-import CardLoader from "../utils/CardLoader";
 import { IoSearch, IoFilterOutline } from "react-icons/io5";
 import { RxCross1 } from "react-icons/rx";
-import { FcSearch } from "react-icons/fc";
 import { HiOutlineSearch } from "react-icons/hi";
 import { GrFormNextLink, GrFormPreviousLink } from "react-icons/gr";
 import { TbCategory } from "react-icons/tb";
 import { useSelector } from "react-redux";
 
-const AllBlogs = () => {
+const pageSize = 16;
+
+function StorySkeleton() {
+  return (
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {Array.from({ length: 8 }, (_, index) => (
+        <div key={index} className="overflow-hidden rounded-2xl border border-stone-200 bg-white">
+          <div className="aspect-[1.45/1] animate-pulse bg-stone-200" />
+          <div className="space-y-3 p-5">
+            <div className="h-3 w-1/3 animate-pulse rounded bg-stone-200" />
+            <div className="h-5 w-4/5 animate-pulse rounded bg-stone-200" />
+            <div className="h-3 w-full animate-pulse rounded bg-stone-100" />
+            <div className="h-3 w-2/3 animate-pulse rounded bg-stone-100" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default function AllBlogs() {
   const { auth, role } = useSelector((state) => state.auth);
-
-
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  const page = searchParams.get("page") || 1;
+  const page = Number(searchParams.get("page") || 1);
   const search = searchParams.get("search") || "";
   const ordering = searchParams.get("ordering") || "-created_at";
-
+  const categoryParam = searchParams.get("category") || "";
   const [localSaved, setLocalSaved] = useState(new Set());
-
   const [tempSearch, setTempSearch] = useState(search);
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState(categoryParam);
 
-  const { data, isLoading } = useBlogListQuery(
+  useEffect(() => {
+    setTempSearch(search);
+    setCategory(categoryParam);
+  }, [search, categoryParam]);
+
+  const { data, isLoading, isError } = useBlogListQuery(
     { page, search, ordering, category },
     { refetchOnMountOrArgChange: true },
   );
   const { data: categories } = useGetAllCategoriesQuery();
   const [savedBlogs] = useSavedBlogsMutation();
-  const { data: savedPosts } = useSavedBlogsListQuery(auth, {
-    skip: !auth,
-  });
+  const { data: savedPosts } = useSavedBlogsListQuery(auth, { skip: !auth });
 
   const posts = data?.results || [];
   const totalCount = data?.count || 0;
-  const pageSize = 16;
   const totalPages = Math.ceil(totalCount / pageSize);
   const hasNext = !!data?.next;
   const hasPrev = !!data?.previous;
 
   const updateURL = useCallback(
-    (newPage, newSearch, newOrdering) => {
+    (newPage, newSearch, newOrdering, newCategory = category) => {
       const params = new URLSearchParams();
       if (newPage && newPage !== 1) params.set("page", newPage);
       if (newSearch) params.set("search", newSearch);
-      if (newOrdering && newOrdering !== "-created_at")
-        params.set("ordering", newOrdering);
+      if (newOrdering && newOrdering !== "-created_at") params.set("ordering", newOrdering);
+      if (newCategory) params.set("category", newCategory);
       const queryString = params.toString();
-      router.push(queryString ? `?${queryString}` : window.location.pathname, {
-        scroll: false,
-      });
+      router.push(queryString ? `?${queryString}` : window.location.pathname, { scroll: false });
     },
-    [router],
+    [router, category],
   );
 
-  const handleSearchSubmit = useCallback(() => {
-    if (tempSearch === search) return;
-    updateURL(1, tempSearch, ordering);
-  }, [tempSearch, search, ordering, updateURL]);
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") handleSearchSubmit();
-  };
-
+  const handleSearchSubmit = () => updateURL(1, tempSearch.trim(), ordering);
   const handleClearSearch = () => {
-    if (tempSearch || search) {
-      setTempSearch("");
-      updateURL(1, "", ordering);
-    }
+    setTempSearch("");
+    updateURL(1, "", ordering);
   };
-
-  const handleOrderingChange = (value) => {
-    updateURL(1, search, value);
+  const handleOrderingChange = (value) => updateURL(1, search, value);
+  const handleCategoryChange = (value) => {
+    setCategory(value);
+    updateURL(1, search, ordering, value);
   };
-
   const goToPage = (newPage) => {
-    if (newPage === page) return;
+    if (newPage < 1 || newPage > totalPages || newPage === page) return;
     updateURL(newPage, search, ordering);
+    document.getElementById("all-stories")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
-
   const resetAllFilters = () => {
     setTempSearch("");
-    updateURL(1, "", "-created_at");
+    setCategory("");
+    updateURL(1, "", "-created_at", "");
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 500,
-      behavior: "smooth",
-    });
-  };
-  
-
-
-  const serverSavedIds = new Set(savedPosts?.map((item) => item.blog));
-
-  const finalSavedIds = new Set([...serverSavedIds, ...localSaved]);
+  const savedIds = new Set(savedPosts?.map((item) => item.id) || []);
+  const finalSavedIds = new Set([...savedIds, ...localSaved]);
 
   const handleSaveClick = async (id) => {
-    const isSaved = finalSavedIds.has(id);
-
-    if (!isSaved && finalSavedIds.size > 8) {
+    const wasSaved = finalSavedIds.has(id);
+    if (!wasSaved && finalSavedIds.size >= 8) {
       alert("Max 8 saved blogs");
       return;
     }
-
-    setLocalSaved((prev) => {
-      const newSet = new Set(prev);
-
-      if (isSaved) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
-
-      return newSet;
+    setLocalSaved((previous) => {
+      const next = new Set(previous);
+      wasSaved ? next.delete(id) : next.add(id);
+      return next;
     });
-
     try {
-      const res = await savedBlogs(id).unwrap();
+      await savedBlogs(id).unwrap();
     } catch (error) {
-      alert(error?.data?.message);
-
-      setLocalSaved((prev) => {
-        const newSet = new Set(prev);
-
-        if (isSaved) {
-          newSet.add(id);
-        } else {
-          newSet.delete(id);
-        }
-
-        return newSet;
+      alert(error?.data?.message || "Could not update your saved stories.");
+      setLocalSaved((previous) => {
+        const next = new Set(previous);
+        wasSaved ? next.add(id) : next.delete(id);
+        return next;
       });
     }
   };
-  const savedIds = new Set(savedPosts?.map((item) => item.id));
-
-  if (isLoading) {
-    return (
-      <CardLoader
-        title="All"
-        description="Explore all my articles, stories, and insights"
-      />
-    );
-  }
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="text-center mb-12 md:mb-16">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800">
-          All{" "}
-          <span className="text-amber-600 relative inline-block">
-            Stories
-            <span className="absolute bottom-0 left-0 w-full h-1 bg-amber-200 rounded-full -mb-2"></span>
-          </span>
-        </h2>
-        <p className="text-gray-600 max-w-2xl mx-auto mt-4 text-lg">
-          Explore all my articles, stories, and insights
-        </p>
-      </div>
-
-      <div className="max-w-4xl mx-auto mb-12">
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <IoSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl" />
-            <input
-              type="text"
-              value={tempSearch}
-              onChange={(e) => setTempSearch(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Search by title, category, content or excerpt..."
-              className="w-full pl-11 pr-10 py-2.5 border border-gray-200 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 bg-gray-50 text-amber-800 placeholder:text-gray-400 outline-0"
-              aria-label="Search blogs"
-            />
-            {tempSearch && (
-              <button
-                onClick={handleClearSearch}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg cursor-pointer"
-                aria-label="Clear search"
-              >
-                <RxCross1 />
-              </button>
-            )}
+    <section id="all-stories" className="scroll-mt-24 bg-[#faf7f0] px-5 py-12 sm:px-8 sm:py-16 lg:px-10 lg:py-20">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-800">The collection</p>
+            <h2 className="mt-2 font-serif text-3xl font-medium tracking-tight text-stone-900 sm:text-4xl">Explore the <span className="italic text-amber-800">archive</span></h2>
+            <p className="mt-2 text-sm leading-6 text-stone-600">Browse every story, or follow a thought that catches your eye.</p>
           </div>
-
-          <button
-            onClick={handleSearchSubmit}
-            className="px-6 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-md transition-all duration-200 font-medium shadow-sm hover:shadow-md cursor-pointer"
-          >
-            Search
-          </button>
-
-          {/* category */}
-          <div className="relative">
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="appearance-none pl-10 pr-8 py-2.5 border border-gray-200 rounded-xl bg-gray-50 text-gray-700 text-sm font-medium focus:ring-2 focus:ring-blue-500 cursor-pointer hover:bg-gray-100 transition-colors"
-            >
-              <option value="">All</option>
-              {categories &&
-                categories.map((category) => {
-                  return (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  );
-                })}
-            </select>
-            <TbCategory className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none text-lg" />
-          </div>
-          {/* ordering */}
-          <div className="relative">
-            <select
-              value={ordering}
-              onChange={(e) => handleOrderingChange(e.target.value)}
-              className="appearance-none pl-10 pr-8 py-2.5 border border-gray-200 rounded-xl bg-gray-50 text-gray-700 text-sm font-medium focus:ring-2 focus:ring-blue-500 cursor-pointer hover:bg-gray-100 transition-colors"
-            >
-              <option value="-created_at"> Newest first</option>
-              <option value="created_at"> Oldest first</option>
-            </select>
-            <IoFilterOutline className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none text-lg" />
-          </div>
+          {!isLoading && <p className="text-sm text-stone-500">{totalCount} {totalCount === 1 ? "story" : "stories"}</p>}
         </div>
 
-        {(search || ordering !== "-created_at") && (
-          <div className="mt-3 text-sm text-gray-500 flex flex-wrap items-center gap-2">
-            {search && (
-              <span className="bg-gray-100 px-2 py-1 rounded-full text-gray-700 flex gap-2 items-center">
-                <FcSearch />
-                Search: <strong>{search}</strong>
-              </span>
-            )}
-            {ordering !== "-created_at" && (
-              <span className="bg-gray-100 px-2 py-1 rounded-full text-gray-700">
-                {ordering === "created_at" ? "Oldest first" : "Newest first"}
-              </span>
-            )}
-            <button
-              onClick={resetAllFilters}
-              className="text-blue-600 hover:text-blue-800 text-xs hover:underline ml-2 cursor-pointer"
-            >
-              Clear all filters
-            </button>
-          </div>
-        )}
-      </div>
-
-      {posts.length === 0 ? (
-        <div className="text-center py-20 bg-gray-50 rounded-2xl">
-          <div className="text-6xl mb-4  flex items-center justify-center">
-            <HiOutlineSearch />
-          </div>
-          <h3 className="text-xl font-semibold text-gray-700">
-            No blogs found
-          </h3>
-          <p className="text-gray-500 mt-2">
-            Try adjusting your search or filters
-          </p>
-          <button
-            onClick={resetAllFilters}
-            className="mt-4 px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition cursor-pointer"
-          >
-            Reset all filters
-          </button>
-        </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {posts.map((post) => {
-              const isSaved = savedIds.has(post.id);
-              return (
-                <Card
-                  key={post.id}
-                  post={post}
-                  role={role}
-                  onSave={handleSaveClick}
-                  savedButton={true}
-                  isSaved={isSaved}
-                />
-              );
-            })}
+        <div className="mb-9 rounded-2xl border border-stone-200 bg-white p-3 shadow-[0_12px_35px_-28px_rgba(41,32,22,0.4)] sm:p-4">
+          <div className="grid gap-3 lg:grid-cols-[minmax(240px,1fr)_190px_190px_auto]">
+            <div className="relative">
+              <IoSearch className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-lg text-stone-400" />
+              <input
+                type="search"
+                value={tempSearch}
+                onChange={(event) => setTempSearch(event.target.value)}
+                onKeyDown={(event) => event.key === "Enter" && handleSearchSubmit()}
+                placeholder="Search stories, topics, or ideas..."
+                className="h-12 w-full rounded-xl border border-stone-200 bg-[#faf9f6] pl-11 pr-10 text-sm text-stone-800 outline-none transition placeholder:text-stone-400 focus:border-amber-700 focus:ring-4 focus:ring-amber-700/10"
+                aria-label="Search stories"
+              />
+              {tempSearch && <button type="button" onClick={handleClearSearch} className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-2 text-stone-400 transition hover:bg-stone-200 hover:text-stone-800" aria-label="Clear search"><RxCross1 className="text-xs" /></button>}
+            </div>
+            <label className="relative">
+              <TbCategory className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-lg text-stone-400" />
+              <select value={category} onChange={(event) => handleCategoryChange(event.target.value)} className="h-12 w-full appearance-none rounded-xl border border-stone-200 bg-[#faf9f6] pl-10 pr-8 text-sm text-stone-700 outline-none transition focus:border-amber-700 focus:ring-4 focus:ring-amber-700/10" aria-label="Filter by category">
+                <option value="">All categories</option>
+                {categories?.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+              </select>
+            </label>
+            <label className="relative">
+              <IoFilterOutline className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-lg text-stone-400" />
+              <select value={ordering} onChange={(event) => handleOrderingChange(event.target.value)} className="h-12 w-full appearance-none rounded-xl border border-stone-200 bg-[#faf9f6] pl-10 pr-8 text-sm text-stone-700 outline-none transition focus:border-amber-700 focus:ring-4 focus:ring-amber-700/10" aria-label="Sort stories">
+                <option value="-created_at">Newest first</option>
+                <option value="created_at">Oldest first</option>
+              </select>
+            </label>
+            <button type="button" onClick={handleSearchSubmit} className="h-12 rounded-xl bg-stone-900 px-6 text-sm font-semibold text-white transition hover:bg-amber-900 focus:outline-none focus:ring-4 focus:ring-amber-700/20">Search stories</button>
           </div>
 
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-3 mt-12 flex-wrap">
-              <button
-                onClick={() =>{
-                  goToPage(page - 1);
-                  scrollToTop();
-                }}
-                disabled={!hasPrev}
-                className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-sm flex items-center gap-2 hover:border hover:border-amber-700 cursor-pointer"
-              >
-                <GrFormPreviousLink />
-                Previous
-              </button>
-
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">Page</span>
-                <strong className="px-3 py-1 bg-gray-100 rounded-lg text-gray-800 text-sm">
-                  {page}
-                </strong>
-                <span className="text-sm text-gray-600">of {totalPages}</span>
-              </div>
-
-              <button
-                onClick={() =>{
-                  goToPage(page + 1);
-                  scrollToTop();
-                }}
-                disabled={!hasNext}
-                className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-sm flex items-center gap-2 hover:border hover:border-amber-700 cursor-pointer"
-              >
-                Next <GrFormNextLink />
-              </button>
+          {(search || category || ordering !== "-created_at") && (
+            <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-stone-100 px-1 pt-3 text-xs text-stone-500">
+              <span className="mr-1 font-medium text-stone-600">Showing:</span>
+              {search && <span className="rounded-full bg-amber-50 px-3 py-1.5 text-amber-900">“{search}”</span>}
+              {category && <span className="rounded-full bg-amber-50 px-3 py-1.5 text-amber-900">{categories?.find((item) => String(item.id) === String(category))?.name || "Selected category"}</span>}
+              {ordering !== "-created_at" && <span className="rounded-full bg-stone-100 px-3 py-1.5 text-stone-700">Oldest first</span>}
+              <button type="button" onClick={resetAllFilters} className="ml-auto font-semibold text-amber-800 transition hover:text-amber-950">Clear filters</button>
             </div>
           )}
-        </>
-      )}
-    </div>
-  );
-};
+        </div>
 
-export default AllBlogs;
+        {isLoading ? <StorySkeleton /> : isError ? (
+          <div className="rounded-2xl border border-stone-200 bg-white px-6 py-16 text-center">
+            <p className="font-serif text-2xl text-stone-900">The stories couldn’t load just now.</p>
+            <p className="mt-2 text-sm text-stone-500">Please try again in a moment.</p>
+          </div>
+        ) : posts.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-stone-300 bg-white/70 px-6 py-16 text-center">
+            <HiOutlineSearch className="mx-auto text-4xl text-stone-400" />
+            <h3 className="mt-4 font-serif text-2xl text-stone-900">No stories found</h3>
+            <p className="mt-2 text-sm text-stone-500">Try a different search or clear your filters.</p>
+            <button type="button" onClick={resetAllFilters} className="mt-5 rounded-full bg-stone-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-900">Clear filters</button>
+          </div>
+        ) : (
+          <>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {posts.map((post) => <Card key={post.id} post={post} role={role} onSave={handleSaveClick} savedButton isSaved={savedIds.has(post.id)} />)}
+            </div>
+            {totalPages > 1 && (
+              <nav aria-label="Story pages" className="mt-12 flex flex-wrap items-center justify-center gap-4">
+                <button type="button" onClick={() => goToPage(page - 1)} disabled={!hasPrev} className="inline-flex items-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold text-stone-700 transition hover:border-amber-800 hover:text-amber-900 disabled:cursor-not-allowed disabled:opacity-40"><GrFormPreviousLink className="text-lg" /> Previous</button>
+                <span className="text-sm text-stone-600">Page <strong className="mx-1 text-stone-900">{page}</strong> of <strong className="text-stone-900">{totalPages}</strong></span>
+                <button type="button" onClick={() => goToPage(page + 1)} disabled={!hasNext} className="inline-flex items-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold text-stone-700 transition hover:border-amber-800 hover:text-amber-900 disabled:cursor-not-allowed disabled:opacity-40">Next <GrFormNextLink className="text-lg" /></button>
+              </nav>
+            )}
+          </>
+        )}
+      </div>
+    </section>
+  );
+}

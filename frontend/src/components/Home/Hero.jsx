@@ -1,136 +1,55 @@
-"use client";
 import Image from "next/image";
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
+import { FaArrowRight, FaRegCompass } from "react-icons/fa";
 
-const Hero = () => {
-  const slides = [
-    {
-      id: 1,
-      url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=700&fit=crop",
-      alt: "Mountain landscape with sunset",
-      title: "Inspire. Learn. Grow",
-      description:
-        "Sharing lessons, experiences and insights to inspire a better tomorrow",
-    },
-    {
-      id: 2,
-      url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&h=700&fit=crop",
-      alt: "Forest with sunlight rays",
-      title: "Life is a collection of moments and words",
-      description:
-        "Join me as I write about life, travel, productivity and everything in between",
-    },
-  ];
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const intervalRef = useRef(null > null);
-
-  const goToPrevious = useCallback(() => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? slides.length - 1 : prevIndex - 1,
-    );
-    setTimeout(() => setIsTransitioning(false), 500);
-  }, [isTransitioning, slides.length]);
-
-  const goToNext = useCallback(() => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setCurrentIndex((prevIndex) =>
-      prevIndex === slides.length - 1 ? 0 : prevIndex + 1,
-    );
-    setTimeout(() => setIsTransitioning(false), 500);
-  }, [isTransitioning, slides.length]);
-
-  const goToSlide = useCallback(
-    (index) => {
-      if (isTransitioning || index === currentIndex) return;
-      setIsTransitioning(true);
-      setCurrentIndex(index);
-      setTimeout(() => setIsTransitioning(false), 500);
-    },
-    [isTransitioning, currentIndex],
-  );
-
-  const startAutoPlay = useCallback(() => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length);
-    }, 5000);
-  }, [slides.length]);
-
-  const stopAutoPlay = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  }, []);
-
-  useEffect(() => {
-    startAutoPlay();
-    return () => stopAutoPlay();
-  }, [startAutoPlay, stopAutoPlay]);
-
-  const currentSlide = slides[currentIndex];
-
+export default function Hero() {
   return (
-    <div
-      className="relative h-[calc(100vh-65px)] w-full overflow-hidden group"
-      onMouseEnter={stopAutoPlay}
-      onMouseLeave={startAutoPlay}
-    >
-      <div className="absolute inset-0 w-full h-full">
-        <Image
-          src={currentSlide.url}
-          alt={currentSlide.alt}
-          fill
-          priority
-          sizes="100vw"
-          className={`object-cover transition-transform duration-700 ease-out scale-105 group-hover:scale-100 ${
-            isTransitioning ? "opacity-95" : "opacity-100"
-          }`}
-        />
-      </div>
+    <section className="overflow-hidden bg-[#faf7f0]">
+      <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[0.94fr_1.06fr] lg:gap-16 lg:px-10 lg:py-20">
+        <div className="relative z-10 max-w-xl">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-amber-900/10 bg-white/70 px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-amber-900">
+            <FaRegCompass className="text-amber-700" /> A journal for the curious
+          </div>
+          <h1 className="font-serif text-[3.25rem] font-medium leading-[1.04] tracking-[-0.045em] text-stone-900 sm:text-6xl lg:text-[4.55rem]">
+            Stories that make you <span className="italic text-amber-800">see things differently.</span>
+          </h1>
+          <p className="mt-6 max-w-lg text-base leading-7 text-stone-600 sm:text-lg sm:leading-8">
+            A thoughtful collection of ideas, experiences, and places. Take a breath, find a story, and follow where it leads.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center gap-4">
+            <Link href="/blogs" className="group inline-flex items-center gap-3 rounded-full bg-stone-900 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-stone-900/10 transition hover:-translate-y-0.5 hover:bg-amber-900">
+              Explore the stories <FaArrowRight className="text-xs transition-transform group-hover:translate-x-1" />
+            </Link>
+            <span className="text-sm text-stone-500">Good reads, at your own pace.</span>
+          </div>
+          <div className="mt-10 flex items-center gap-3 border-t border-stone-300/70 pt-5 text-xs font-medium uppercase tracking-[0.15em] text-stone-500">
+            <span className="h-px w-9 bg-amber-700" /> Read. Reflect. Wander.
+          </div>
+        </div>
 
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/20" />
-
-      <div className="absolute inset-0 shadow-inner pointer-events-none" />
-
-      <div className="absolute inset-0 flex flex-col items-center justify-end pb-32 md:pb-40 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <div
-            className={`transition-all duration-700 delay-100 transform ${
-              isTransitioning
-                ? "translate-y-4 opacity-0"
-                : "translate-y-0 opacity-100"
-            }`}
-          >
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 drop-shadow-2xl tracking-tight">
-              {currentSlide.title}
-            </h1>
-            <div className="w-24 h-1 bg-amber-400/80 mx-auto my-6 rounded-full" />
-            <p className="text-md md:text-md lg:text-xl text-white/90 max-w-2xl mx-auto drop-shadow-lg leading-relaxed">
-              {currentSlide.description}
-            </p>
-            <button className="mt-8 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/30 rounded-full text-white font-medium hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:border-white/50 shadow-lg cursor-pointer">
-              Discover More
-            </button>
+        <div className="relative mx-auto w-full max-w-2xl lg:ml-auto">
+          <div className="absolute -right-8 -top-8 h-40 w-40 rounded-full bg-amber-200/40 blur-3xl" />
+          <div className="relative aspect-[1.13/1] overflow-hidden rounded-[2rem] bg-stone-200 shadow-[0_30px_80px_-35px_rgba(54,39,22,0.45)] sm:aspect-[1.25/1]">
+            <Image
+              src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1400&h=1100&fit=crop&auto=format"
+              alt="A quiet mountain lake surrounded by forests"
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 54vw"
+              className="object-cover transition duration-700 hover:scale-[1.03]"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-stone-950/55 via-transparent to-stone-950/5" />
+            <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-9">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-200">A little inspiration</p>
+              <p className="mt-2 max-w-md font-serif text-2xl leading-tight sm:text-3xl">Make room for a new perspective.</p>
+            </div>
+          </div>
+          <div className="absolute -bottom-5 left-4 hidden rounded-2xl border border-white/70 bg-[#fffdf9]/95 px-5 py-4 shadow-xl backdrop-blur sm:block lg:-left-8">
+            <span className="block font-serif text-2xl text-stone-900">Globira</span>
+            <span className="mt-0.5 block text-[10px] uppercase tracking-[0.17em] text-stone-500">Stories & ideas</span>
           </div>
         </div>
       </div>
-
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20 z-20">
-        <div
-          key={currentIndex}
-          className="h-full bg-amber-400 transition-all duration-5000ms linear"
-          style={{ width: "100%" }}
-          onAnimationEnd={() => {}}
-        />
-      </div>
-    </div>
+    </section>
   );
-};
-
-export default Hero;
+}

@@ -16,19 +16,19 @@ const Card = ({ post, onSave, savedButton = false, isSaved, role }) => {
   const isButtonShown = savedButton && auth && role === "user";
 
   return (
-    <article className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer border border-gray-100">
+    <article className="group flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-stone-200/90 bg-[#fffdf9] shadow-[0_10px_30px_-24px_rgba(41,32,22,0.45)] transition duration-300 hover:-translate-y-1 hover:border-amber-900/20 hover:shadow-[0_24px_45px_-28px_rgba(41,32,22,0.4)]">
       <Link href={`/blogs/${post.slug}`}>
-        <div className="relative h-52 overflow-hidden bg-gray-100">
+        <div className="relative aspect-[1.45/1] overflow-hidden bg-stone-200">
           <Image
             src={post.image || ""}
             alt={post.title}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             fill
             priority
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           />
           {/* Category badge */}
-          <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-amber-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm select-none">
+          <div className="absolute left-4 top-4 rounded-full border border-white/70 bg-[#fffdf9]/95 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-amber-900 shadow-sm backdrop-blur-sm select-none">
             {post.category}
           </div>
 
@@ -49,34 +49,34 @@ const Card = ({ post, onSave, savedButton = false, isSaved, role }) => {
         </div>
       </Link>
 
-      <div className="p-5 flex-1 flex flex-col">
-        <div className="flex items-center text-xs text-gray-500 mb-2 space-x-2 tracking-wide select-none">
-          <span className="font-medium">
-            {new Date(post.created_at).toLocaleDateString("en-BD", {
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
+        <div className="mb-3 flex items-center gap-2 text-[11px] font-medium tracking-wide text-stone-500 select-none">
+          <span>
+            {post.created_at ? new Date(post.created_at).toLocaleDateString("en-BD", {
               year: "numeric",
               month: "long",
               day: "numeric",
-            })}
+            }) : "Recently published"}
           </span>
           <span>•</span>
-          <span>{post.readTime}</span>
+          <span>{post.readTime || "5 min read"}</span>
         </div>
         <Link href={`/blogs/${post.slug}`}>
-          <h3 className="text-md font-bold text-gray-800 mb-2 group-hover:text-amber-600 transition-colors leading-tight select-none">
-            {post.title.slice(0, 28) + (post.title.length > 28 ? "..." : "")}
+          <h3 className="mb-2 line-clamp-2 font-serif text-xl font-semibold leading-snug text-stone-900 transition-colors group-hover:text-amber-900 select-none">
+            {post.title}
           </h3>
         </Link>
 
-        <p className="text-gray-600 text-sm leading-relaxed mb-4 flex-1 line-clamp-3 select-none">
+        <p className="mb-5 line-clamp-3 flex-1 text-sm leading-6 text-stone-600 select-none">
           {post.excerpt}
         </p>
 
         <Link
           href={`/blogs/${post.slug || ""}`}
-          className="self-start flex items-center text-amber-600 font-medium text-sm hover:text-amber-700 transition-colors group/btn cursor-pointer select-none"
+          className="group/btn inline-flex items-center self-start text-sm font-semibold text-amber-900 transition-colors hover:text-amber-700 select-none"
         >
           <span>Read more</span>
-          <FaArrowRight className="h-4 w-4 ml-2 transition-transform duration-200 group-hover/btn:translate-x-1 select-none" />
+          <FaArrowRight className="ml-2 h-3 w-3 transition-transform duration-200 group-hover/btn:translate-x-1 select-none" />
         </Link>
       </div>
     </article>

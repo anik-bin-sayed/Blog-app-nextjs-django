@@ -1,15 +1,16 @@
 import Dashboard from "@/components/Dashboard";
 import GlobalLoader from "@/components/Loader/GlobalLoader";
-import React, { Suspense } from "react";
+import { Suspense } from "react";
 
-const page = () => {
-  return (
-    <>
-      <Suspense fallback={<GlobalLoader />}>
-        <Dashboard />
-      </Suspense>
-    </>
-  );
+export const metadata = {
+  title: "Admin Dashboard | Globira",
+  description: "Manage stories, readers, and activity for the Globira journal.",
 };
 
-export default page;
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<GlobalLoader />}>
+      <Dashboard />
+    </Suspense>
+  );
+}

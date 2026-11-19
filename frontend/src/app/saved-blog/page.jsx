@@ -1,12 +1,10 @@
 import SavedBlog from "@/components/SavedBlog";
-import React from "react";
 
-const page = () => {
-  return (
-    <div className="bg-amber-50 min-h-screen py-10 px-4 sm:px-6">
-      <SavedBlog />
-    </div>
-  );
+export const metadata = {
+  title: "Saved Stories | Globira",
+  description: "Your personal collection of stories saved for later reading.",
 };
 
-export default page;
+export default function SavedBlogPage() {
+  return <SavedBlog />;
+}

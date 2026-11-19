@@ -2,11 +2,12 @@ import React from "react";
 import Link from "next/link";
 
 
-const Logo = ({postion="header"}) => {
+const Logo = ({ position = "header", postion }) => {
+  const placement = postion || position;
   return (
     <Link href="/" className="group flex items-center gap-2 shrink-0">
       <div className="flex flex-col">
-        <span className={`text-2xl md:text-3xl font-medium text-black select-none tracking-wide ${postion === "header" ? "text-black" : "text-white"}`}>
+        <span className={`text-2xl md:text-3xl font-semibold text-black select-none tracking-wide ${placement === "header" ? "text-stone-900" : "text-white"}`}>
           Globir
           <span className="relative">
             a
@@ -14,8 +15,8 @@ const Logo = ({postion="header"}) => {
           </span>
         </span>
 
-        <span className={`text-[10px] pl-2 md:text-xs text-gray-500  -mt-1 tracking-wide select-none ${postion === "header" ? "text-gray-500" : "text-white"}`}>
-          Travel & Adventure
+        <span className={`pl-2 text-[10px] tracking-[0.12em] -mt-1 select-none md:text-[11px] ${placement === "header" ? "text-stone-500" : "text-stone-400"}`}>
+          Stories & Ideas
         </span>
       </div>
     </Link>

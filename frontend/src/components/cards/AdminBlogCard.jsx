@@ -38,25 +38,25 @@ const AdminBlogCard = ({ blog, onEdit }) => {
   };
 
   return (
-    <div className="group bg-white rounded-xl shadow-md border  border-gray-100 overflow-hidden transition-all duration-300 flex flex-col transform hover:-translate-y-1">
-      <div className="relative h-44 w-full overflow-hidden bg-gray-200">
+    <article className="group flex flex-col overflow-hidden rounded-2xl border border-stone-200 bg-[#fffdf9] shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg">
+      <div className="relative aspect-[1.65/1] w-full overflow-hidden bg-stone-200">
         <Link href={`/blogs/${blog.slug}`}>
           <Image
             src={blog.image}
             alt={blog.title}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
             priority={false}
           />
         </Link>
 
         <div className="absolute top-3 right-3 z-10">
           <span
-            className={`text-xs px-2.5 py-1 rounded-full font-medium shadow-md backdrop-blur-sm ${
+            className={`rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide shadow-md backdrop-blur-sm ${
               blog.is_public
-                ? "bg-green-500/90 text-white"
-                : "bg-amber-500/90 text-white"
+                ? "bg-emerald-700/90 text-white"
+                : "bg-stone-800/90 text-white"
             }`}
           >
             {blog.is_public ? "Published" : "Draft"}
@@ -64,32 +64,32 @@ const AdminBlogCard = ({ blog, onEdit }) => {
         </div>
       </div>
 
-      <div className="p-4 flex-1 ">
+      <div className="flex-1 p-5">
         <Link
           href={`/blogs/${blog.slug}`}
-          className="text-lg font-bold text-gray-900 line-clamp-2 group-hover:text-yellow-600 transition cursor-pointer"
+          className="line-clamp-2 font-serif text-xl font-semibold leading-snug text-stone-900 transition group-hover:text-amber-900 cursor-pointer"
         >
           {blog.title}
         </Link>
-        <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
-          <span className="font-medium">Category:</span> {blog.category}
+        <p className="mt-2 text-xs font-medium text-stone-500">
+          {blog.category}
         </p>
-        <p className="text-gray-600 text-sm mt-2 line-clamp-3 leading-relaxed">
+        <p className="mt-3 line-clamp-3 text-sm leading-6 text-stone-600">
           {blog.excerpt}
         </p>
-        <div className="flex items-center gap-2 mt-4 text-xs text-gray-400">
-          <CiTimer className="w-3.5 h-3.5" />
+        <div className="mt-4 flex items-center gap-2 text-xs text-stone-500">
+          <CiTimer className="h-3.5 w-3.5 text-amber-800" />
           <span>{formatDate(blog.created_at)}</span>
         </div>
       </div>
 
-      <div className="border-t border-gray-100 px-5 py-3 bg-gray-50/80 flex justify-between items-center">
+      <div className="flex items-center justify-between border-t border-stone-200 bg-[#faf7f0] px-5 py-3">
         <button
           onClick={() => handleToggleStatus(blog.id)}
           className={`text-xs font-medium px-2 py-1 rounded-full transition ${
             blog.is_public
-              ? "text-amber-600 hover:bg-amber-50"
-              : "text-green-600 hover:bg-green-50"
+            ? "text-stone-600 hover:bg-amber-100 hover:text-amber-950"
+              : "text-emerald-800 hover:bg-emerald-50"
           }`}
         >
           {blog.is_public ? "→ Draft" : "→ Publish"}
@@ -97,21 +97,21 @@ const AdminBlogCard = ({ blog, onEdit }) => {
         <div className="flex gap-3">
           <button
             onClick={() => onEdit(blog)}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium transition flex items-center gap-1"
+            className="flex items-center gap-1 text-xs font-semibold text-stone-600 transition hover:text-amber-900"
           >
             <FaEdit size={14} /> Edit
           </button>
 
           <button
             onClick={() => handleDelete(blog.id)}
-            className="text-red-500 hover:text-red-700 text-sm font-medium transition flex items-center gap-1"
+            className="flex items-center gap-1 text-xs font-semibold text-rose-700 transition hover:text-rose-900"
           >
             <FaTrashAlt size={14} />
             Delete
           </button>
         </div>
       </div>
-    </div>
+    </article>
   );
 };
 
